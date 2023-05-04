@@ -1,0 +1,29 @@
+body {
+    overflow-y: hidden; /* Hide vertical scrollbar */
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+.token.operator {
+    background: none !important;
+}
+
+.code-block-container {
+    position: relative;
+  }
+
+  .copy-code-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+  
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+
+  pre {
+    position: relative;
+    z-index: 0;
+  }
+
+
