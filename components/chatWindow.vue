@@ -11,8 +11,12 @@
                 </option>
             </select>
         </div>
-        <div class="flex justify-center p-2 sm:h-[calc(90%-2rem)] lg:h-[calc(90%-2rem)] xl:h-[calc(90%-2rem)] 2xl:h-[calc(94%-2rem)]">
-            <div class=" overflow-y-auto mb-4 w-1/2" ref="chatWindow" style="overflow-y: scroll; scroll-snap-align: end;" >
+
+
+
+
+        <div class="flex justify-center p-2 overflow-y-auto sm:h-[calc(90%-2rem)] lg:h-[calc(90%-2rem)] xl:h-[calc(90%-2rem)] 2xl:h-[calc(94%-2rem)]">
+            <div class=" mb-4 w-auto px-4" ref="chatWindow" style="overflow-y: scroll; scroll-snap-align: end;" >
 
 
 
@@ -35,6 +39,26 @@
                             <div class="bg-blue-100 text-black shadow rounded-b-lg rounded-r-lg py-2 px-4 inline-block ml-2 prose" v-if="ai_messages[index]">
                                 <!-- <p>{{ ai_messages[index] }}</p> -->
                                 <div v-html="renderMarkdown(ai_messages[index].content)"></div>
+
+                                <div v-show="ai_messages[index].source_documents">
+                                    <span >Sources:</span>
+                                    <div v-for="(source_document, source_index) in ai_messages[index].source_documents" :key="source_index">
+                                        <Disclosure v-slot="{ open }">
+                                            <DisclosureButton
+                                            class="flex w-full border border-gray-300 justify-between rounded-lg bg-gray-100 px-4 py-2 my-1 text-left text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
+                                            >
+                                            <span> {{ getSourceName(source_document.metadata.source) }}</span>
+                                            <ChevronUpIcon
+                                                :class="open ? 'rotate-180 transform' : ''"
+                                                class="h-5 w-5 text-gray-500"
+                                            />
+                                            </DisclosureButton>
+                                            <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
+                                            {{ source_document.page_content }}
+                                            </DisclosurePanel>
+                                        </Disclosure>
+                                    </div>
+                                </div>
 
                             </div>
                         </div>
@@ -61,12 +85,20 @@
 
 
 <script>
+import {
+    Disclosure,
+    DisclosureButton,
+    DisclosurePanel,
+  } from '@headlessui/vue';
 
+import { ChevronUpIcon } from '@heroicons/vue/20/solid';
 import MarkdownIt from 'markdown-it';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism-okaidia.css';
 import ClipboardJS from 'clipboard';
+
+const exampleCode = `test`;
 
 export default {
     setup() {
@@ -80,6 +112,7 @@ export default {
             highlight: (str, lang) => {
                 if (lang && Prism.languages[lang]) {
                     try {
+
                         return Prism.highlight(str, Prism.languages[lang], lang);
                     } catch (error) {
                         console.error(`Error highlighting code with Prism: ${error}`);
@@ -90,7 +123,6 @@ export default {
             },
         });
 
-
         markdown.renderer.rules.fence = (tokens, idx, options, env, self) => {
         const token = tokens[idx];
         const code = token.content.trim();
@@ -98,10 +130,14 @@ export default {
 
         const content = `
             <div class="code-block-container">
-            <pre class="language-${token.info}"><code>${escapedCode}</code></pre>
-            <button class="copy-code-button border border-gray-100 text-gray-100 rounded px-1" data-clipboard-text="${escapedCode}"><i class="fas fa-copy"></i></button>
+                <pre class="language-${token.info}"><code>${escapedCode}</code></pre>
+                <button class="copy-code-button border border-gray-300 text-gray-300 rounded px-1 hover:text-white hover:border-white" data-clipboard-text="${escapedCode}" data-unique-id="${idx}">
+                    <i class="icon fas fa-copy"></i>
+                    <i class="icon fas fa-check" style="display:none;"></i>
+                </button>
             </div>
-        `
+        `;
+
 
         return content;
         }
@@ -117,6 +153,7 @@ export default {
     },
     data() {
         return {
+            exampleCode,
             conversationId: '',
             message: '',
             copySuccess: new Set(),
@@ -132,14 +169,25 @@ export default {
         this.$nextTick(() => {
             const clipboard = new ClipboardJS('.copy-code-button');
             clipboard.on('success', (e) => {
-                alert('Copied to clipboard!');
+                console.log('Copied to clipboard!');
+                const uniqueId = e.trigger.getAttribute('data-unique-id');
+                const icons = e.trigger.querySelectorAll('.icon');
+                icons[0].style.display = 'none';
+                icons[1].style.display = 'inline-block';
+                e.trigger.disabled = true; // Disable the button
+                setTimeout(() => {
+                    icons[1].style.display = 'none';
+                    icons[0].style.display = 'inline-block';
+                    e.trigger.disabled = false; // Re-enable the button
+                }, 1500);
                 e.clearSelection();
             });
 
             clipboard.on('error', (e) => {
-                alert('Failed to copy to clipboard!');
+            console.log('Failed to copy to clipboard!');
             });
         });
+        // TODO: Think about how to handle this better
         const supabase = this.initSupabase();
         if (this.$route.params.id){
             this.conversationId = this.$route.params.id
@@ -195,28 +243,6 @@ export default {
           }
 
         },
-        async copyToClipboard(event, codeBlock) {
-            const button = event.target;
-
-            const clipboard = new ClipboardJS(button, {
-                text: () => codeBlock.textContent,
-            });
-
-            clipboard.on('success', () => {
-                this.copySuccess.add(button);
-
-                setTimeout(() => {
-                    this.copySuccess.delete(button);
-                }, 1500);
-
-                clipboard.destroy();
-            });
-
-            clipboard.on('error', () => {
-                console.error('Error copying to clipboard');
-                clipboard.destroy();
-            });
-        },
         async scrollToBottom() {
             await nextTick();
 
@@ -228,33 +254,30 @@ export default {
             }
         },
         async loadMessages(supabase) {
-                const { data: messages, error } = await supabase
-                    .from('messages')
-                    .select('id, sender, content, source_documents')
-                    .order('id', { ascending: true })
-                    .eq('conversation_id', this.conversationId)
+            const { data: messages, error } = await supabase
+                .from('messages')
+                .select('id, sender, content, source_documents')
+                .order('id', { ascending: true })
+                .eq('conversation_id', this.conversationId)
 
-
-
-
-                if (error) {
-                    console.log(error)
-                    alert('There was an error loading your messages')
-                }else{
-                    // Assuming the backend returns an array of messages with a sender and data properties
-                    const user_session = await this.getSession(supabase)
-                    if (user_session) {
-                        this.setUserAvatar(user_session.user.user_metadata.avatar_url)
-                    }
-                    messages.forEach((message) => {
-                        if (message.sender === 'ai') {
-                            this.ai_messages.push({"content":message.content, "source_documents": message.source_documents});
-                        } else {
-                            this.user_messages.push({"content":message.content});
-                        }
-                    });
-
+            if (error) {
+                console.log(error)
+                alert('There was an error loading your messages')
+            }else{
+                // Assuming the backend returns an array of messages with a sender and data properties
+                const user_session = await this.getSession(supabase)
+                if (user_session) {
+                    this.setUserAvatar(user_session.user.user_metadata.avatar_url)
                 }
+                messages.forEach((message) => {
+                    if (message.sender === 'ai') {
+                        this.ai_messages.push({"content":message.content, "source_documents": message.source_documents});
+                    } else {
+                        this.user_messages.push({"content":message.content});
+                    }
+                });
+
+            }
 
         },
         async insertData(supabase, table, data){
@@ -268,7 +291,6 @@ export default {
             }
 
         },
-
         async queryModel() {
             const supabase = this.initSupabase()
             const user_session = await this.getSession(supabase)
@@ -316,8 +338,8 @@ export default {
                         response_dict = JSON.parse(json_string);
                         if (response_dict.source_documents.length > 0) {
                             result += chunk.split(delimiter)[0];
-                            const matchingDataSource = this.dataSources.find(dataSource => dataSource.id == this.selectedDataType);
-                            this.ai_messages.splice(index, 1, {"content": result + " " + `Source: ${matchingDataSource.name}`});
+
+                            this.ai_messages.splice(index, 1, {"content": result , "source_documents": response_dict.source_documents});
                         }
 
                     }else{
@@ -357,10 +379,27 @@ export default {
                 ]
             )
 
-
-
+        },
+        getSourceName(id){
+            const matchingDataSource =  this.dataSources.find(dataSource => dataSource.id == id);
+            return matchingDataSource ? matchingDataSource["name"] : "Unknown";
+        }
+    },
+    watch: {
+        ai_messages: {
+            handler: function (val, oldVal) {
+                this.highlightCode();
+            },
+            deep: true
         },
     },
+    components: {
+        Disclosure,
+        DisclosureButton,
+        DisclosurePanel,
+        ChevronUpIcon,
+    }
+
 };
 </script>
 
