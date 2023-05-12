@@ -1,41 +1,42 @@
 <template>
     <!-- Side Navbar -->
-    <div class="w-64 bg-white p-4 flex flex-col" id="mainSideNavbar">
+    <div class="w-64 bg-white p-4 flex flex-col border-r border-gray-200" id="mainSideNavbar">
         <nav>
-            <div class="py-2 font-semibold mb-4 text-center">
+            <div class="flex py-2 font-semibold mb-4 text-center justify-between">
                 <img src="~~/assets/logos/kulissiwa.svg" width="32" height="32" alt="Kulissiwa Logo">
+                <ChevronDoubleLeftIcon class="w-8 h-8 text-gray-600 py-1 px-2 rounded-full hover:bg-sky-100" id="collapseButton" @click="collapse" />
             </div>
-            <button id="collapseButton" @click="collapse" class="block py-2 px-2 mb-2 rounded hover:bg-gray-100">
-                <i class="fa-solid fa-arrow-left pr-1 "></i>
-                <span></span>
+            <button v-show="collapsed" @click="collapse" class="block py-2 px-2 mb-2 font-semibold rounded-full hover:bg-sky-100">
+                <Bars3Icon class="w-4 h-4 text-gray-600"/>
             </button>
-            <NuxtLink to="/dashboard" class="block py-2 px-2 mb-2 rounded-full hover:bg-gray-100">
+            <NuxtLink to="/dashboard" class="block py-1 px-2 mb-2 rounded-full hover:bg-sky-100">
                 <i class="fa-solid fa-cubes pr-1"></i>
                 <span>Dashboard</span>
             </NuxtLink>
-            <NuxtLink to="/dataSources" class="block py-2 px-2 mb-2 rounded-full hover:bg-gray-100">
+            <NuxtLink to="/dataSources" class="block py-1 px-2 mb-2 rounded-full hover:bg-sky-100">
                 <i class="fa-solid fa-database pr-1"></i>
                 <span>Data Sources </span>
             </NuxtLink>
-            <NuxtLink to="/chats"  class="block py-2 px-2 mb-2 rounded-full hover:bg-gray-100">
+            <NuxtLink to="/chats"  class="block py-1 px-2 mb-2 rounded-full hover:bg-sky-100">
                 <i class="fa-solid fa-comments fa-sm pr-1"></i>
                 <span>Chats</span>
             </NuxtLink>
 
-            <NuxtLink to="/keys" class="block py-2 px-2 mb-2 rounded-full hover:bg-gray-100">
+            <NuxtLink to="/keys" class="block py-1 px-2 mb-2 rounded-full hover:bg-sky-100">
                 <i class="fa-solid fa-credit-card pr-1"></i>
                 <span>Billing</span>
             </NuxtLink>
         </nav>
 
-        <hr class="mt-auto w-full h-px my-2 border-0 dark:bg-gray-300">
-            <div class="mb-4 py-2 px-2 flex items-start rounded-full hover:bg-gray-100">
+        <hr class="mt-auto w-full h-px my-2 border dark:bg-gray-300">
 
-                <a class="block" @click="signOut">
-                    <i class="fa-solid fa-right-from-bracket"></i> <span id="logOut">Logout</span>
-                </a>
-            </div>
-        <div class="mb-2 p-1 flex items-start rounded-full hover:bg-gray-100">
+        <div class="mb-4 py-2 px-2 flex items-start rounded-full hover:bg-sky-100">
+
+            <a class="block" @click="signOut">
+                <i class="fa-solid fa-right-from-bracket"></i> <span id="logOut">Logout</span>
+            </a>
+        </div>
+        <div class="mb-2 p-1 flex items-start rounded-full hover:bg-sky-100">
 
             <img class="w-12 h-12 rounded-full border-2 border-white" id="profilePicture" :src="avatar_url" alt="Profile Picture">
             <div id="profileDetails">
@@ -55,14 +56,15 @@
 
 
 <script>
-
+import { ChevronDoubleLeftIcon, Bars3Icon } from '@heroicons/vue/20/solid'
 
 export default {
     data(){
         return {
             name:"",
             email:"",
-            avatar_url:""
+            avatar_url:"",
+            collapsed: false
         }
     },
     async mounted() {
@@ -86,6 +88,8 @@ export default {
             this.$router.push('/login')
         },
         collapse() {
+            if (this.collapsed) this.collapsed = false
+            else this.collapsed = true
             // hide link text on collapse
             let links = document.querySelectorAll('#mainSideNavbar nav span');
             links.forEach(link => {
@@ -103,16 +107,13 @@ export default {
 
 
             var mainSideNavbar = document.getElementById("mainSideNavbar");
-            var collapseButton = document.getElementById("collapseButton");
             if (mainSideNavbar.classList.contains("w-64")) {
                 mainSideNavbar.classList.remove("w-64");
                 mainSideNavbar.classList.add("w-16");
                 mainSideNavbar.classList.add("rounded");
-                collapseButton.innerHTML = "<i class='fa-solid fa-arrow-right'></i>";
             } else {
                 mainSideNavbar.classList.remove("w-16");
                 mainSideNavbar.classList.add("w-64");
-                collapseButton.innerHTML = "<i class='fa-solid fa-arrow-left'></i> ";
             }
 
             // Hide profile details on collapse
@@ -123,8 +124,11 @@ export default {
             var settingsButton = document.getElementById("settingsButton");
             settingsButton.classList.toggle('hidden');
 
-
         }
+    },
+    components: {
+        ChevronDoubleLeftIcon,
+        Bars3Icon
     }
 
 }
