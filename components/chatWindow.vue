@@ -1,51 +1,70 @@
 <template>
     <!-- Content -->
-    <div class="flex-1 p-8 bg-gray-100 " >
-        <div class="flex">
-            <h1 class="text-3xl font-semibold m-1">Chat</h1>
+    <div class="flex-1 py-8 p bg-white " >
+        <div class="flex justify-between items-center pb-4 px-8 border-b border-gray-200">
+            <div class="flex">
+                <img src="~~/assets/logos/gpt-4.svg" alt="Chatbot Avatar" class="w-10 h-10 rounded-full mr-1">
+                <h1 class="text-2xl font-semibold m-1">GPT-4</h1>
+            </div>
 
 
-            <select id="data-type" class="block border border-gray-300 rounded-lg ml-1" v-model="selectedDataType">
-                <option  v-for="dataSource in dataSources" :key="dataSource.id" :value="dataSource.id">
-                    {{ dataSource.name }}
-                </option>
-            </select>
+            <!-- <Listbox v-model="selectedDataType">
+                <ListboxOptions>
+                    <ListboxOption  v-for="dataSource in dataSources" :key="dataSource.id" :value="dataSource.id"  v-slot="{ active, selected }">
+                        <li
+                        :class="{
+                            'bg-blue-500 text-white': active,
+                            'bg-white text-black': !active,
+                        }"
+                        >
+                        <CheckIcon v-show="selected" />
+                        {{ dataSource.name }}
+                        </li>
+                    </ListboxOption>
+            </ListboxOptions>
+            </Listbox> -->
+            <div class="flex items-center">
+                <select id="data-type" class="block border border-gray-300 rounded-lg p-1 mr-4" v-model="selectedDataType">
+                    <option  v-for="dataSource in dataSources" :key="dataSource.id" :value="dataSource.id">
+                        {{ dataSource.name }}
+                    </option>
+                </select>
+                <i class="fa-solid fa-gear"></i>
+            </div>
         </div>
 
 
 
 
-        <div class="flex justify-center p-2 overflow-y-auto sm:h-[calc(90%-2rem)] lg:h-[calc(90%-2rem)] xl:h-[calc(90%-2rem)] 2xl:h-[calc(94%-2rem)]">
-            <div class=" mb-4 w-auto px-4" ref="chatWindow" style="overflow-y: scroll; scroll-snap-align: end;" >
-
-
+        <div class="flex mb-4 justify-center p-2 sm:h-[calc(90%-2rem)] lg:h-[calc(90%-2rem)] xl:h-[calc(90%-2rem)] 2xl:h-[calc(94%-2rem)] overflow-y-auto">
+            <div class="w-auto px-4" ref="chatWindow" >
 
                 <!-- User Message -->
                 <div v-for="(user_message, index) in user_messages" :key="user_message.content">
-                    <div class="mb-1.5" >
-                        <div class="text-right font-semibold text-green-600 mb-1">You</div>
+                    <div class="my-4" >
+
                         <div class="flex items-start justify-end">
-                            <div class="bg-green-200  text-black shadow rounded-b-lg rounded-l-lg py-2 px-4 inline-block mr-2">
-                                {{ user_message.content }}
+                            <div class="bg-sky-500  text-white shadow rounded-b-lg rounded-l-lg py-2 px-4 inline-block mr-2">
+                                <div v-html="renderMarkdown(user_message.content)"></div>
                             </div>
                             <img :src="avatar_url" alt="User Avatar" class="w-10 h-10 rounded-full">
                         </div>
                     </div>
                     <!-- Chatbot Message -->
-                    <div class="mb-1.5">
-                        <div class="font-semibold text-blue-600 mb-1">Chatbot</div>
+                    <div class="my-4 pb-2">
+
                         <div class="flex items-start">
-                            <img src="~~/assets/logos/gpt-4.svg" alt="Chatbot Avatar" class="w-10 h-10 rounded-full">
-                            <div class="bg-blue-100 text-black shadow rounded-b-lg rounded-r-lg py-2 px-4 inline-block ml-2 prose" v-if="ai_messages[index]">
+                            <!-- <img src="~~/assets/logos/gpt-4.svg" alt="Chatbot Avatar" class="w-10 h-10 rounded-full"> -->
+                            <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg py-2 px-6 inline-block ml-2 prose" v-if="ai_messages[index]">
                                 <!-- <p>{{ ai_messages[index] }}</p> -->
                                 <div v-html="renderMarkdown(ai_messages[index].content)"></div>
 
-                                <div v-show="ai_messages[index].source_documents">
-                                    <span >Sources:</span>
+                                <div v-show="ai_messages[index].source_documents" class="pb-4">
+                                    <div v-html="renderMarkdown(`**Sources 📃**`)"></div>
                                     <div v-for="(source_document, source_index) in ai_messages[index].source_documents" :key="source_index">
                                         <Disclosure v-slot="{ open }">
                                             <DisclosureButton
-                                            class="flex w-full border border-gray-300 justify-between rounded-lg bg-gray-100 px-4 py-2 my-1 text-left text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
+                                            class="flex w-full border border-gray-300 justify-between rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
                                             >
                                             <span> {{ getSourceName(source_document.metadata.source) }}</span>
                                             <ChevronUpIcon
@@ -53,8 +72,8 @@
                                                 class="h-5 w-5 text-gray-500"
                                             />
                                             </DisclosureButton>
-                                            <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
-                                            {{ source_document.page_content }}
+                                            <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
+                                                <div v-html="renderMarkdown(source_document.page_content)"></div>
                                             </DisclosurePanel>
                                         </Disclosure>
                                     </div>
@@ -69,9 +88,9 @@
         </div>
 
         <!-- Message Input -->
-        <div class="flex justify-center items-center">
-            <div class="mt-auto bg-white rounded-full shadow p-2 flex items-center border-1.5 border-gray-400 w-1/2 ">
-                <input type="text" class="w-full px-4 py-2 rounded focus:border-blue-500 focus:outline-none" placeholder="Type your message..." v-model="message">
+        <div class="flex justify-center items-center w-auto">
+            <div class="mt-auto bg-white rounded-full flex items-center shadow-md border border-gray-200 w-3/4 hover:border-sky-200 ">
+                <input type="text" class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Type your message..." v-model="message">
                 <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center" @click.prevent="queryModel">
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -89,9 +108,13 @@ import {
     Disclosure,
     DisclosureButton,
     DisclosurePanel,
+    Listbox,
+    ListboxButton,
+    ListboxOptions,
+    ListboxOption,
   } from '@headlessui/vue';
 
-import { ChevronUpIcon } from '@heroicons/vue/20/solid';
+import { ChevronUpIcon, CheckIcon } from '@heroicons/vue/20/solid';
 import MarkdownIt from 'markdown-it';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-python';
@@ -165,7 +188,6 @@ export default {
         };
     },
     async mounted() {
-        this.highlightCode();
         this.$nextTick(() => {
             const clipboard = new ClipboardJS('.copy-code-button');
             clipboard.on('success', (e) => {
@@ -197,6 +219,10 @@ export default {
         }
 
         this.getDataSources(supabase)
+        const user_session = await this.getSession(supabase)
+        if (user_session) {
+            this.setUserAvatar(user_session.user.user_metadata.avatar_url)
+        }
     },
     methods: {
         setUserAvatar(avatar_url) {
@@ -265,10 +291,6 @@ export default {
                 alert('There was an error loading your messages')
             }else{
                 // Assuming the backend returns an array of messages with a sender and data properties
-                const user_session = await this.getSession(supabase)
-                if (user_session) {
-                    this.setUserAvatar(user_session.user.user_metadata.avatar_url)
-                }
                 messages.forEach((message) => {
                     if (message.sender === 'ai') {
                         this.ai_messages.push({"content":message.content, "source_documents": message.source_documents});
@@ -397,7 +419,12 @@ export default {
         Disclosure,
         DisclosureButton,
         DisclosurePanel,
+        Listbox,
+        ListboxButton,
+        ListboxOptions,
+        ListboxOption,
         ChevronUpIcon,
+        CheckIcon,
     }
 
 };
