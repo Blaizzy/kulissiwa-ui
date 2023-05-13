@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen bg-gray-100">
+  <div class="flex h-screen">
     <navbar v-if="!isLogin"/>
     <conversations v-if="isChats"/>
     <NuxtPage />
@@ -16,7 +16,11 @@ export default {
 
 
     const { data, error } = await useSupabaseClient().auth.getSession()
-    console.log(data)
+
+    if (error) {
+        console.log(error)
+        console.log('There was an error loading your data source')
+    }
 
     if (data.session == null) {
         this.$router.push('/login')
