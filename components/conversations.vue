@@ -1,33 +1,38 @@
 <template>
     <!-- Chat Side Navbar -->
-    <div class="w-80 bg-gray-50 p-4">
-        <div class="relative mb-4">
-            <input type="search" class="w-full p-2 rounded border border-gray-300 focus:border-blue-500 focus:outline-none" placeholder="Search chats...">
-            <span class="absolute top-3 right-3 text-gray-500">
-                <i class="fas fa-search"></i>
-            </span>
+    <div class="w-80 bg-white p-4 border-r border-gray-200">
+        <div class="mb-2">
+            <div class="flex justify-between items-center bg-white p-2">
+                <h1 class="text-2xl font-semibold">Chats</h1>
+                <div class="font-semibold p-2 rounded-full hover:bg-sky-50">
+                    <nuxt-link to="/chats">
+                        <img src="~~/assets/icons/icons8-new-message-24.png" alt="Chatbot Avatar" class="w-5 h-5">
+                    </nuxt-link>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="flex justify-center items-center mb-4">
+            <div class="mt-auto bg-white rounded-full flex items-center w-full border border-gray-200 hover:border-sky-200 ">
+                <input type="search"  class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Search chats...">
+                <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
         </div>
         <div class="overflow-y-auto h-[calc(100%-2rem)]">
-            <div class="mb-4">
-                <nuxt-link to="/chats">
-                    <div class="bg-white p-4 rounded shadow">
 
-                        <div class="font-semibold">
-                            <i class="fa fa-square-plus pr-1"></i>
-                            New chat
-                        </div>
-
-                    </div>
-                </nuxt-link>
-            </div>
 
             <div class="mb-4" v-for="conversation in conversations" :key="conversation.id">
                 <!-- <h2 class="text-xl font-semibold mb-2">Today</h2> -->
                 <nuxt-link
                         :to="`/chats/${conversation.id}`">
                 <div
-                    class="bg-white p-4 rounded shadow hover:bg-gray-100/50"
-                    :class="{ 'border-gray-300 border-2': isSelectedConversation(conversation.id) && !isNewChat() }"
+                    class="p-3 rounded-full"
+                    :class="{
+                        'bg-sky-100': isSelectedConversation(conversation.id) && !isNewChat(),
+                        'hover:bg-sky-50': !isSelectedConversation(conversation.id)}"
                     @click="setConversation(conversation.id)"
                 >
 
@@ -56,7 +61,7 @@
 
                                 <button v-show="!showDeleteConfirmation && !showTitleEditConfirmation"
                                 @click.prevent="toggleDeleteConfirmation()">
-                                    <i class="fas fa-trash-alt text-gray-600 hover:text-black"
+                                    <i class="fas fa-trash text-gray-600 hover:text-black"
 
                                     ></i>
                                 </button>
@@ -97,6 +102,8 @@
 </template>
 
 <script>
+
+
 export default {
     data() {
         return {
@@ -131,7 +138,7 @@ export default {
 
         },
 
-        async getConversations() {
+        async getConversations(refresh=false) {
             const supabase = await this.initSupabase()
             const { data, error } = await supabase
                 .from('conversations')
@@ -142,6 +149,9 @@ export default {
                 console.log(error)
             } else {
                 if (data){
+                    if (refresh) {
+                        this.conversations = []
+                    }
                     data.forEach(conversation => {
                         this.conversations.push(conversation)
                     });
@@ -164,13 +174,15 @@ export default {
                 this.conversations = this.conversations.filter(conversation => conversation.id !== this.selectedConversation)
                 this.selectedConversation = null
                 this.showDeleteConfirmation = false
-                this.$router.push('/chats')
+                if (this.$route.params.id) {
+                    this.$router.push('/chats')
+                }else{
+                    await this.getConversations(true)
+                }
             }
 
         },
         async editConversationTitle(conversation) {
-
-
                 const supabase = await this.initSupabase()
                 const { data, error } = await supabase
                     .from('conversations')
