@@ -153,7 +153,6 @@
                 }, 10000);
               }else{
                 const data = await response.json();
-                alert(data.message)
                 this.$emit('refreshData')
                 this.$emit('close')
               }
@@ -177,7 +176,7 @@
               alert("Error uploading data")
               console.log(error)
             }else{
-              this.emdedData(supabase, user_session)
+              await this.emdedData(supabase, user_session)
             }
 
           }
