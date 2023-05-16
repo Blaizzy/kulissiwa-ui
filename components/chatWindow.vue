@@ -1,6 +1,6 @@
 <template>
     <!-- Content -->
-    <div class="flex-1 py-8 p bg-white " >
+    <div class="flex-1 py-8 bg-white " >
         <div class="flex justify-between items-center pb-4 px-8 border-b border-gray-200">
             <div class="flex">
                 <img src="~~/assets/logos/gpt-4.svg" alt="Chatbot Avatar" class="w-10 h-10 rounded-full mr-1">
@@ -34,29 +34,25 @@
         </div>
 
 
-
-
         <div class="flex mb-4 justify-center p-2 sm:h-[calc(90%-2rem)] lg:h-[calc(90%-2rem)] xl:h-[calc(90%-2rem)] 2xl:h-[calc(94%-2rem)] overflow-y-auto">
             <div class="w-auto px-4" ref="chatWindow" >
 
-                <!-- User Message -->
+
                 <div v-for="(user_message, index) in user_messages" :key="user_message.content">
                     <div class="my-4" >
-
                         <div class="flex items-start justify-end">
+                            <!-- User Message -->
                             <div class="bg-sky-500  text-white shadow rounded-b-lg rounded-l-lg py-2 px-4 inline-block mr-2">
                                 <div v-html="renderMarkdown(user_message.content)"></div>
                             </div>
                             <img :src="avatar_url" alt="User Avatar" class="w-10 h-10 rounded-full">
                         </div>
                     </div>
+
                     <!-- Chatbot Message -->
                     <div class="my-4 pb-2">
-
                         <div class="flex items-start">
-                            <!-- <img src="~~/assets/logos/gpt-4.svg" alt="Chatbot Avatar" class="w-10 h-10 rounded-full"> -->
                             <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg py-2 px-6 inline-block ml-2 prose" v-if="ai_messages[index]">
-                                <!-- <p>{{ ai_messages[index] }}</p> -->
                                 <div v-html="renderMarkdown(ai_messages[index].content)"></div>
 
                                 <div v-show="ai_messages[index].source_documents" class="pb-4">
@@ -78,7 +74,14 @@
                                         </Disclosure>
                                     </div>
                                 </div>
+                            </div>
 
+                            <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg inline-block py-2 px-6 ml-2" v-else-if="loading_ai_response ">
+                                <p>I'm thinking about it...</p>
+                                <p class="suspense_block py-1 my-1 w-10/12"></p>
+                                <p class="suspense_block py-1 my-1 "></p>
+                                <p class="suspense_block py-1 my-1 w-10/12"></p>
+                                <p class="suspense_block py-1 my-1"></p>
                             </div>
                         </div>
                     </div>
@@ -91,9 +94,14 @@
         <div class="flex justify-center items-center w-auto">
             <div class="mt-auto bg-white rounded-full flex items-center shadow-md border border-gray-200 w-3/4 hover:border-sky-200 ">
                 <input type="text" class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Type your message..." v-model="message">
-                <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center" @click.prevent="queryModel">
+                <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center" @click.prevent="queryModel" v-if="!loading_ai_response">
                     <i class="fas fa-paper-plane"></i>
                 </button>
+
+                <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center" disabled v-else >
+                    <i class="fas fa-spinner fa-spin"></i>
+                </button>
+
             </div>
         </div>
       </div>
@@ -120,6 +128,7 @@ import Prism from 'prismjs';
 import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism-okaidia.css';
 import ClipboardJS from 'clipboard';
+import { parse } from '@fortawesome/fontawesome-svg-core';
 
 const exampleCode = `test`;
 
@@ -184,6 +193,7 @@ export default {
             user_messages: [],
             dataSources: [],
             selectedDataType: '',
+            loading_ai_response: false,
             avatar_url: 'https://via.placeholder.com/40',
         };
     },
@@ -320,6 +330,8 @@ export default {
             this.user_messages.push({content: this.message});
             this.message = '';
 
+            this.loading_ai_response = true;
+
             // get the last user message
             const last_user_message = this.user_messages[this.user_messages.length - 1];
             let response_dict = {};
@@ -375,6 +387,8 @@ export default {
                 console.log("Received JSON object:", response_dict);
             } catch (err) {
                 console.log(err);
+            } finally {
+                this.loading_ai_response = false;
             }
 
             if (this.$route.params.id==undefined && this.conversationId=='') {
@@ -416,17 +430,39 @@ export default {
         },
     },
     components: {
-        Disclosure,
-        DisclosureButton,
-        DisclosurePanel,
-        Listbox,
-        ListboxButton,
-        ListboxOptions,
-        ListboxOption,
-        ChevronUpIcon,
-        CheckIcon,
-    }
+    Disclosure,
+    DisclosureButton,
+    DisclosurePanel,
+    Listbox,
+    ListboxButton,
+    ListboxOptions,
+    ListboxOption,
+    ChevronUpIcon,
+    CheckIcon,
+    parse
+}
 
 };
 </script>
 
+
+<style scoped>
+.suspense_block {
+    height: 100%;
+    display: flex;
+    animation: pulse-bg 1s infinite;
+}
+@keyframes pulse-bg {
+    0% {
+        background: rgb(194, 194, 194);
+    }
+    50% {
+        background: rgb(167, 167, 167);
+    }
+    100% {
+        background: gray;
+    }
+}
+
+
+</style>
