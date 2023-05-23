@@ -125,6 +125,16 @@ export default {
         initSupabase() {
             return useSupabaseClient()
         },
+        async getSession(supabase){
+          const { data, error } = await supabase.auth.getSession()
+          if (error) {
+            console.log(error)
+            alert("Error getting session")
+          }else{
+            return data.session
+          }
+
+        },
         addDataToList(data){
             data.forEach((dataSource) => {
                 this.dataSources.push({
@@ -171,6 +181,7 @@ export default {
         },
         async deleteDataSource(dataSourceId) {
             const supabase = this.initSupabase()
+            const user_session = await this.getSession(supabase)
             const { error } = await supabase
                 .from('data')
                 .delete()
@@ -180,7 +191,30 @@ export default {
                 console.log(error)
                 alert('There was an error deleting your data source')
             }else {
-                await this.onDataRefreshed()
+                const formData = new FormData();
+
+                formData.append("namespace", user_session.user.id);
+                formData.append("data_source", dataSourceId);
+
+
+                try {
+                    const response = await fetch("http://127.0.0.1:8000/delete_item", {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (!response.ok) {
+                        const message = `An error has occured while deleting embedding data: ${response.status}`;
+                        console.log(message)
+                    }else{
+                        const data = await response.json();
+                        console.log(data)
+                        await this.onDataRefreshed()
+                    }
+                } catch (err) {
+                console.log(err)
+                }
+
             }
         }
     },
