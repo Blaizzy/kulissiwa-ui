@@ -4,7 +4,7 @@ export default defineNuxtConfig({
         '@nuxtjs/tailwindcss',
         '@nuxtjs/supabase',
         '@nuxt/content',
-  
+
     ],
     css: [
         "~/assets/css/main.css",
@@ -20,10 +20,9 @@ export default defineNuxtConfig({
         { src: "~/plugins/markdown-it.js", mode: "client"},
     ],
     runtimeConfig: {
-        openai_api_key: "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",
         supabase:{
-            url: "https://jnkqbhwiooorctzxrdlm.supabase.co",
-            key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impua3FiaHdpb29vcmN0enhyZGxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODIyNTQ2MTgsImV4cCI6MTk5NzgzMDYxOH0.M78WTGkXUaWSys0wLCMNacJkBR2KBi0_XPJ2nbXWoug"
+            url: "",
+            key: ""
         }
     }
 
