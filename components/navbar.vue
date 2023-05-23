@@ -36,16 +36,14 @@
                 <i class="fa-solid fa-right-from-bracket"></i> <span id="logOut">Logout</span>
             </a>
         </div>
-        <div class="mb-2 p-1 flex items-start rounded-full hover:bg-sky-50">
-
-            <img class="w-12 h-12 rounded-full border-2 border-white" id="profilePicture" :src="avatar_url" alt="Profile Picture">
-            <div id="profileDetails">
-                <span class="font-semibold">{{ name }}</span>
-                <p class="text-sm text-gray-600">{{email}}</p>
+        <div class="mb-2 py-2 px-2 flex items-start rounded-full hover:bg-sky-50">
+            <div class="flex items-center">
+                <img class="w-12 h-12 rounded-full border-2 border-white" id="profilePicture" :src="avatar_url" alt="Profile Picture">
+                <div id="profileDetails" class="mr-8 pr-8">
+                    <span class="font-semibold">{{ name }}</span>
+                    <p class="text-sm text-gray-600">{{email}}</p>
+                </div>
             </div>
-            <!-- <button class="m-2 rounded-full hover:bg-gray-100 text-center" id="settingsButton">
-                <i class="fa-solid fa-ellipsis fa-sm"></i>
-            </button> -->
 
 
         </div>
@@ -63,7 +61,7 @@ export default {
         return {
             name:"",
             email:"",
-            avatar_url:"",
+            avatar_url:"https://via.placeholder.com/50",
             collapsed: false
         }
     },
