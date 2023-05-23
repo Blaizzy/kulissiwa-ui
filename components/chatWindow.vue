@@ -1,28 +1,12 @@
 <template>
     <!-- Content -->
-    <div class="flex-1 py-8 bg-white " >
+    <div class="flex flex-col h-full w-full py-8 bg-white" >
         <div class="flex justify-between items-center pb-4 px-8 border-b border-gray-200">
             <div class="flex">
                 <img src="~~/assets/logos/gpt-4.svg" alt="Chatbot Avatar" class="w-10 h-10 rounded-full mr-1">
                 <h1 class="text-2xl font-semibold m-1">GPT-4</h1>
             </div>
 
-
-            <!-- <Listbox v-model="selectedDataType">
-                <ListboxOptions>
-                    <ListboxOption  v-for="dataSource in dataSources" :key="dataSource.id" :value="dataSource.id"  v-slot="{ active, selected }">
-                        <li
-                        :class="{
-                            'bg-blue-500 text-white': active,
-                            'bg-white text-black': !active,
-                        }"
-                        >
-                        <CheckIcon v-show="selected" />
-                        {{ dataSource.name }}
-                        </li>
-                    </ListboxOption>
-            </ListboxOptions>
-            </Listbox> -->
             <div class="flex items-center">
                 <select id="data-type" class="block border border-gray-300 rounded-lg p-1 mr-4" v-model="selectedDataType">
                     <option  v-for="dataSource in dataSources" :key="dataSource.id" :value="dataSource.id">
@@ -34,66 +18,69 @@
         </div>
 
 
-        <div class="flex mb-4 justify-center p-2 sm:h-[calc(90%-2rem)] lg:h-[calc(90%-2rem)] xl:h-[calc(90%-2rem)] 2xl:h-[calc(94%-2rem)] overflow-y-auto">
-            <div class="w-auto px-4" ref="chatWindow" >
+        <div class="flex-grow overflow-y-auto mb-4 border-b border-gray-200">
+            <div class="flex justify-center p-2">
+                <div class="w-auto px-4 overflow-y-auto" ref="chatWindow" >
 
 
-                <div v-for="(user_message, index) in user_messages" :key="user_message.content">
-                    <div class="my-4" >
-                        <div class="flex items-start justify-end">
-                            <!-- User Message -->
-                            <div class="bg-sky-500  text-white shadow rounded-b-lg rounded-l-lg py-2 px-4 inline-block mr-2">
-                                <div v-html="renderMarkdown(user_message.content)"></div>
+                    <div v-for="(user_message, index) in user_messages" :key="user_message.content">
+                        <div class="my-4" >
+                            <div class="flex items-start justify-end">
+                                <!-- User Message -->
+                                <div class="bg-sky-500  text-white shadow rounded-b-lg rounded-l-lg py-2 px-4 inline-block mr-2">
+                                    <div v-html="renderMarkdown(user_message.content)" style="white-space: pre-wrap; max-width: 500px; word-wrap: break-word;"></div>
+                                </div>
+                                <img :src="avatar_url" alt="User Avatar" class="w-10 h-10 rounded-full">
                             </div>
-                            <img :src="avatar_url" alt="User Avatar" class="w-10 h-10 rounded-full">
                         </div>
-                    </div>
 
-                    <!-- Chatbot Message -->
-                    <div class="my-4 pb-2">
-                        <div class="flex items-start">
-                            <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg py-2 px-6 inline-block ml-2 prose" v-if="ai_messages[index]">
-                                <div v-html="renderMarkdown(ai_messages[index].content)"></div>
+                        <!-- Chatbot Message -->
+                        <div class="my-4 pb-2">
+                            <div class="flex items-start">
+                                <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg py-2 px-6 inline-block ml-2 prose" v-if="ai_messages[index]">
+                                    <div v-html="renderMarkdown(ai_messages[index].content)" class="inline-block"></div>
 
-                                <div v-show="ai_messages[index].source_documents" class="pb-4">
-                                    <div v-html="renderMarkdown(`**Sources 📃**`)"></div>
-                                    <div v-for="(source_document, source_index) in ai_messages[index].source_documents" :key="source_index">
-                                        <Disclosure v-slot="{ open }">
-                                            <DisclosureButton
-                                            class="flex w-full border border-gray-300 justify-between rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
-                                            >
-                                            <span> {{ getSourceName(source_document.metadata.source) }}</span>
-                                            <ChevronUpIcon
-                                                :class="open ? 'rotate-180 transform' : ''"
-                                                class="h-5 w-5 text-gray-500"
-                                            />
-                                            </DisclosureButton>
-                                            <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
-                                                <div v-html="renderMarkdown(source_document.page_content)"></div>
-                                            </DisclosurePanel>
-                                        </Disclosure>
+                                    <div v-show="ai_messages[index].source_documents" class="pb-4">
+                                        <div v-html="renderMarkdown(`**Sources 📃**`)"></div>
+                                        <div v-for="(source_document, source_index) in ai_messages[index].source_documents" :key="source_index">
+                                            <Disclosure v-slot="{ open }">
+                                                <DisclosureButton
+                                                class="flex w-full border border-gray-300 justify-between rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
+                                                >
+                                                <span> {{ getSourceName(source_document.metadata.source) }}</span>
+                                                <ChevronUpIcon
+                                                    :class="open ? 'rotate-180 transform' : ''"
+                                                    class="h-5 w-5 text-gray-500"
+                                                />
+                                                </DisclosureButton>
+                                                <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
+                                                    <div v-html="renderMarkdown(source_document.page_content)"></div>
+                                                </DisclosurePanel>
+                                            </Disclosure>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg inline-block py-2 px-6 ml-2" v-else-if="loading_ai_response ">
-                                <p>I'm thinking about it...</p>
-                                <p class="suspense_block py-1 my-1 w-10/12"></p>
-                                <p class="suspense_block py-1 my-1 "></p>
-                                <p class="suspense_block py-1 my-1 w-10/12"></p>
-                                <p class="suspense_block py-1 my-1"></p>
+                                <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg inline-block py-2 px-6 ml-2" v-else-if="loading_ai_response ">
+                                    <p>I'm thinking about it...</p>
+                                    <p class="suspense_block py-1 my-1 w-10/12"></p>
+                                    <p class="suspense_block py-1 my-1 "></p>
+                                    <p class="suspense_block py-1 my-1 w-10/12"></p>
+                                    <p class="suspense_block py-1 my-1"></p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
+                    </div>
                 </div>
             </div>
         </div>
 
+
         <!-- Message Input -->
-        <div class="flex justify-center items-center w-auto">
-            <div class="mt-auto bg-white rounded-full flex items-center shadow-md border border-gray-200 w-3/4 hover:border-sky-200 ">
-                <input type="text" class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Type your message..." v-model="message">
+        <div class="flex items-start justify-center w-auto">
+            <div class="bg-white rounded-xl flex items-center shadow-md border border-gray-200 w-1/2 hover:border-sky-200">
+                <textarea type="text" :rows="rows" class="w-full px-4 h-auto py-3 rounded-xl focus:outline-none" placeholder="Type your message..." v-model="message" style="resize: none;"></textarea>
                 <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center" @click.prevent="queryModel" v-if="!loading_ai_response">
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -104,7 +91,8 @@
 
             </div>
         </div>
-      </div>
+
+    </div>
 
 
 
@@ -130,7 +118,7 @@ import 'prismjs/themes/prism-okaidia.css';
 import ClipboardJS from 'clipboard';
 import { parse } from '@fortawesome/fontawesome-svg-core';
 
-const exampleCode = `test`;
+const maxRows = 4;
 
 export default {
     setup() {
@@ -185,7 +173,6 @@ export default {
     },
     data() {
         return {
-            exampleCode,
             conversationId: '',
             message: '',
             copySuccess: new Set(),
@@ -233,6 +220,12 @@ export default {
         if (user_session) {
             this.setUserAvatar(user_session.user.user_metadata.avatar_url)
         }
+    },
+    computed: {
+        rows() {
+            const lineBreaks = (this.message.match(/\n/g) || []).length + 1; // Add one for the first line
+            return lineBreaks > maxRows ? maxRows : lineBreaks;
+        },
     },
     methods: {
         setUserAvatar(avatar_url) {
@@ -289,6 +282,7 @@ export default {
             chatWindow.scrollTop = scrollBottom;
             }
         },
+
         async loadMessages(supabase) {
             const { data: messages, error } = await supabase
                 .from('messages')
@@ -324,13 +318,30 @@ export default {
 
         },
         async queryModel() {
+
             const supabase = this.initSupabase()
             const user_session = await this.getSession(supabase)
 
-            this.user_messages.push({content: this.message});
+            this.user_messages.push({content: this.message.trim().replace(/\n/g, '\n')});
             this.message = '';
 
             this.loading_ai_response = true;
+
+            if (this.$route.params.id==undefined && this.conversationId=='') {
+                await this.insertData(supabase, 'conversations', [{user_id: user_session.user.id}])
+                const { data, error } = await supabase
+                    .from('conversations')
+                    .select('id, created_at')
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                if (error) {
+                    console.log(error)
+                    alert('Failed to get conversation ID')
+                }
+                if (data) {
+                    this.conversationId = data[0].id;
+                }
+            }
 
             // get the last user message
             const last_user_message = this.user_messages[this.user_messages.length - 1];
@@ -391,21 +402,7 @@ export default {
                 this.loading_ai_response = false;
             }
 
-            if (this.$route.params.id==undefined && this.conversationId=='') {
-                await this.insertData(supabase, 'conversations', [{user_id: user_session.user.id}])
-                const { data, error } = await supabase
-                    .from('conversations')
-                    .select('id, created_at')
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                if (error) {
-                    console.log(error)
-                    alert('Failed to get conversation ID')
-                }
-                if (data) {
-                    this.conversationId = data[0].id;
-                }
-            }
+
             await this.insertData(
                 supabase,
                 'messages',
