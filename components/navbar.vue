@@ -1,28 +1,28 @@
 <template>
     <!-- Side Navbar -->
     <div class="w-64 bg-white p-4 flex flex-col border-r border-gray-200" id="mainSideNavbar">
-        <nav>
-            <div class="flex py-2 font-semibold mb-4 text-center justify-between">
+        <nav class="text-base">
+            <div class="flex py-3 font-semibold mb-4 text-center justify-between">
                 <img src="~~/assets/logos/kulissiwa.svg" width="32" height="32" alt="Kulissiwa Logo">
                 <ChevronDoubleLeftIcon class="w-8 h-8 text-gray-600 py-1 px-2 rounded-full hover:bg-sky-50" id="collapseButton" @click="collapse" />
             </div>
-            <button v-show="collapsed" @click="collapse" class="block py-2 px-2 mb-2 font-semibold rounded-full hover:bg-sky-100">
+            <button v-show="collapsed" @click="collapse" class="block py-3 px-2 mb-2 font-semibold rounded-full hover:bg-sky-100">
                 <Bars3Icon class="w-4 h-4 text-gray-600"/>
             </button>
-            <NuxtLink to="/dashboard" class="block py-1 px-2 mb-2 rounded-full hover:bg-sky-50">
+            <NuxtLink to="/dashboard" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
                 <i class="fa-solid fa-cubes pr-1"></i>
                 <span>Dashboard</span>
             </NuxtLink>
-            <NuxtLink to="/dataSources" class="block py-1 px-2 mb-2 rounded-full hover:bg-sky-50">
+            <NuxtLink to="/dataSources" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
                 <i class="fa-solid fa-database pr-1"></i>
                 <span>Data Sources </span>
             </NuxtLink>
-            <NuxtLink to="/chats"  class="block py-1 px-2 mb-2 rounded-full hover:bg-sky-50">
+            <NuxtLink to="/chats"  class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
                 <i class="fa-solid fa-comments fa-sm pr-1"></i>
                 <span>Chats</span>
             </NuxtLink>
 
-            <NuxtLink to="/billing" class="block py-1 px-2 mb-2 rounded-full hover:bg-sky-50">
+            <NuxtLink to="/billing" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
                 <i class="fa-solid fa-credit-card pr-1"></i>
                 <span>Billing</span>
             </NuxtLink>
@@ -36,7 +36,7 @@
                 <i class="fa-solid fa-right-from-bracket"></i> <span id="logOut">Logout</span>
             </a>
         </div>
-        <div class="mb-2 py-2 px-2 flex items-start rounded-full hover:bg-sky-50">
+        <div class="mb-2 flex items-start rounded-full hover:bg-sky-50">
             <div class="flex items-center">
                 <img class="w-12 h-12 rounded-full border-2 border-white" id="profilePicture" :src="avatar_url" alt="Profile Picture">
                 <div id="profileDetails" class="mr-8 pr-8">
@@ -96,8 +96,8 @@ export default {
 
             // Reduce profile picture size on collapse and expand
             var profilePicture = document.getElementById("profilePicture");
-            profilePicture.classList.toggle('w-7');
-            profilePicture.classList.toggle('h-6');
+            profilePicture.classList.toggle('w-8');
+            profilePicture.classList.toggle('h-8');
 
             // Hide logout link text on collapse
             var logoutButton = document.getElementById("logOut");
