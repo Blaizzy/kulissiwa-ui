@@ -128,7 +128,7 @@ export default{
         async loadDataSource(supabase, id){
             const { data, error } = await supabase
                 .from('data')
-                .select('id, name, content_data')
+                .select('id, name, content_data, isFile')
                 .eq('id', id)
 
             if (error) {
@@ -136,12 +136,37 @@ export default{
                 alert('There was an error loading your data source')
             }
             if (data) {
-
                 this.data_source_id = data[0].id
                 this.data_source_name = data[0].name
-                this.data_source_content = data[0].content_data
+                if (data[0].isFile){
+                    const file = await this.getFile(data[0].id)
+                    this.data_source_content = file[0].content
+                }else{
+                    this.data_source_content = data[0].content_data
+                }
             }
         },
+        async getFile(id){
+
+            const config = useRuntimeConfig()
+            const supabase = createClient(
+            config.supabase.url,
+            config.supabase.key,
+            {db: { schema: 'storage' }}
+            );
+
+            const { data, error } = await supabase
+            .from('objects')
+            .select('*')
+            .eq('id', id)
+
+            if (error) {
+                console.log(error)
+                alert('There was an error loading your data source')
+            }else{
+                return data
+            }
+        }
     },
     watch: {
         data_source_content: {

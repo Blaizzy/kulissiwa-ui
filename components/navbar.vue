@@ -10,21 +10,29 @@
                 <Bars3Icon class="w-4 h-4 text-gray-600"/>
             </button>
             <NuxtLink to="/dashboard" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
-                <i class="fa-solid fa-cubes pr-1"></i>
-                <span>Dashboard</span>
+                <i class="fa-solid fa-cubes"></i>
+                    <span v-show="!collapsed" class="pl-1.5">Dashboard</span>
+  
             </NuxtLink>
             <NuxtLink to="/dataSources" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
-                <i class="fa-solid fa-database pr-1"></i>
-                <span>Data Sources </span>
+                <i class="fa-solid fa-database"></i>
+ 
+                    <span v-show="!collapsed" class="pl-1.5">Data Sources </span>
+         
+        
             </NuxtLink>
             <NuxtLink to="/chats"  class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
-                <i class="fa-solid fa-comments fa-sm pr-1"></i>
-                <span>Chats</span>
+                <i class="fa-solid fa-comments fa-sm"></i>
+                
+                    <span v-show="!collapsed" class="pl-1.5">Chats</span>
+                
             </NuxtLink>
 
             <NuxtLink to="/billing" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
-                <i class="fa-solid fa-credit-card pr-1"></i>
-                <span>Billing</span>
+                <i class="fa-solid fa-credit-card"></i>
+               
+                    <span v-show="!collapsed" class="pl-1.5">Billing</span>
+                
             </NuxtLink>
         </nav>
 
@@ -33,15 +41,15 @@
         <div class="mb-4 py-2 px-2 flex items-start rounded-full hover:bg-sky-50">
 
             <a class="block" @click="signOut">
-                <i class="fa-solid fa-right-from-bracket"></i> <span id="logOut">Logout</span>
+                <i class="fa-solid fa-right-from-bracket"></i> <span id="logOut" v-show="!collapsed" class="pl-1.5">Logout</span>
             </a>
         </div>
         <div class="mb-2 flex items-start rounded-full hover:bg-sky-50">
             <div class="flex items-center">
                 <img class="w-12 h-12 rounded-full border-2 border-white" id="profilePicture" :src="avatar_url" alt="Profile Picture">
-                <div id="profileDetails" class="mr-8 pr-8">
-                    <span class="font-semibold">{{ name }}</span>
-                    <p class="text-sm text-gray-600">{{email}}</p>
+                <div id="profileDetails" class="mr-8 pr-8 pl-1.5">
+                    <span class="font-semibold" v-show="!collapsed">{{ name }}</span>
+                    <p class="text-sm text-gray-600" v-show="!collapsed">{{email}}</p>
                 </div>
             </div>
 
@@ -62,7 +70,7 @@ export default {
             name:"",
             email:"",
             avatar_url:"https://via.placeholder.com/50",
-            collapsed: false
+            collapsed: false,
         }
     },
     async mounted() {
@@ -88,20 +96,10 @@ export default {
         collapse() {
             if (this.collapsed) this.collapsed = false
             else this.collapsed = true
-            // hide link text on collapse
-            let links = document.querySelectorAll('#mainSideNavbar nav span');
-            links.forEach(link => {
-                link.classList.toggle('hidden');
-            });
-
             // Reduce profile picture size on collapse and expand
             var profilePicture = document.getElementById("profilePicture");
             profilePicture.classList.toggle('w-8');
             profilePicture.classList.toggle('h-8');
-
-            // Hide logout link text on collapse
-            var logoutButton = document.getElementById("logOut");
-            logoutButton.classList.toggle('hidden');
 
 
             var mainSideNavbar = document.getElementById("mainSideNavbar");
@@ -114,13 +112,6 @@ export default {
                 mainSideNavbar.classList.add("w-64");
             }
 
-            // Hide profile details on collapse
-            var profileDetails = document.getElementById("profileDetails");
-            profileDetails.classList.toggle('hidden');
-
-            // Hide settings button on collapse
-            var settingsButton = document.getElementById("settingsButton");
-            settingsButton.classList.toggle('hidden');
 
         }
     },
@@ -135,5 +126,9 @@ export default {
 </script>
 
 <style>
+
+#mainSideNavbar {
+  transition: width 0.3s ease-in-out;
+}
 
 </style>

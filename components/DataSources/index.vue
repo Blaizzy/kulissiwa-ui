@@ -9,7 +9,7 @@
         :class="{ 'opacity-0 scale-90': !isOpen, 'opacity-100 scale-100': isOpen }"
       >
         <button
-          @click="$emit('close')"
+          @click="resetModal(); $emit('close')"
           class="absolute top-6 right-6 text-gray-500 hover:text-gray-700"
         >
           <i class="fas fa-times" ></i>
@@ -26,9 +26,10 @@
           <label for="data-type" class="block mb-2">Select data type:</label>
           <select id="data-type" class="block w-full border border-gray-300 rounded-lg p-1" v-model="selectedDataType">
             <option>PDF</option>
+            <option>Docx</option>
             <option>Website</option>
-            <option>CSV</option>
-            <option>Text</option>
+            <option>Text file</option>
+            <option>Text</option>            
             <!-- Add more data types as needed -->
           </select>
         </div>
@@ -39,6 +40,13 @@
                 type="file"
                 @change="handleFileUpload"
                 accept=".pdf"
+              />
+            </div>
+            <div v-if="selectedDataType === 'Text file'">
+              <input
+                type="file"
+                @change="handleFileUpload"
+                accept=".txt"
               />
             </div>
             <div v-else-if="selectedDataType === 'Website'">
@@ -57,6 +65,13 @@
                 accept=".csv"
               />
             </div>
+            <div v-else-if="selectedDataType === 'Docx'">
+              <input
+                type="file"
+                @change="handleFileUpload"
+                accept=".docx"
+              />
+            </div>
             <div v-else-if="selectedDataType === 'Text'">
               <label for="text-data" class="block mb-2">Text Data:</label>
               <textarea
@@ -68,7 +83,7 @@
             <p v-if="error.length>0" class="text-red-600"> {{ error }} </p>
             <div class="flex justify-end mt-4">
               <button
-                @click="$emit('close')"
+                @click="resetModal(); $emit('close')"
                 class="bg-red-600 text-white py-2 px-4 rounded-lg m-1"
                 v-if="!loading"
               >
@@ -134,6 +149,13 @@
           }
 
         },
+        resetModal() {
+          this.selectedDataType = "Text";
+          this.name = "";
+          this.data = "";
+          this.error = "";
+          this.file_type = "";
+        },
         async embedData(supabase, user_session, is_file=false) {
 
           const { data, error } = await supabase
@@ -194,7 +216,7 @@
             const { data, error } = await supabase
               .from('data')
               .insert([
-                { name: this.name, content_data: this.data, user_id: `${user_session.user.id}` },
+                { name: this.name, content_data: this.data, user_id: `${user_session.user.id}`, file_type: 'text'},
               ])
             if (error){
               alert("Error uploading data")
@@ -204,7 +226,7 @@
             }
 
           }
-          else if (this.selectedDataType=="PDF") {
+          else if (this.selectedDataType=="PDF" || this.selectedDataType=="DOCX" || this.selectedDataType=="CSV") {
             const unique_name = `${this.name}_${Date.now()}`
             const { data, error } = await supabase
               .storage
@@ -231,6 +253,7 @@
               }
             }
           }
+          
 
 
         },

@@ -19,12 +19,12 @@
         <div class="h-full" style=" overflow-y: auto;">
         <div class="flex flex-wrap p-4 " >
                 <div v-for="dataSource in dataSources" :key="dataSource.id" class="basis-1/5 bg-white relative p-4 border-2 border-gray-200 rounded-lg w-full my-3 mx-3 hover:shadow-md hover:border-sky-100 hover:bg-sky-50">
-                    <NuxtLink
-                        :to="`/dataSources/${dataSource.id}`">
+                    <!-- <NuxtLink
+                        :to="`/dataSources/${dataSource.id}`"> -->
                     <div class="flex justify-between items-center">
-                        <div class="flex items-center">
-                            <!-- <img :src="dataSource.logo" :alt="dataSource.name" class="mb-2 mr-2 w-12 h-12 rounded-md"> -->
-                            <h3 class="mt-2 mb-4 text-gray-900">{{ dataSource.name }}</h3>
+                        <div class="flex justify-between items-center">
+                            <img :src="getIconForFileType(dataSource.file_type)" :alt="dataSource.name" class="mr-2 w-8 h-8 rounded-md"/>
+                            <p class="truncate text-gray-900">{{ dataSource.name }}</p>
                         </div>
 
                         <div class="flex">
@@ -91,7 +91,7 @@
                             </div>
                         </div>
                     </div>
-                   </NuxtLink>
+                   <!-- </NuxtLink> -->
                 </div>
             </div>
         </div>
@@ -99,8 +99,6 @@
 </template>
 
 <script>
-import FileUpload from '~~/components/FileUpload.vue';
-
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import { ChevronDownIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/20/solid'
 
@@ -122,6 +120,17 @@ export default {
 
     },
     methods: {
+        getIconForFileType(fileType) {
+            const iconMap = {
+                'pdf': '/images/pdf.png',
+                'vnd.openxmlformats-officedocument.wordprocessingml.document': '/images/word.png',
+                'website': '/images/website.png',
+                'csv': '/images/csv.png',
+                'text': '/images/text.png',
+                // Add more mappings as needed
+            };
+            return iconMap[fileType] || '/images/text.png'; // Default to 'text.png' if no match
+        },
         initSupabase() {
             return useSupabaseClient()
         },
@@ -140,14 +149,14 @@ export default {
                 this.dataSources.push({
                     id: dataSource.id,
                     name: dataSource.name,
-                    logo: "https://via.placeholder.com/50"
+                    file_type: dataSource.file_type,
                 })
             })
         },
         async getDataSources(supabase, refresh = false) {
             const { data, error } = await supabase
                 .from('data')
-                .select('id, name, content_data');
+                .select('id, name, content_data, file_type');
 
             if (error) {
                 console.log(error)
@@ -171,6 +180,7 @@ export default {
         },
         closeNewDataSource() {
             this.newDataSourceModalOpen = false;
+
         },
         openSettings(dataSourceId) {
             this.activeDataSource = dataSourceId;
@@ -178,6 +188,7 @@ export default {
         },
         closeSettings() {
             this.settingsModalOpen = false;
+ 
         },
         async deleteDataSource(dataSourceId) {
             const supabase = this.initSupabase()
@@ -219,7 +230,6 @@ export default {
         }
     },
     components: {
-        FileUpload,
         Menu,
         MenuButton,
         MenuItems,

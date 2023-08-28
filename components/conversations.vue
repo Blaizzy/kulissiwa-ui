@@ -5,7 +5,7 @@
             <div class="flex justify-between items-center bg-white p-2">
                 <h1 class="text-2xl font-semibold">Chats</h1>
                 <div class="font-semibold p-2 rounded-full hover:bg-sky-50">
-                    <nuxt-link to="/chats">
+                    <nuxt-link to="/chats" @click.native="clearMessages">
                         <img src="~~/assets/icons/icons8-new-message-24.png" alt="Chatbot Avatar" class="w-5 h-5">
                     </nuxt-link>
                 </div>
@@ -27,7 +27,7 @@
             <div class="mb-4" v-for="conversation in conversations" :key="conversation.id">
                 <!-- <h2 class="text-xl font-semibold mb-2">Today</h2> -->
                 <nuxt-link
-                        :to="`/chats/${conversation.id}`">
+                        :to="`/chats/${conversation.id}`" >
                 <div
                     class="p-3 rounded-full"
                     :class="{
@@ -42,7 +42,11 @@
                                 <span v-show="showDeleteConfirmation && isSelectedConversation(conversation.id)"
                                 class="mr-1 ">
                                 <i class="fas fa-trash-alt text-gray-600"></i></span>
-                                <p v-show="!showTitleEditConfirmation || !isSelectedConversation(conversation.id)" class="text-sm text-gray-600">{{ conversation.title }}</p>
+                                <p v-show="!showTitleEditConfirmation || !isSelectedConversation(conversation.id)" class="text-sm text-gray-600" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 150px;"
+                                :class="{'typed-title': !typedTitle && isSelectedConversation(conversation.id)}">
+                                    {{ conversation.title }}
+                            
+                                </p>
                                 <input
                                 v-show="showTitleEditConfirmation && isSelectedConversation(conversation.id)"
                                 type="text" class="text-sm text-gray-600 border border-sky-500" v-model="conversationTitle"
@@ -105,6 +109,14 @@
 
 
 export default {
+    setup() {
+        const { clearMessages } = useChat();
+
+        return {
+          clearMessages,
+          
+        };
+    },
     data() {
         return {
             conversations: [],
@@ -112,9 +124,18 @@ export default {
             showDeleteConfirmation: false,
             conversationTitle: '',
             showTitleEditConfirmation: false,
+            typedTitle: '',
         }
     },
+    async created() {
+        const { refreshConversations } = useConversations()
+
+        watch(refreshConversations, () => {
+            this.updateConversations()
+        })
+    },
     mounted() {
+       
         this.getConversations()
         if (this.showDeleteConfirmation == true) {
             this.showDeleteConfirmation = false
@@ -123,8 +144,25 @@ export default {
             this.showTitleEditConfirmation = false
         }
         this.selectedConversation  = this.$route.params.id ? this.$route.params.id : null
+
     },
     methods: {
+        async updateConversations() {
+            await this.getConversations(true)
+            if (this.conversations.length > 0) {
+                this.$route.params.id = this.conversations[0].id
+                this.setConversation(this.conversations[0].id)
+                this.typeTitle(this.conversations[0].title);
+            }
+        },
+        async typeTitle(title) {
+            this.typedTitle = title;  // Use 'this' to access typedTitle
+            this.conversations[0].title = '';  // Use 'this' to access typedTitle
+            for (let i = 0; i < this.typedTitle.length; i++) {
+                await new Promise(resolve => setTimeout(resolve, 100));  // adjust the speed of typing here
+                this.conversations[0].title += this.typedTitle[i];  // Use 'this' to access typedTitle
+            }
+        },
         async initSupabase() {
             return useSupabaseClient()
         },
@@ -135,7 +173,10 @@ export default {
             }
             this.selectedConversation = id
             this.conversationTitle = this.conversations.find(conversation => conversation.id === id).title
-
+            // Only type out the title if this is the first conversation
+            if (this.selectedConversation === this.conversations[0].id) {
+                
+            }
         },
 
         async getConversations(refresh=false) {
@@ -233,11 +274,23 @@ export default {
         },
 
     },
+   
 
 
 }
 </script>
 
 <style>
+
+.typed-title::after{
+    font-size: 1.5em;
+    white-space: pre;
+    overflow: hidden;
+    border-right: .3em solid black;  /* make cursor bigger and black */
+    animation: blink 1s steps(1) infinite;
+}
+@keyframes blink {
+  50% { border-color: black; }
+}
 
 </style>

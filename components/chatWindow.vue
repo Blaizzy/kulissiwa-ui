@@ -8,27 +8,33 @@
             </div>
 
             <div class="flex items-center">
-                <select id="data-type" class="block border border-gray-300 rounded-lg p-1 mr-4" v-model="selectedDataType">
+                <img :src="file_logo" alt="Data Source Icon" class="w-6 h-6 rounded-md mr-1">
+                <select id="data-type" class="block border border-gray-300 rounded-lg p-1 mr-4" v-model="selectedDataType" @change="getIconForFileType()">
+                    <!-- Add a all option bound to dataSources -->
+                    <option value="All">All</option>
                     <option  v-for="dataSource in dataSources" :key="dataSource.id" :value="dataSource.id">
                         {{ dataSource.name }}
                     </option>
                 </select>
+                
+                
+                
                 <i class="fa-solid fa-gear"></i>
             </div>
         </div>
 
 
         <div class="flex-grow overflow-y-auto mb-4 border-b border-gray-200">
+    
             <div class="flex justify-center p-2">
                 <div class="w-auto px-4 overflow-y-auto" ref="chatWindow" >
-
 
                     <div v-for="(user_message, index) in user_messages" :key="user_message.content">
                         <div class="my-4" >
                             <div class="flex items-start justify-end">
                                 <!-- User Message -->
-                                <div class="bg-sky-500  text-white shadow rounded-b-lg rounded-l-lg py-2 px-4 inline-block mr-2">
-                                    <div v-html="renderMarkdown(user_message.content)" style="white-space: pre-wrap; max-width: 500px; word-wrap: break-word;"></div>
+                                <div class="bg-sky-500 text-white shadow rounded-b-lg rounded-l-lg px-4 inline-block mr-2 prose">
+                                    <div v-html="renderMarkdown(user_message.content)"></div>
                                 </div>
                                 <img :src="avatar_url" alt="User Avatar" class="w-10 h-10 rounded-full">
                             </div>
@@ -47,7 +53,7 @@
                                                 <DisclosureButton
                                                 class="flex w-full border border-gray-300 justify-between rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
                                                 >
-                                                <span> {{ getSourceName(source_document.metadata.source) }}</span>
+                                                <span> {{ source_document.metadata.source }}</span>
                                                 <ChevronUpIcon
                                                     :class="open ? 'rotate-180 transform' : ''"
                                                     class="h-5 w-5 text-gray-500"
@@ -61,12 +67,12 @@
                                     </div>
                                 </div>
 
-                                <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg inline-block py-2 px-6 ml-2" v-else-if="loading_ai_response ">
-                                    <p>I'm thinking about it...</p>
-                                    <p class="suspense_block py-1 my-1 w-10/12"></p>
-                                    <p class="suspense_block py-1 my-1 "></p>
-                                    <p class="suspense_block py-1 my-1 w-10/12"></p>
-                                    <p class="suspense_block py-1 my-1"></p>
+                                <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg inline-block py-2 px-6 ml-2" v-else-if="loading_ai_response">
+                                    <div class="space-x-1.5">
+                                        <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0s;--fa-fade-opacity: 0.1;"></i>
+                                        <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0.3s;--fa-fade-opacity: 0.1;"></i>
+                                        <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0.6s;--fa-fade-opacity: 0.1;"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -122,11 +128,11 @@ const maxRows = 4;
 
 export default {
     setup() {
-
-
+        
         // Create a local markdown instance
         const markdown = new MarkdownIt({
             html: true,
+            breaks: true,  
             linkify: true,
             typographer: true,
             highlight: (str, lang) => {
@@ -142,6 +148,15 @@ export default {
                 return '';
             },
         });
+
+        markdown.renderer.rules.heading_open = (tokens, idx) => {
+            const token = tokens[idx];
+            const hLevel = token.tag;
+            return `<${hLevel} style="color:white;">`;
+        };
+
+        markdown.renderer.rules.paragraph_open = () => '<p style="white-space: pre-wrap;">';
+        markdown.renderer.rules.paragraph_close = () => '</p>';
 
         markdown.renderer.rules.fence = (tokens, idx, options, env, self) => {
         const token = tokens[idx];
@@ -165,6 +180,7 @@ export default {
         // Create a method to render markdown
         const renderMarkdown = (source) => markdown.render(source);
 
+
         // Expose the `renderMarkdown` method to the template
         return {
             renderMarkdown,
@@ -182,7 +198,16 @@ export default {
             selectedDataType: '',
             loading_ai_response: false,
             avatar_url: 'https://via.placeholder.com/40',
+            file_logo: '/images/text.png',
         };
+    },
+    async created() {
+        const { clearMessagesFlag } = useChat();
+
+        watch(clearMessagesFlag, () => {
+            this.user_messages = [];
+            this.ai_messages = [];
+        })
     },
     async mounted() {
         this.$nextTick(() => {
@@ -206,8 +231,10 @@ export default {
             console.log('Failed to copy to clipboard!');
             });
         });
+
+        const supabase = useSupabaseClient()
         // TODO: Think about how to handle this better
-        const supabase = this.initSupabase();
+        
         if (this.$route.params.id){
             this.conversationId = this.$route.params.id
             this.user_messages = [];
@@ -226,15 +253,41 @@ export default {
             const lineBreaks = (this.message.match(/\n/g) || []).length + 1; // Add one for the first line
             return lineBreaks > maxRows ? maxRows : lineBreaks;
         },
+    
     },
     methods: {
+        getSelectedName() {
+            const selectedSource = this.dataSources.find(ds => ds.id === this.selectedDataType);
+            if (!selectedSource) {
+                return 'Select a data source';
+            }
+            return selectedSource.name;
+        },
+        getIconForFileType() {
+            console.log(this.selectedDataType);
+            const selectedSource = this.dataSources.find(ds => ds.id === this.selectedDataType);
+            console.log(selectedSource);
+            if (!selectedSource) {
+                this.file_logo = '/images/text.png'; // Return a default icon if no match found
+            }
+            const iconMap = {
+                'pdf': '/images/pdf.png',
+                'vnd.openxmlformats-officedocument.wordprocessingml.document': '/images/word.png',
+                'website': '/images/website.png',
+                'csv': '/images/csv.png',
+                'text': '/images/text.png',
+                // Add more mappings as needed
+            };
+            this.file_logo = iconMap[selectedSource.file_type] || '/images/text.png'; // Default to 'fa-file' if no match
+        },
+        
         setUserAvatar(avatar_url) {
             this.avatar_url = avatar_url;
         },
         async getDataSources( supabase ){
             const { data, error } = await supabase
             .from('data')
-            .select('id, name, content_data')
+            .select('id, name, content_data, file_type')
 
             if (error) {
                 console.log(error)
@@ -245,10 +298,11 @@ export default {
                 data.forEach((dataSource) => {
                     this.dataSources.push({
                         id: dataSource.id,
-                        name: dataSource.name
+                        name: dataSource.name,
+                        file_type: dataSource.file_type,
                     })
                 })
-                if (this.dataSources.length > 0) this.selectedDataType = this.dataSources[0].id
+                this.selectedDataType = "All"
             }
         },
         highlightCode() {
@@ -317,98 +371,148 @@ export default {
             }
 
         },
+        async autoTitle(firstMessage){
+            try {   
+                const query = `Please summarize the following message as a single sentence of less than 5 words:\n` + firstMessage;
+                const formData = new FormData();
+                formData.append("query", query);
+
+                const response = await fetch("http://127.0.0.1:8000/auto_title", {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.body) {
+                    console.log("No response body")
+                }else{
+                    return response.json();
+                }
+                
+            } catch (err) {
+                console.log(err);
+            }
+
+        },
+    
         async queryModel() {
 
             const supabase = this.initSupabase()
             const user_session = await this.getSession(supabase)
 
-            this.user_messages.push({content: this.message.trim().replace(/\n/g, '\n')});
+            this.user_messages.push({content: this.message});
             this.message = '';
 
             this.loading_ai_response = true;
-
+            
             if (this.$route.params.id==undefined && this.conversationId=='') {
-                await this.insertData(supabase, 'conversations', [{user_id: user_session.user.id}])
+
+                const title = await this.autoTitle(this.user_messages[0].content)
+                await this.insertData(supabase, 'conversations', [{user_id: user_session.user.id, title: title.content}])
                 const { data, error } = await supabase
                     .from('conversations')
                     .select('id, created_at')
                     .order('created_at', { ascending: false })
                     .limit(1)
+
                 if (error) {
                     console.log(error)
-                    alert('Failed to get conversation ID')
                 }
                 if (data) {
                     this.conversationId = data[0].id;
+                    const { refresh } = useConversations();
+                    refresh();
+                    
                 }
             }
 
             // get the last user message
             const last_user_message = this.user_messages[this.user_messages.length - 1];
-            let response_dict = {};
+            let response_dict;
 
             try {
                 const formData = new FormData();
                 formData.append("query",last_user_message.content);
-                formData.append("data_source",this.selectedDataType);
+                if (this.selectedDataType != 'All'){
+                    formData.append("data_source",this.selectedDataType);
+                }
                 formData.append("namespace", user_session.user.id);
+                
 
                 const response = await fetch("http://127.0.0.1:8000/chat_with_sources", {
                     method: 'POST',
-                    body: formData
+                    body: formData,
                 });
 
                 if (!response.body) {
                     throw new Error('ReadableStream not supported');
                 }
                 const reader = response.body.getReader();
-                const decoder = new TextDecoder();
+                const decoder = new TextDecoder('utf-8');
 
-                let result = '';
                 let index = this.ai_messages.push(' ') - 1;
                 this.scrollToBottom();
-                const delimiter = "||JSON||";
+                function isPotentialJSON(chunk) {
+                    return chunk.startsWith('{') && chunk.endsWith('}') && chunk.includes('"source_documents"');
+                }
+                let result = '';
                 while (true) {
                     const { value, done } = await reader.read();
-
+                    
                     if (done) {
                         console.log('Stream complete');
                         break;
                     }
 
-                    const chunk = decoder.decode(value, { stream: true });
+                    let chunk = decoder.decode(value, { stream: true }).replace(/data: /g, '').trim();
+    
+                    // Split the chunk by new lines
+                    const words = chunk.split('\n');
 
-                    if (chunk.includes(delimiter)) {
-                        const json_string = chunk.split(delimiter)[1];
-                        response_dict = JSON.parse(json_string);
-                        if (response_dict.source_documents.length > 0) {
-                            result += chunk.split(delimiter)[0];
+                    // If there's more than one word, join them into a single string
+                    if (words.length > 1) {
+                        chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
+                    }
+                    if (isPotentialJSON(chunk)) {
+                        response_dict = JSON.parse(chunk);
+                        this.ai_messages.splice(index, 1, { "content" : result, "source_documents" : response_dict.source_documents });
+                        
+                    } else {
+                        result += chunk.replace(/^"(.*)"$/, '$1');
 
-                            this.ai_messages.splice(index, 1, {"content": result , "source_documents": response_dict.source_documents});
-                        }
-
-                    }else{
-                        result += chunk;
-                        this.ai_messages.splice(index, 1,  {"content": result });
+                        this.ai_messages.splice(index, 1,  { "content" : result });
                     }
                     this.highlightCode();
                 }
-
-                console.log(result);
-                console.log("Received JSON object:", response_dict);
+               
+                
             } catch (err) {
                 console.log(err);
             } finally {
                 this.loading_ai_response = false;
             }
-
+            // replace the source id with the source name
+            if (response_dict.source_documents) 
+                response_dict.source_documents.forEach(item => {
+                    let id = item.metadata.source;
+                    item.metadata.source = this.getSourceName(id);
+                });
+            else
+                response_dict = {source_documents: []};
 
             await this.insertData(
                 supabase,
                 'messages',
                 [
-                    {conversation_id: this.conversationId, sender: 'human', content: this.user_messages[this.user_messages.length - 1]["content"] , source_documents: []},
-                    {conversation_id: this.conversationId, sender: 'ai', content: this.ai_messages[this.ai_messages.length - 1]["content"], source_documents: response_dict.source_documents}
+                    {
+                        conversation_id: this.conversationId, 
+                        sender: 'human', content: this.user_messages[this.user_messages.length - 1]["content"] , 
+                        source_documents: []
+                    },
+                    {
+                        conversation_id: this.conversationId,
+                        sender: 'ai', content: this.ai_messages[this.ai_messages.length - 1]["content"], 
+                        source_documents: this.ai_messages[this.ai_messages.length - 1]["source_documents"]
+                    }
                 ]
             )
 
@@ -419,12 +523,19 @@ export default {
         }
     },
     watch: {
+        user_messages: {
+            handler: function (val, oldVal) {
+                this.highlightCode();
+            },
+            deep: true
+        },
         ai_messages: {
             handler: function (val, oldVal) {
                 this.highlightCode();
             },
             deep: true
         },
+        
     },
     components: {
     Disclosure,
@@ -443,23 +554,3 @@ export default {
 </script>
 
 
-<style scoped>
-.suspense_block {
-    height: 100%;
-    display: flex;
-    animation: pulse-bg 1s infinite;
-}
-@keyframes pulse-bg {
-    0% {
-        background: rgb(194, 194, 194);
-    }
-    50% {
-        background: rgb(167, 167, 167);
-    }
-    100% {
-        background: gray;
-    }
-}
-
-
-</style>
