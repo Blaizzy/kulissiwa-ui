@@ -27,9 +27,10 @@
           <select id="data-type" class="block w-full border border-gray-300 rounded-lg p-1" v-model="selectedDataType">
             <option>PDF</option>
             <option>Docx</option>
-            <option>Website</option>
-            <option>Text file</option>
-            <option>Text</option>            
+            <option>Text</option>
+            <option disabled>Website</option>
+            <option disabled>CSV</option>
+            <option disabled>Notion</option>            
             <!-- Add more data types as needed -->
           </select>
         </div>
@@ -40,13 +41,6 @@
                 type="file"
                 @change="handleFileUpload"
                 accept=".pdf"
-              />
-            </div>
-            <div v-if="selectedDataType === 'Text file'">
-              <input
-                type="file"
-                @change="handleFileUpload"
-                accept=".txt"
               />
             </div>
             <div v-else-if="selectedDataType === 'Website'">
@@ -155,6 +149,7 @@
           this.data = "";
           this.error = "";
           this.file_type = "";
+          this.loading= false;
         },
         async embedData(supabase, user_session, is_file=false) {
 
@@ -179,7 +174,7 @@
             formData.append("data_type", this.selectedDataType);
 
             try {
-              const response = await fetch("http://127.0.0.1:8000/embed_data", {
+              const response = await fetch("https://blaizzy--kulissiwa-data-data.modal.run/embed_data", {
                   method: 'POST',
                   body: formData,
               });

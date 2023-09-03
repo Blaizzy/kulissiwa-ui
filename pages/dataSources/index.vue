@@ -50,20 +50,25 @@
                                     class="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" style=" z-index: 1000;"
                                     >
                                     <div class="px-1 py-1">
-                                        <MenuItem v-slot="{ active }">
+                                        <MenuItem v-slot="{ disabled }" disabled>
                                             <NuxtLink
                                                 :class="[
+                                                disabled ? 'opacity-50 cursor-not-allowed' : 'text-gray-900',
                                                 active ? 'bg-sky-500 text-white' : 'text-gray-900',
                                                 'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+                                                
                                                 ]"
                                                 :to="`/dataSources/${dataSource.id}`"
-                                            >
-                                                <PencilSquareIcon
-                                                :active="active"
-                                                class="mr-2 h-5 w-5 text-sky-400 group-hover:text-white"
-                                                aria-hidden="true"
-                                                />
-                                                Edit
+                                            >   
+                                                <div class="flex items-center">
+                                                    <PencilSquareIcon
+                                                    :active="active"
+                                                    class="mr-2 h-5 w-5 text-sky-400"
+                                                    aria-hidden="true"
+                                                    />
+                                                    <p> Edit </p> 
+                                                </div>
+                                                <span class="inline-flex items-center rounded-md bg-yellow-50 ml-auto px-1.5 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">soon</span>
                                             </NuxtLink>
                                         </MenuItem>
                                     </div>
@@ -93,6 +98,15 @@
                     </div>
                    <!-- </NuxtLink> -->
                 </div>
+                <!-- <div v-if="dataSources.length === 0" class="flex justify-center items-center w-full">
+                    <p class="text-gray-500">No data sources found</p>
+                    <div class="flex">
+                        <button @click="newDataSource" class=" bg-blue-50 py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
+                            <p class="text-gray-500">Add new data source</p>
+                        </button>
+                        <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" />
+                    </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -209,7 +223,7 @@ export default {
 
 
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/delete_item", {
+                    const response = await fetch("https://blaizzy--kulissiwa-data-data.modal.run/delete_data", {
                         method: 'POST',
                         body: formData,
                     });

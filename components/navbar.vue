@@ -9,11 +9,11 @@
             <button v-show="collapsed" @click="collapse" class="block py-3 px-2 mb-2 font-semibold rounded-full hover:bg-sky-100">
                 <Bars3Icon class="w-4 h-4 text-gray-600"/>
             </button>
-            <NuxtLink to="/dashboard" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
+            <!-- <NuxtLink to="/dashboard" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
                 <i class="fa-solid fa-cubes"></i>
                     <span v-show="!collapsed" class="pl-1.5">Dashboard</span>
   
-            </NuxtLink>
+            </NuxtLink> -->
             <NuxtLink to="/dataSources" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
                 <i class="fa-solid fa-database"></i>
  
@@ -28,12 +28,12 @@
                 
             </NuxtLink>
 
-            <NuxtLink to="/billing" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
+            <!-- <NuxtLink to="/billing" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
                 <i class="fa-solid fa-credit-card"></i>
                
                     <span v-show="!collapsed" class="pl-1.5">Billing</span>
                 
-            </NuxtLink>
+            </NuxtLink> -->
         </nav>
 
         <hr class="mt-auto w-full h-px my-2 border dark:bg-gray-300">

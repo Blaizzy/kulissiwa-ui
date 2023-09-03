@@ -7,19 +7,21 @@
                 <h1 class="text-2xl font-semibold m-1">GPT-4</h1>
             </div>
 
-            <div class="flex items-center">
-                <img :src="file_logo" alt="Data Source Icon" class="w-6 h-6 rounded-md mr-1">
-                <select id="data-type" class="block border border-gray-300 rounded-lg p-1 mr-4" v-model="selectedDataType" @change="getIconForFileType()">
-                    <!-- Add a all option bound to dataSources -->
-                    <option value="All">All</option>
-                    <option  v-for="dataSource in dataSources" :key="dataSource.id" :value="dataSource.id">
-                        {{ dataSource.name }}
-                    </option>
-                </select>
-                
-                
-                
-                <i class="fa-solid fa-gear"></i>
+            <div class="flex items-center" >
+               
+                    <img :src="file_logo" alt="Data Source Icon" class="w-6 h-6 rounded-md mr-1">
+                  
+                    <select id="data-type" class="block border border-gray-300 rounded-lg p-1 mr-4" v-model="selectedDataType" @change="getIconForFileType()" >
+                        <!-- Add  option bound to dataSources -->
+                        <option value="Chat">Chat</option>
+                        <option  v-for="dataSource in dataSources" :key="dataSource.id" :value="dataSource.id">
+                            {{ dataSource.name }}
+                        </option>
+
+                    </select>
+                    
+               
+            
             </div>
         </div>
 
@@ -198,7 +200,7 @@ export default {
             selectedDataType: '',
             loading_ai_response: false,
             avatar_url: 'https://via.placeholder.com/40',
-            file_logo: '/images/text.png',
+            file_logo: '/images/chat.png',
         };
     },
     async created() {
@@ -253,7 +255,9 @@ export default {
             const lineBreaks = (this.message.match(/\n/g) || []).length + 1; // Add one for the first line
             return lineBreaks > maxRows ? maxRows : lineBreaks;
         },
-    
+        hasDataSources() {
+            return this.dataSources && this.dataSources.length > 0;
+        },
     },
     methods: {
         getSelectedName() {
@@ -264,11 +268,9 @@ export default {
             return selectedSource.name;
         },
         getIconForFileType() {
-            console.log(this.selectedDataType);
             const selectedSource = this.dataSources.find(ds => ds.id === this.selectedDataType);
-            console.log(selectedSource);
             if (!selectedSource) {
-                this.file_logo = '/images/text.png'; // Return a default icon if no match found
+                this.file_logo = '/images/chat.png'; // Return a default icon if no match found
             }
             const iconMap = {
                 'pdf': '/images/pdf.png',
@@ -302,7 +304,7 @@ export default {
                         file_type: dataSource.file_type,
                     })
                 })
-                this.selectedDataType = "All"
+                this.selectedDataType = 'Chat';
             }
         },
         highlightCode() {
@@ -351,9 +353,9 @@ export default {
                 // Assuming the backend returns an array of messages with a sender and data properties
                 messages.forEach((message) => {
                     if (message.sender === 'ai') {
-                        this.ai_messages.push({"content":message.content, "source_documents": message.source_documents});
+                        this.ai_messages.push({"sender": message.sender,"content":message.content, "source_documents": message.source_documents});
                     } else {
-                        this.user_messages.push({"content":message.content});
+                        this.user_messages.push({"sender":message.sender, "content":message.content});
                     }
                 });
 
@@ -377,7 +379,7 @@ export default {
                 const formData = new FormData();
                 formData.append("query", query);
 
-                const response = await fetch("http://127.0.0.1:8000/auto_title", {
+                const response = await fetch("https://blaizzy--kulissiwa-auto-title-fastapi-app.modal.run", {
                     method: 'POST',
                     body: formData
                 });
@@ -393,13 +395,40 @@ export default {
             }
 
         },
-    
+        transformMessage(userMessage) {
+            let _type = userMessage.sender;
+            let content = userMessage.content;
+
+            let senderName = _type === 'human' ? 'Human' : 'AI';
+
+            return {
+                type: _type,
+                data: {
+                    content: content,
+                    additional_kwargs: {
+                        // sender_name: senderName
+                    }
+                }
+            };
+        },
+        combineMessages(user_messages, ai_messages) {
+            let combinedMessages = [];
+            for (let i = 0; i < Math.max(user_messages.length, ai_messages.length); i++) {
+                if (i < user_messages.length) {
+                    combinedMessages.push(user_messages[i]);
+                }
+                if (i < ai_messages.length) {
+                    combinedMessages.push(ai_messages[i]);
+                }
+            }
+            return combinedMessages;
+        },
         async queryModel() {
 
             const supabase = this.initSupabase()
             const user_session = await this.getSession(supabase)
 
-            this.user_messages.push({content: this.message});
+            this.user_messages.push({sender: "human", content: this.message});
             this.message = '';
 
             this.loading_ai_response = true;
@@ -432,72 +461,130 @@ export default {
             try {
                 const formData = new FormData();
                 formData.append("query",last_user_message.content);
-                if (this.selectedDataType != 'All'){
-                    formData.append("data_source",this.selectedDataType);
-                }
-                formData.append("namespace", user_session.user.id);
-                
 
-                const response = await fetch("http://127.0.0.1:8000/chat_with_sources", {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (!response.body) {
-                    throw new Error('ReadableStream not supported');
-                }
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder('utf-8');
-
-                let index = this.ai_messages.push(' ') - 1;
-                this.scrollToBottom();
-                function isPotentialJSON(chunk) {
-                    return chunk.startsWith('{') && chunk.endsWith('}') && chunk.includes('"source_documents"');
-                }
-                let result = '';
-                while (true) {
-                    const { value, done } = await reader.read();
-                    
-                    if (done) {
-                        console.log('Stream complete');
-                        break;
+                if (this.selectedDataType == 'Chat'){
+                    // Create a history variable that contains list of all user and ai messages
+                    // Convert sender key to type
+                    // Copy user_messages and ai_messages
+                    let user_messages = this.user_messages.map(this.transformMessage);
+                    console.log(user_messages)
+                    let ai_messages = ''
+                    if (this.ai_messages.length > 0){
+                        ai_messages = this.ai_messages.map(this.transformMessage);
                     }
-
-                    let chunk = decoder.decode(value, { stream: true }).replace(/data: /g, '').trim();
-    
-                    // Split the chunk by new lines
-                    const words = chunk.split('\n');
-
-                    // If there's more than one word, join them into a single string
-                    if (words.length > 1) {
-                        chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
+                    else{
+                        ai_messages = [];
                     }
-                    if (isPotentialJSON(chunk)) {
-                        response_dict = JSON.parse(chunk);
-                        this.ai_messages.splice(index, 1, { "content" : result, "source_documents" : response_dict.source_documents });
+                    // Combine the two lists one element at a time
+                    let history = this.combineMessages(user_messages, ai_messages);
+                    // Convert the history to a string and append to formData
+                    formData.append("history", JSON.stringify({"messages":history}));
+                    const response = await fetch("https://blaizzy--kulissiwa-chat-chat.modal.run/", {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (!response.body) {
+                        throw new Error('ReadableStream not supported');
+                    }
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder('utf-8');
+
+                    let index = this.ai_messages.push(' ') - 1;
+                    this.scrollToBottom();
+                    let result = '';
+                    while (true) {
+                        const { value, done } = await reader.read();
                         
-                    } else {
+                        if (done) {
+                            console.log('Stream complete');
+                            break;
+                        }
+
+                        let chunk = decoder.decode(value, { stream: true }).replace(/data: /g, '').trim();
+        
+                        // Split the chunk by new lines
+                        const words = chunk.split('\n');
+
+                        // If there's more than one word, join them into a single string
+                        if (words.length > 1) {
+                            chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
+                        }
+                       
                         result += chunk.replace(/^"(.*)"$/, '$1');
 
                         this.ai_messages.splice(index, 1,  { "content" : result });
+                        
+                        this.highlightCode();
                     }
-                    this.highlightCode();
                 }
-               
-                
+                else{
+                    if (this.selectedDataType != 'All'){
+                        formData.append("data_source", this.selectedDataType);
+                    }
+                    formData.append("namespace", user_session.user.id);
+                    
+
+                    const response = await fetch("https://blaizzy--kulissiwa-chat-with-sources-chat-with-sources.modal.run", {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (!response.body) {
+                        throw new Error('ReadableStream not supported');
+                    }
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder('utf-8');
+
+                    let index = this.ai_messages.push(' ') - 1;
+                    this.scrollToBottom();
+                    function isPotentialJSON(chunk) {
+                        return chunk.startsWith('{') && chunk.endsWith('}') && chunk.includes('"source_documents"');
+                    }
+                    let result = '';
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        
+                        if (done) {
+                            console.log('Stream complete');
+                            break;
+                        }
+
+                        let chunk = decoder.decode(value, { stream: true }).replace(/data: /g, '').trim();
+        
+                        // Split the chunk by new lines
+                        const words = chunk.split('\n');
+
+                        // If there's more than one word, join them into a single string
+                        if (words.length > 1) {
+                            chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
+                        }
+                        if (isPotentialJSON(chunk)) {
+                            response_dict = JSON.parse(chunk);
+                            this.ai_messages.splice(index, 1, { "content" : result, "source_documents" : response_dict.source_documents });
+                            
+                        } else {
+                            result += chunk.replace(/^"(.*)"$/, '$1');
+
+                            this.ai_messages.splice(index, 1,  { "content" : result });
+                        }
+                        this.highlightCode();
+                    }
+                    // replace the source id with the source name
+                    if (response_dict.source_documents) 
+                        response_dict.source_documents.forEach(item => {
+                            let id = item.metadata.source;
+                            item.metadata.source = this.getSourceName(id);
+                        });
+                    else
+                        response_dict = {source_documents: []};
+                    } 
             } catch (err) {
                 console.log(err);
             } finally {
                 this.loading_ai_response = false;
             }
-            // replace the source id with the source name
-            if (response_dict.source_documents) 
-                response_dict.source_documents.forEach(item => {
-                    let id = item.metadata.source;
-                    item.metadata.source = this.getSourceName(id);
-                });
-            else
-                response_dict = {source_documents: []};
+            
 
             await this.insertData(
                 supabase,
@@ -505,7 +592,7 @@ export default {
                 [
                     {
                         conversation_id: this.conversationId, 
-                        sender: 'human', content: this.user_messages[this.user_messages.length - 1]["content"] , 
+                        sender: this.user_messages[this.user_messages.length - 1]["sender"], content: this.user_messages[this.user_messages.length - 1]["content"] , 
                         source_documents: []
                     },
                     {
