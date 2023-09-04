@@ -33,6 +33,9 @@ export default defineNuxtConfig({
         { src: "~/plugins/markdown-it.js", mode: "client"},
     ],
     runtimeConfig: {
+        public:{
+            baseURL: "/chats",
+        },
         supabase:{
             url: "",
             key: ""
