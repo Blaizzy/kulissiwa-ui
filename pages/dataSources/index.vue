@@ -5,28 +5,65 @@ definePageMeta({
 </script>
 <template>
     <div class="flex-1 p-8 bg-white">
+        <div 
+            v-if="showSuccess" 
+            class="fixed top-4 right-4 py-2 px-4 text-lg text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800 shadow-md transition-transform transform"
+            :class="{ 'translate-x-full opacity-0': !showSuccess, 'translate-x-0 opacity-100': showSuccess }"
+        >
+            <i class="fas fa-square-check mr-2"></i>
+                Data uploaded successfully!
+        </div>
+        <div 
+            v-if="showFailure" 
+            class="fixed top-4 right-4 py-2 px-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800 shadow-md transition-transform transform"
+            :class="{ 'translate-x-full opacity-0': !showFailure, 'translate-x-0 opacity-100': showFailure }"
+        >
+            <i class="fas fa-square-xmark mr-2"></i>
+            Data upload failed!
+        </div>
+
+        <div 
+            v-if="showDeleteSuccess" 
+            class="fixed top-4 right-4 py-2 px-4 text-lg text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800 shadow-md transition-transform transform"
+            :class="{ 'translate-x-full opacity-0': !showDeleteSuccess, 'translate-x-0 opacity-100': showDeleteSuccess }"
+        >
+            <i class="fas fa-square-check mr-2"></i>
+                Data deleted successfully!
+        </div>
+        <div 
+            v-if="showDeleteFailure" 
+            class="fixed top-4 right-4 py-2 px-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800 shadow-md transition-transform transform"
+            :class="{ 'translate-x-full opacity-0': !showDeleteFailure, 'translate-x-0 opacity-100': showDeleteFailure }"
+        >
+            <i class="fas fa-square-xmark mr-2"></i>
+            Data deletion failed!
+        </div>
         <div class="flex justify-between pb-4 px-8 border-b border-gray-200 w-full">
             <div class="flex">
                 <h1 class="text-3xl font-semibold">Data sources</h1>
                 <button @click="newDataSource" class="text-gray-500 hover:text-gray-700 ml-5">
                     <i class="fa-solid fa-square-plus"></i>
                 </button>
-                <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" />
+                <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onEmbedDataSuccess" @show-failure="onEmbedDataFailure"  />
             </div>
 
-            <div class="mt-auto bg-white rounded-full flex items-center border border-gray-200 hover:border-sky-200 ">
+            <!-- TODO -->
+            <!-- <div class="mt-auto bg-white rounded-full flex items-center border border-gray-200 hover:border-sky-200 ">
                 <input type="search"  class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Search data sources...">
                 <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center">
                     <i class="fas fa-search"></i>
                 </button>
-            </div>
+            </div> -->
         </div>
         <div class="h-full" style=" overflow-y: auto;">
         <div class="flex flex-wrap p-4 " >
-                <div v-for="dataSource in dataSources" :key="dataSource.id" class="basis-1/5 bg-white relative p-4 border-2 border-gray-200 rounded-lg w-full my-3 mx-3 hover:shadow-md hover:border-sky-100 hover:bg-sky-50">
+                <div v-for="dataSource in dataSources" :key="dataSource.id" class="basis-1/5 bg-white relative p-4 border-2 border-gray-200 rounded-lg w-full my-3 mx-3 hover:shadow-md hover:border-sky-100 hover:bg-sky-50"
+                >
                     <!-- <NuxtLink
                         :to="`/dataSources/${dataSource.id}`"> -->
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center"
+                        :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''"
+                    >
                         <div class="flex justify-between items-center">
                             <img :src="getIconForFileType(dataSource.file_type)" :alt="dataSource.name" class="mr-2 w-8 h-8 rounded-md"/>
                             <p class="truncate text-gray-900">{{ dataSource.name }}</p>
@@ -130,6 +167,11 @@ export default {
             newDataSourceModalOpen: false,
             settingsModalOpen: false,
             activeDataSource: null,
+            showSuccess: false,
+            showFailure: false,
+            showDeleteSuccess: false,
+            showDeleteFailure: false,
+            dataSourceToDelete: null,
         };
     },
     async mounted(){
@@ -168,14 +210,16 @@ export default {
                 this.dataSources.push({
                     id: dataSource.id,
                     name: dataSource.name,
+                    content_data: dataSource.content_data,
                     file_type: dataSource.file_type,
+                    is_file: dataSource.is_file,
                 })
             })
         },
         async getDataSources(supabase, refresh = false) {
             const { data, error } = await supabase
                 .from('data')
-                .select('id, name, content_data, file_type');
+                .select('id, name, content_data, file_type, is_file');
 
             if (error) {
                 console.log(error)
@@ -194,6 +238,30 @@ export default {
             const supabase = this.initSupabase()
             await this.getDataSources(supabase, true)
         },
+        onEmbedDataSuccess() {
+            this.showSuccess = true
+            setTimeout(() => {
+                this.showSuccess = false
+            }, 3000)
+        },
+        onEmbedDataFailure() {
+            this.showFailure = true
+            setTimeout(() => {
+                this.showFailure = false
+            }, 3000)
+        },
+        onDeleteDataSuccess() {
+            this.showDeleteSuccess = true
+            setTimeout(() => {
+                this.showDeleteSuccess = false
+            }, 3000)
+        },
+        onDeleteDataFailure() {
+            this.showDeleteFailure = true
+            setTimeout(() => {
+                this.showDeleteFailure = false
+            }, 3000)
+        },
         newDataSource() {
             this.newDataSourceModalOpen = true;
         },
@@ -210,17 +278,36 @@ export default {
  
         },
         async deleteDataSource(dataSourceId) {
+            this.dataSourceToDelete = dataSourceId
             const supabase = this.initSupabase()
             const user_session = await this.getSession(supabase)
+            const item = this.dataSources.find(dataSource => dataSource.id === dataSourceId)
+            if (item.is_file){
+                
+                const { data, file_error } = await supabase
+                .storage
+                .from('user_files')
+                .remove([`${item.content_data}`])
+                
+                if (file_error) {
+                    console.log(file_error)
+                    this.onDeleteDataFailure()
+                }
+                console.log(item.content_data, "file deleted")
+                console.log(data, "file deleted")
+            }
             const { error } = await supabase
                 .from('data')
                 .delete()
                 .eq('id', dataSourceId)
 
+        
             if (error) {
                 console.log(error)
-                alert('There was an error deleting your data source')
-            }else {
+                this.onDeleteDataFailure()
+            
+            }
+            else {
                 const formData = new FormData();
 
                 formData.append("namespace", user_session.user.id);
@@ -235,10 +322,11 @@ export default {
 
                     if (!response.ok) {
                         const message = `An error has occured while deleting embedding data: ${response.status}`;
+                        this.onDeleteDataFailure()
                         console.log(message)
                     }else{
                         const data = await response.json();
-                        console.log(data)
+                        this.onDeleteDataSuccess()
                         await this.onDataRefreshed()
                     }
                 } catch (err) {

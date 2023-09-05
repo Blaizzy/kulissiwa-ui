@@ -23,7 +23,7 @@ definePageMeta({
 </template>
 
 <script>
-import MarkdownIt from 'markdown-it';
+import { marked } from 'marked';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism-okaidia.css';
@@ -32,53 +32,59 @@ import ClipboardJS from 'clipboard';
 export default {
     setup() {
 
+        const renderer = new marked.Renderer();
 
-        // Create a local markdown instance
-        const markdown = new MarkdownIt({
-            html: true,
-            linkify: true,
-            typographer: true,
-            highlight: (str, lang) => {
-                if (lang && Prism.languages[lang]) {
-                    try {
-
-                        return Prism.highlight(str, Prism.languages[lang], lang);
-                    } catch (error) {
-                        console.error(`Error highlighting code with Prism: ${error}`);
-                    }
+        renderer.code = function(code, lang) {
+            if (lang === 'markdown') {
+                return marked(code); // render it as markdown content
+            }
+            let highlightedCode = code;
+            if (lang && Prism.languages[lang]) {
+                try {
+                    highlightedCode = Prism.highlight(code, Prism.languages[lang], lang);
+                } catch (error) {
+                    console.error(`Error highlighting code with Prism: ${error}`);
                 }
+            }
+            const escapedForHtml = code
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+            return `
+                <div class="code-block-container">
+                    <pre class="language-${lang}"><code>${highlightedCode}</code></pre>
+                    <button class="copy-code-button border border-gray-300 text-gray-300 rounded px-1 hover:text-white hover:border-white" data-clipboard-text="${escapedForHtml}">
+                        <i class="icon fas fa-copy"></i>
+                        <i class="icon fas fa-check" style="display:none;"></i>
+                    </button>
+                </div>
+            `;
+        };
 
-                return '';
-            },
+        marked.use({
+            gfm: true,
+            breaks: true,
+            renderer
         });
 
-        markdown.renderer.rules.fence = (tokens, idx, options, env, self) => {
-        const token = tokens[idx];
-        const code = token.content.trim();
-        const escapedCode = markdown.utils.escapeHtml(code);
 
-        const content = `
-            <div class="code-block-container">
-                <pre class="language-${token.info}"><code>${escapedCode}</code></pre>
-                <button class="copy-code-button border border-gray-300 text-gray-300 rounded px-1 hover:text-white hover:border-white" data-clipboard-text="${escapedCode}" data-unique-id="${idx}">
-                    <i class="icon fas fa-copy"></i>
-                    <i class="icon fas fa-check" style="display:none;"></i>
-                </button>
-            </div>
-        `;
-
-
-        return content;
-        }
 
         // Create a method to render markdown
-        const renderMarkdown = (source) => markdown.render(source);
+        const renderMarkdown = (source) => {
+            if (!source) {
+                return '';
+            }
+            const correctedSource = source.replace(/\\n/g, '\n').replace(/\\\"/g, '\"');
+            const tokens = marked.lexer(correctedSource);
 
-        // Expose the `renderMarkdown` method to the template
+            // Convert the tokens back to HTML
+            return marked.parser(tokens);
+        };
         return {
             renderMarkdown,
-        // ...
         };
+
     },
     data(){
         return {
