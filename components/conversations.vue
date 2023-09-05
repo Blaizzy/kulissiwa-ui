@@ -1,6 +1,6 @@
 <template>
     <!-- Chat Side Navbar -->
-    <div class="w-80 bg-white p-4 border-r border-gray-200">
+    <div class="flex flex-col h-full w-80 bg-white p-4 border-r border-gray-200" >
         <div class="mb-2">
             <div class="flex justify-between items-center bg-white p-2">
                 <h1 class="text-2xl font-semibold">Chats</h1>
@@ -21,7 +21,7 @@
                 </button>
             </div>
         </div>
-        <div class="overflow-y-auto h-[calc(100%-2rem)]">
+        <div class="overflow-y-auto">
 
 
             <div class="mb-4" v-for="conversation in conversations" :key="conversation.id">

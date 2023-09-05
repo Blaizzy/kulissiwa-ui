@@ -1,3 +1,9 @@
+<script setup>
+definePageMeta({
+  middleware: ['auth', 'redirect-to-chats'],
+});
+</script>
+
 <template>
   <div class="flex-1 p-8">
       <h1 class="text-3xl font-semibold">Index</h1>
@@ -5,9 +11,3 @@
   </div>
 </template>
 
-<script>
-
-export default {
-
-}
-</script>

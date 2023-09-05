@@ -1,3 +1,8 @@
+<script setup>
+definePageMeta({
+  middleware: 'auth',
+});
+</script>
 <template>
     <div class="flex-1 p-8 bg-white">
         <div class="flex justify-between pb-4 px-8 border-b border-gray-200 w-full">

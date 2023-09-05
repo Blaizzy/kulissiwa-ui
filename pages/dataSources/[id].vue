@@ -1,6 +1,12 @@
+<script setup>
+definePageMeta({
+  middleware: 'auth',
+});
+</script>
+
 <template>
 
-<div class="flex-1 isolate bg-white p-9 py-24 sm:py-32 lg:px-0 min-h-screen overflow-y-auto">
+    <div class="flex-1 isolate bg-white p-9 py-24 sm:py-32 lg:px-0 min-h-screen overflow-y-auto">
         <div class="mx-auto max-w-2xl">
             <div class="lg:pr-4">
                 <div class="lg:max-w-lg">
@@ -23,7 +29,7 @@ import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism-okaidia.css';
 import ClipboardJS from 'clipboard';
 
-export default{
+export default {
     setup() {
 
 

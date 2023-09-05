@@ -14,6 +14,7 @@ export default defineNuxtConfig({
         '@nuxtjs/tailwindcss',
         '@nuxtjs/supabase',
         '@nuxt/content',
+        '@pinia/nuxt',
 
     ],
     css: [
@@ -30,16 +31,15 @@ export default defineNuxtConfig({
     },
     plugins: [
         { src: "~/plugins/fontawesome.js", mode: "client"},
-        { src: "~/plugins/markdown-it.js", mode: "client"},
+        // { src: "~/plugins/markdown-it.js", mode: "client"},
     ],
     runtimeConfig: {
-        public:{
-            baseURL: "/chats",
-        },
         supabase:{
             url: "",
-            key: ""
-        }
-    }
+            key: "",
+        },
+    },
+
+
 
 })

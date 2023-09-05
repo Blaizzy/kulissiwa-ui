@@ -27,7 +27,7 @@
             </div>
 
             <div>
-                <button type="submit" class="flex w-full justify-center rounded-md bg-sky-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400" @click="signInWithEmail">Sign in</button>
+                <button type="submit" class="flex w-full justify-center rounded-md bg-sky-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400" @click.prevent="signInWithEmail">Sign in</button>
             </div>
 
             <div class="inline-flex items-center justify-center w-full">
@@ -36,7 +36,7 @@
             </div>
 
             <div>
-                <button class="w-full  py-1.5 px-3  border-2 border-gray-300 text-gray-500 rounded mt-2 hover:bg-gray-200" @click="signInWithGoogle">
+                <button class="w-full  py-1.5 px-3  border-2 border-gray-300 text-gray-500 rounded mt-2 hover:bg-gray-200" @click.prevent="signInWithGoogle">
                     <i class="fa-brands fa-google pr-2"></i>
                     <span class="font-semibold">Continue with Google</span>
                 </button>
@@ -53,7 +53,7 @@
 </template>
 
 <script>
-
+import { useAuthStore } from '@/stores/index'
 export default {
     data() {
         return {
@@ -61,7 +61,24 @@ export default {
             password: ''
         }
     },
+    setup() {
+        const store = useAuthStore()
+        return {
+           store: store
+        }
+    },
+    mounted() {
+        watchEffect(() => {
+            const user = useSupabaseUser()
+            if (user.value) {
+                this.$router.push('/chats')
+            }
+        })
+    },
     methods: {
+        getURL(){
+            return 
+        },
         async signInWithEmail(){
             const supabase = useSupabaseClient()
             const { data, error } = await supabase.auth.signInWithPassword({
@@ -75,13 +92,15 @@ export default {
         },
         async signInWithGoogle() {
             const supabase = useSupabaseClient()
+
             const { data, error } = await supabase.auth.signInWithOAuth({
-                provider: 'google'
+                provider: 'google',
             })
             if (error) {
                 return alert('Something went wrong !')
             }
-            this.$router.push('/')
+        
+            
         }
     }
 

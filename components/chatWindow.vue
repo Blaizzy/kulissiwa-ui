@@ -46,7 +46,9 @@
                         <div class="my-4 pb-2">
                             <div class="flex items-start">
                                 <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg py-2 px-6 inline-block ml-2 prose" v-if="ai_messages[index]">
+                                    <!-- <div v-html="renderMarkdown(ai_messages[index].content)" class="inline-block"></div> -->
                                     <div v-html="renderMarkdown(ai_messages[index].content)" class="inline-block"></div>
+
 
                                     <div v-show="ai_messages[index].source_documents" class="pb-4">
                                         <div v-html="renderMarkdown(`**Sources 📃**`)"></div>
@@ -88,7 +90,7 @@
         <!-- Message Input -->
         <div class="flex items-start justify-center w-auto">
             <div class="bg-white rounded-xl flex items-center shadow-md border border-gray-200 w-1/2 hover:border-sky-200">
-                <textarea type="text" :rows="rows" class="w-full px-4 h-auto py-3 rounded-xl focus:outline-none" placeholder="Type your message..." v-model="message" style="resize: none;"></textarea>
+                <textarea type="text" :rows="rows" class="w-full px-4 h-auto py-3 rounded-xl focus:outline-none" placeholder="Type your message..." v-model="message" style="resize: none;"  @keydown.enter.exact.prevent="queryModel"></textarea>
                 <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center" @click.prevent="queryModel" v-if="!loading_ai_response">
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -119,7 +121,7 @@ import {
   } from '@headlessui/vue';
 
 import { ChevronUpIcon, CheckIcon } from '@heroicons/vue/20/solid';
-import MarkdownIt from 'markdown-it';
+import { marked } from 'marked';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism-okaidia.css';
@@ -130,64 +132,60 @@ const maxRows = 4;
 
 export default {
     setup() {
-        
-        // Create a local markdown instance
-        const markdown = new MarkdownIt({
-            html: true,
-            breaks: true,  
-            linkify: true,
-            typographer: true,
-            highlight: (str, lang) => {
-                if (lang && Prism.languages[lang]) {
-                    try {
 
-                        return Prism.highlight(str, Prism.languages[lang], lang);
-                    } catch (error) {
-                        console.error(`Error highlighting code with Prism: ${error}`);
-                    }
+        const renderer = new marked.Renderer();
+
+        renderer.code = function(code, lang) {
+            if (lang === 'markdown') {
+                return marked(code); // render it as markdown content
+            }
+            let highlightedCode = code;
+            if (lang && Prism.languages[lang]) {
+                try {
+                    highlightedCode = Prism.highlight(code, Prism.languages[lang], lang);
+                } catch (error) {
+                    console.error(`Error highlighting code with Prism: ${error}`);
                 }
+            }
+            const escapedForHtml = code
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+            return `
+                <div class="code-block-container">
+                    <pre class="language-${lang}"><code>${highlightedCode}</code></pre>
+                    <button class="copy-code-button border border-gray-300 text-gray-300 rounded px-1 hover:text-white hover:border-white" data-clipboard-text="${escapedForHtml}">
+                        <i class="icon fas fa-copy"></i>
+                        <i class="icon fas fa-check" style="display:none;"></i>
+                    </button>
+                </div>
+            `;
+        };
 
-                return '';
-            },
+        marked.use({
+            gfm: true,
+            breaks: true,
+            renderer
         });
 
-        markdown.renderer.rules.heading_open = (tokens, idx) => {
-            const token = tokens[idx];
-            const hLevel = token.tag;
-            return `<${hLevel} style="color:white;">`;
-        };
 
-        markdown.renderer.rules.paragraph_open = () => '<p style="white-space: pre-wrap;">';
-        markdown.renderer.rules.paragraph_close = () => '</p>';
-
-        markdown.renderer.rules.fence = (tokens, idx, options, env, self) => {
-        const token = tokens[idx];
-        const code = token.content.trim();
-        const escapedCode = markdown.utils.escapeHtml(code);
-
-        const content = `
-            <div class="code-block-container">
-                <pre class="language-${token.info}"><code>${escapedCode}</code></pre>
-                <button class="copy-code-button border border-gray-300 text-gray-300 rounded px-1 hover:text-white hover:border-white" data-clipboard-text="${escapedCode}" data-unique-id="${idx}">
-                    <i class="icon fas fa-copy"></i>
-                    <i class="icon fas fa-check" style="display:none;"></i>
-                </button>
-            </div>
-        `;
-
-
-        return content;
-        }
 
         // Create a method to render markdown
-        const renderMarkdown = (source) => markdown.render(source);
+        const renderMarkdown = (source) => {
+            if (!source) {
+                return '';
+            }
+            const correctedSource = source.replace(/\\n/g, '\n').replace(/\\\"/g, '\"');
+            const tokens = marked.lexer(correctedSource);
 
-
-        // Expose the `renderMarkdown` method to the template
+            // Convert the tokens back to HTML
+            return marked.parser(tokens);
+        };
         return {
             renderMarkdown,
-        // ...
         };
+
     },
     data() {
         return {
@@ -466,8 +464,7 @@ export default {
                     // Create a history variable that contains list of all user and ai messages
                     // Convert sender key to type
                     // Copy user_messages and ai_messages
-                    let user_messages = this.user_messages.map(this.transformMessage);
-                    console.log(user_messages)
+                    let user_messages = this.user_messages.slice(0, -1).map(this.transformMessage);
                     let ai_messages = ''
                     if (this.ai_messages.length > 0){
                         ai_messages = this.ai_messages.map(this.transformMessage);
@@ -478,7 +475,8 @@ export default {
                     // Combine the two lists one element at a time
                     let history = this.combineMessages(user_messages, ai_messages);
                     // Convert the history to a string and append to formData
-                    formData.append("history", JSON.stringify({"messages":history}));
+                    formData.append("history", JSON.stringify({"messages": history}));
+                    console.log(formData.get("history"))
                     const response = await fetch("https://blaizzy--kulissiwa-chat-chat.modal.run/", {
                         method: 'POST',
                         body: formData,
@@ -490,7 +488,7 @@ export default {
                     const reader = response.body.getReader();
                     const decoder = new TextDecoder('utf-8');
 
-                    let index = this.ai_messages.push(' ') - 1;
+                    let index = this.ai_messages.push({sender: "ai"}) - 1;
                     this.scrollToBottom();
                     let result = '';
                     while (true) {
@@ -513,10 +511,11 @@ export default {
                        
                         result += chunk.replace(/^"(.*)"$/, '$1');
 
-                        this.ai_messages.splice(index, 1,  { "content" : result });
+                        this.ai_messages[index].content = result;
                         
                         this.highlightCode();
                     }
+                    console.log(result)
                 }
                 else{
                     if (this.selectedDataType != 'All'){
@@ -536,7 +535,7 @@ export default {
                     const reader = response.body.getReader();
                     const decoder = new TextDecoder('utf-8');
 
-                    let index = this.ai_messages.push(' ') - 1;
+                    let index = this.ai_messages.push({sender: "ai"}) - 1;
                     this.scrollToBottom();
                     function isPotentialJSON(chunk) {
                         return chunk.startsWith('{') && chunk.endsWith('}') && chunk.includes('"source_documents"');
@@ -561,12 +560,12 @@ export default {
                         }
                         if (isPotentialJSON(chunk)) {
                             response_dict = JSON.parse(chunk);
-                            this.ai_messages.splice(index, 1, { "content" : result, "source_documents" : response_dict.source_documents });
+                            this.ai_messages[index].content = result;
+                            this.ai_messages[index].source_documents = response_dict.source_documents;
                             
                         } else {
                             result += chunk.replace(/^"(.*)"$/, '$1');
-
-                            this.ai_messages.splice(index, 1,  { "content" : result });
+                            this.ai_messages[index].content = result;
                         }
                         this.highlightCode();
                     }
@@ -597,7 +596,7 @@ export default {
                     },
                     {
                         conversation_id: this.conversationId,
-                        sender: 'ai', content: this.ai_messages[this.ai_messages.length - 1]["content"], 
+                        sender: this.ai_messages[this.ai_messages.length - 1]["sender"], content: this.ai_messages[this.ai_messages.length - 1]["content"], 
                         source_documents: this.ai_messages[this.ai_messages.length - 1]["source_documents"]
                     }
                 ]
