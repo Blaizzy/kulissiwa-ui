@@ -294,18 +294,19 @@ export default {
         },
         getIconForFileType() {
             const selectedSource = this.dataSources.find(ds => ds.id === this.selectedDataType);
-            if (!selectedSource) {
+            if (!selectedSource || this.selectedDataType === 'Chat') {
                 this.file_logo = '/images/chat.png'; // Return a default icon if no match found
+            } else {
+                const iconMap = {
+                    'pdf': '/images/pdf.png',
+                    'vnd.openxmlformats-officedocument.wordprocessingml.document': '/images/word.png',
+                    'website': '/images/website.png',
+                    'csv': '/images/csv.png',
+                    'text': '/images/text.png',
+                    // Add more mappings as needed
+                };
+                this.file_logo = iconMap[selectedSource.file_type] || '/images/text.png'; // Default to 'fa-file' if no match
             }
-            const iconMap = {
-                'pdf': '/images/pdf.png',
-                'vnd.openxmlformats-officedocument.wordprocessingml.document': '/images/word.png',
-                'website': '/images/website.png',
-                'csv': '/images/csv.png',
-                'text': '/images/text.png',
-                // Add more mappings as needed
-            };
-            this.file_logo = iconMap[selectedSource.file_type] || '/images/text.png'; // Default to 'fa-file' if no match
         },
         
         setUserAvatar(avatar_url) {
