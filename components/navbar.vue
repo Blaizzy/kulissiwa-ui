@@ -90,17 +90,28 @@ export default {
             if (event === 'SIGNED_IN') {
                 this.store.signIn(session)
                 const user_metadata = this.store.user_session.user.user_metadata
-                this.name = user_metadata.full_name
-                this.email = user_metadata.email
-                this.avatar_url = user_metadata.avatar_url
+                if (Object.keys(user_metadata).length > 0){
+                    this.avatar_url = user_metadata.avatar_url
+                    this.name = user_metadata.full_name
+                    this.email = user_metadata.email
+                } else {
+                    this.email = this.store.user_session.user.email
+                }
             } else if (event === 'SIGNED_OUT') {
                 this.store.signOut()
+                this.resetProfile()
                 this.$router.push('/login');
             }
         });
         
+        
     },
     methods: {
+        resetProfile(){
+            this.avatar_url = "/images/avatars/user-default-pic.png"
+            this.name = ""
+            this.email = ""
+        },
         async signOut() {
             const supabase = useSupabaseClient()
             const { error } = await supabase.auth.signOut()
