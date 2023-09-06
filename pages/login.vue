@@ -45,7 +45,7 @@
 
         <p class="mt-10 text-center text-sm text-gray-500">
             Not a member?
-            <a href="#" class="font-semibold leading-6 text-sky-500 hover:text-sky-400">Sign up</a>
+            <a href="https://www.kulissiwa.com" class="font-semibold leading-6 text-sky-500 hover:text-sky-400">Sign up</a>
         </p>
         </div>
     </div>
