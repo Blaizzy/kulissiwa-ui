@@ -96,7 +96,7 @@
               >
                 Cancel
               </button>
-              <p v-if="loading" class="text-gray-500 mr-2"> This will take a few seconds, please wait... </p>  
+              <p v-if="loading" class="text-gray-500 mr-2 inline-block  prose break-words animate-pulse"> This will take a few seconds, please wait... </p>  
               <button
                 @click="uploadData"
                 class="bg-blue-600 text-white py-2 px-4 rounded-lg m-1"
@@ -138,7 +138,7 @@
         data: "",
         error: "",
         file_type: "",
-        loading: false,
+        loading: true,
   
       };
     },
