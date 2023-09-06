@@ -58,7 +58,7 @@ definePageMeta({
         <div class="h-full" style=" overflow-y: auto;">
         <div class="flex flex-wrap p-4 " >
                 <div class="flex justify-center flex-grow items-center" v-if="noDataFound">
-                    <img src="~~/assets/logos/No-documents-found.svg" alt="No Documents Found"> 
+                    <img src="~~/assets/logos/No-documents-found.svg" alt="No Documents Found" class="md:w-1/3 max-lg:w-1/2"> 
                 </div>
                 <div v-for="dataSource in dataSources" :key="dataSource.id" class="basis-1/5 bg-white relative p-4 border-2 border-gray-200 rounded-lg w-full my-3 mx-3 hover:shadow-md hover:border-sky-100 hover:bg-sky-50"
                 >
