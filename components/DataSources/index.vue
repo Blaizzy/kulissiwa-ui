@@ -86,8 +86,9 @@
               /> -->
               
             </div>
+            
             <p v-if="error.length>0" class="text-red-600"> {{ error }} </p>
-            <div class="flex justify-end mt-4">
+            <div class="flex justify-end mt-4 items-center">
               <button
                 @click="resetModal(); $emit('close')"
                 class="bg-red-600 text-white py-2 px-4 rounded-lg m-1"
@@ -95,6 +96,7 @@
               >
                 Cancel
               </button>
+              <p v-if="loading" class="text-gray-500 mr-2"> This will take a few seconds, please wait... </p>  
               <button
                 @click="uploadData"
                 class="bg-blue-600 text-white py-2 px-4 rounded-lg m-1"
@@ -103,7 +105,7 @@
                 Upload
 
               </button>
-
+              
               <button
                 class="bg-blue-600 text-white py-2 px-4 rounded-lg m-1"
                 disabled v-else
@@ -137,7 +139,7 @@
         error: "",
         file_type: "",
         loading: false,
-        showSuccess: true
+  
       };
     },
 
