@@ -225,6 +225,9 @@ export default {
                 this.showDeleteConfirmation = false
                 if (this.$route.params.id) {
                     this.$router.push('/chats')
+                if (this.$route.name == 'chats'){
+                    window.location.reload(true)
+                }
                 }else{
                     await this.getConversations(true)
                 }
