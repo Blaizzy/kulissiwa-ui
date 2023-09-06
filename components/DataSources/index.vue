@@ -138,7 +138,7 @@
         data: "",
         error: "",
         file_type: "",
-        loading: true,
+        loading: false,
   
       };
     },
