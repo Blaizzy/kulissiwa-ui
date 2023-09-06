@@ -15,10 +15,10 @@
 
         <div class="flex justify-center items-center mb-4">
             <div class="mt-auto bg-white rounded-full flex items-center w-full border border-gray-200 hover:border-sky-200 ">
-                <input type="search"  class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Search chats...">
-                <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center">
+                <input type="search"  class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Search chats..." v-model="searchQuery" @keyup.prevent="searchConversations" @input="searchConversations">
+                <span class="py-2 px-4 text-gray-500 inline-flex items-center">
                     <i class="fas fa-search"></i>
-                </button>
+                </span>
             </div>
         </div>
         <div class="overflow-y-auto">
@@ -125,6 +125,7 @@ export default {
             conversationTitle: '',
             showTitleEditConfirmation: false,
             typedTitle: '',
+            searchQuery: '',
         }
     },
     async created() {
@@ -147,6 +148,13 @@ export default {
 
     },
     methods: {
+        searchConversations() {
+            if (this.searchQuery && this.conversations.length > 0) {
+                this.conversations = this.conversations.filter(conversation => conversation.title.toLowerCase().includes(this.searchQuery.toLowerCase()))
+            } else {
+                this.getConversations(true)
+            }
+        },
         async updateConversations() {
             await this.getConversations(true)
             if (this.conversations.length > 0) {
