@@ -34,7 +34,7 @@
             >
                 <div class="flex justify-center items-center" v-if="noChatFound">
                     <div class="flex justify-center items-center flex-col">
-                    <img src="~~/assets/logos/No chats found.jpg" alt="No Chat Found" class="md:w-1/3 max-lg:w-1/2"> 
+                    <img src="~~/assets/logos/No-chats-found.jpg" alt="No Chat Found" class="md:w-1/3 max-lg:w-1/2"> 
                     <h1 class="text-4xl font-semibold m-1">No chats yet</h1>
                     <p class="text-2xl m-1">Start a new chat by typing a message below
                     </p>
