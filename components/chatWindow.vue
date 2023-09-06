@@ -212,7 +212,7 @@ export default {
             dataSources: [],
             selectedDataType: '',
             loading_ai_response: false,
-            avatar_url: 'https://via.placeholder.com/40',
+            avatar_url: '/images/avatars/user-default-pic.png',
             file_logo: '/images/chat.png',
             noChatFound: false,
         };
@@ -260,7 +260,7 @@ export default {
 
         this.getDataSources(supabase)
         const user_session = await this.getSession(supabase)
-        if (user_session) {
+        if (user_session && user_session.user.user_metadata.avatar_url) {
             this.setUserAvatar(user_session.user.user_metadata.avatar_url)
         }
         watchEffect(() => {

@@ -55,11 +55,32 @@ definePageMeta({
                 </button>
             </div> -->
         </div>
-        <div class="h-full" style=" overflow-y: auto;">
-        <div class="flex flex-wrap p-4 " >
-                <div class="flex justify-center flex-grow items-center" v-if="noDataFound">
-                    <img src="~~/assets/logos/No-documents-found.svg" alt="No Documents Found" class="md:w-1/3 max-lg:w-1/2"> 
+        <div class="h-full" style=" overflow-y: auto;"
+        :class="noDataFound ? 'flex justify-center items-center' : ''"
+        >
+            <div class="flex justify-center items-center" v-if="noDataFound">
+                    <div class="flex justify-center items-center flex-col">
+                        <img src="~~/assets/logos/No-documents-found.png" alt="No Documents Found" class="md:w-1/2 max-lg:w-auto"> 
+                        <h1 class="text-4xl font-semibold m-1">Empty folder</h1>
+                        <h2 class="text-2xl m-1">Start uploading files</h2>
+                        <ul class="items-center md:text-lg max-lg:text-xl">
+                            <li>
+                                1. Click on the <i class="fa-solid fa-square-plus text-gray-500"></i> button
+                            </li>
+                            <li>
+                                2. Select a file from your computer
+                            </li>
+                            <li>
+                                3. Click on the <i class="fa-solid fa-upload text-gray-500"></i> button
+                            </li>
+                            <li>
+                                4. Wait for the upload to finish
+                            </li>
+                        </ul>
+                    </div>
                 </div>
+        <div class="flex flex-wrap p-4 " >
+                
                 <div v-for="dataSource in dataSources" :key="dataSource.id" class="basis-1/5 bg-white relative p-4 border-2 border-gray-200 rounded-lg w-full my-3 mx-3 hover:shadow-md hover:border-sky-100 hover:bg-sky-50"
                 >
                     <!-- <NuxtLink

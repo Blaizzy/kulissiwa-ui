@@ -73,7 +73,7 @@ export default {
         return {
             name:"",
             email:"",
-            avatar_url:"https://via.placeholder.com/50",
+            avatar_url:"/images/avatars/user-default-pic.png",
             collapsed: false,
         }
     },
