@@ -530,7 +530,6 @@ export default {
                         const { value, done } = await reader.read();
                         
                         if (done) {
-                            console.log('Stream complete');
                             break;
                         }
 
@@ -580,7 +579,6 @@ export default {
                         const { value, done } = await reader.read();
                         
                         if (done) {
-                            console.log('Stream complete');
                             break;
                         }
 
