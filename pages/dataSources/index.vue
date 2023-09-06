@@ -57,6 +57,9 @@ definePageMeta({
         </div>
         <div class="h-full" style=" overflow-y: auto;">
         <div class="flex flex-wrap p-4 " >
+                <div class="flex justify-center flex-grow items-center" v-if="noDataFound">
+                    <img src="~~/assets/logos/No documents found.svg" alt="No Documents Found"> 
+                </div>
                 <div v-for="dataSource in dataSources" :key="dataSource.id" class="basis-1/5 bg-white relative p-4 border-2 border-gray-200 rounded-lg w-full my-3 mx-3 hover:shadow-md hover:border-sky-100 hover:bg-sky-50"
                 >
                     <!-- <NuxtLink
@@ -69,7 +72,9 @@ definePageMeta({
                             <p class="truncate text-gray-900">{{ dataSource.name }}</p>
                         </div>
 
-                        <div class="flex">
+                        <div class="flex" 
+                          :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''"
+                        >
                             <div class="text-right">
                                 <Menu as="div" class="relative inline-block text-left" @click.prevent>
                                 <div>
@@ -172,15 +177,26 @@ export default {
             showDeleteSuccess: false,
             showDeleteFailure: false,
             dataSourceToDelete: null,
+            noDataFound: false,
         };
     },
     async mounted(){
         // Load data sources from database and append to dataSources array
+        watchEffect(() => {
+            if (this.dataSources.length === 0) {
+                this.noDataFound = true
+            } else {
+                this.noDataFound = false
+            }
+        })
+
         const supabase = this.initSupabase()
         this.getDataSources(supabase)
+        
 
     },
     methods: {
+
         getIconForFileType(fileType) {
             const iconMap = {
                 'pdf': '/images/pdf.png',
@@ -293,8 +309,6 @@ export default {
                     console.log(file_error)
                     this.onDeleteDataFailure()
                 }
-                console.log(item.content_data, "file deleted")
-                console.log(data, "file deleted")
             }
             const { error } = await supabase
                 .from('data')

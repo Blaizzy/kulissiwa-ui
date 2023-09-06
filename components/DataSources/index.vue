@@ -3,6 +3,8 @@
       class="fixed inset-0 flex items-center justify-center z-50"
       :class="{ 'opacity-0 pointer-events-none': !isOpen }"
     >
+  
+
       <div class="absolute inset-0 bg-black bg-opacity-50" :class="{ 'opacity-0': !isOpen, 'opacity-100': isOpen }"></div>
       <div
         class="bg-white w-1/3 rounded-lg p-6 shadow-lg transform transition ease-in-out duration-300"
@@ -26,8 +28,8 @@
           <label for="data-type" class="block mb-2">Select data type:</label>
           <select id="data-type" class="block w-full border border-gray-300 rounded-lg p-1" v-model="selectedDataType">
             <option>PDF</option>
-            <option>Docx</option>
             <option>Text</option>
+            <option>Docx</option>
             <option disabled>Website</option>
             <option disabled>CSV</option>
             <option disabled>Notion</option>            
@@ -73,6 +75,16 @@
                 class="block w-full border border-gray-300 rounded-lg p-1"
                 placeholder="Enter text here" v-model="data"
               ></textarea>
+              <!-- <div class="inline-flex items-center justify-center w-full">
+                  <hr class="w-full h-px my-2 border-1 dark:bg-gray-300">
+                  <span class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2  dark:bg-white">OR</span>
+              </div>
+              <input disabled
+                type="file"
+                @change="handleFileUpload"
+                accept=".txt"
+              /> -->
+              
             </div>
             <p v-if="error.length>0" class="text-red-600"> {{ error }} </p>
             <div class="flex justify-end mt-4">
@@ -119,12 +131,13 @@
     },
     data() {
       return {
-        selectedDataType: "Text",
+        selectedDataType: "PDF",
         name: "",
         data: "",
         error: "",
         file_type: "",
         loading: false,
+        showSuccess: true
       };
     },
 
@@ -172,7 +185,6 @@
             formData.append("namespace", user_session.user.id);
             formData.append("data_source", data[0].id);
             formData.append("data_type", this.selectedDataType);
-
             try {
               const response = await fetch("https://blaizzy--kulissiwa-data-data.modal.run/embed_data", {
                   method: 'POST',
@@ -188,9 +200,12 @@
                 const data = await response.json();
                 this.$emit('refreshData')
                 this.$emit('close')
+                this.$emit("showSuccess")
               }
             } catch (err) {
               console.log(err)
+              this.$emit('close')
+              this.$emit('showFailure')
             }
           }
 
@@ -199,7 +214,13 @@
         async handleFileUpload(event) {
           this.data = event.target.files[0]
           this.name = event.target.files[0].name.split(".")[0]
-          this.file_type = event.target.files[0].type.split("/")[1]
+          
+          if (this.selectedDataType === "DOCX") {
+            this.file_type = "docx"
+          } else {
+            this.file_type = event.target.files[0].type.split("/")[1]
+          }
+          
         },
         async uploadData() {
           const supabase = useSupabaseClient()
@@ -221,7 +242,7 @@
             }
 
           }
-          else if (this.selectedDataType=="PDF" || this.selectedDataType=="DOCX" || this.selectedDataType=="CSV") {
+          else if (this.selectedDataType=="PDF" || this.selectedDataType=="Docx" || this.selectedDataType=="CSV") {
             const unique_name = `${this.name}_${Date.now()}`
             const { data, error } = await supabase
               .storage
@@ -236,7 +257,7 @@
               const { data, error } = await supabase
                 .from('data')
                 .insert([
-                  { name: this.name, content_data: file[0].id, user_id: `${user_session.user.id}`, is_file: true, file_type: this.file_type },
+                  { name: this.name, content_data: `${user_session.user.id}/${unique_name}`, user_id: `${user_session.user.id}`, is_file: true, file_type: this.file_type },
                 ])
 
               if (error){
