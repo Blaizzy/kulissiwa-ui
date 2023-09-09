@@ -592,7 +592,9 @@ export default {
                             chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
                         }
                         if (isPotentialJSON(chunk)) {
-                            response_dict = JSON.parse(chunk);
+                            // If the chunk is a potential JSON string, parse it and add it to the result
+                            let cleanedString = jsonString.replace(/[\cA-\cZ]/g, "");
+                            response_dict = JSON.parse(cleanedString);
                             this.ai_messages[index].content = result;
                             this.ai_messages[index].source_documents = response_dict.source_documents;
                             
