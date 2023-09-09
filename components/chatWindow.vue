@@ -281,7 +281,6 @@ export default {
             return this.dataSources && this.dataSources.length > 0;
         },
         isEmptyMessage() {
-            console.log(this.message.trim().length)
             return this.message.trim().length === 0;
         },
     },
@@ -468,6 +467,7 @@ export default {
         },
         handleEnterPress() {
             if (!this.isMessageEmpty) {
+                console.log(this.isEmptyMessage, this.message)
                 this.queryModel();
             }
         },
