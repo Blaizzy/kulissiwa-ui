@@ -99,7 +99,8 @@
               <p v-if="loading" class="text-gray-500 mr-2 inline-block  prose break-words animate-pulse"> This will take a few seconds, please wait... </p>  
               <button
                 @click="uploadData"
-                class="bg-blue-600 text-white py-2 px-4 rounded-lg m-1"
+                class=" text-white py-2 px-4 rounded-lg m-1"
+                :class="noData ? 'opacity-50 bg-gray-500' : 'bg-blue-600'"
                 :disabled="noData"
                 v-if="!loading"
               >

@@ -31,7 +31,6 @@ export default defineNuxtConfig({
     },
     plugins: [
         { src: "~/plugins/fontawesome.js", mode: "client"},
-        // { src: "~/plugins/markdown-it.js", mode: "client"},
     ],
     runtimeConfig: {
         supabase:{
