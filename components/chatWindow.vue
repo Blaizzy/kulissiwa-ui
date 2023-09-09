@@ -109,8 +109,8 @@
                     v-model="message" style="resize: none;"  @keydown.enter.exact.prevent="handleEnterPress">
                 </textarea>
                 <button class="py-2 px-4 text-gray-500 inline-flex items-center" @click.prevent="queryModel" v-if="!loading_ai_response"
-                :disabled="isEmptyMessage"
-                :class="isEmptyMessage ?'hover:text-gray-500' : 'hover:text-black'"
+                :disabled="isMessageEmpty"
+                :class="isMessageEmpty ?'hover:text-gray-500' : 'hover:text-black'"
                 >
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -280,7 +280,7 @@ export default {
         hasDataSources() {
             return this.dataSources && this.dataSources.length > 0;
         },
-        isEmptyMessage() {
+        isMessageEmpty() {
             return this.message.trim().length === 0;
         },
     },
@@ -467,7 +467,6 @@ export default {
         },
         handleEnterPress() {
             if (!this.isMessageEmpty) {
-                console.log(this.isEmptyMessage, this.message)
                 this.queryModel();
             }
         },
