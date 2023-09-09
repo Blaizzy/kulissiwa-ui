@@ -100,6 +100,7 @@
               <button
                 @click="uploadData"
                 class="bg-blue-600 text-white py-2 px-4 rounded-lg m-1"
+                :disabled="noData"
                 v-if="!loading"
               >
                 Upload
@@ -139,7 +140,6 @@
         error: "",
         file_type: "",
         loading: false,
-  
       };
     },
 
@@ -200,12 +200,14 @@
                 }, 10000);
               }else{
                 const data = await response.json();
+                this.resetModal()
                 this.$emit('refreshData')
                 this.$emit('close')
                 this.$emit("showSuccess")
               }
             } catch (err) {
               console.log(err)
+              this.resetModal()
               this.$emit('close')
               this.$emit('showFailure')
             }
@@ -300,7 +302,19 @@
           }
 
         },
-    }
+    },
+    computed: {
+      isNameEmpty() {
+        if (this.selectedDataType=="Text") {
+          return this.name.length == 0 || this.data.length == 0
+        } else if (this.selectedDataType=="PDF" || this.selectedDataType=="Docx" || this.selectedDataType=="CSV") {
+          return this.name.length == 0 || this.data.length == 0
+        }
+      },
+      noData() {
+        return this.isNameEmpty;
+      }
+    },
 };
   </script>
 
