@@ -100,7 +100,7 @@
               <button
                 @click="uploadData"
                 class=" text-white py-2 px-4 rounded-lg m-1"
-                :class="noData ? 'opacity-50 cursor-not-allowed bg-gray-500' : 'bg-blue-600'"
+                :class="noData ? 'opacity-50 bg-gray-500' : 'bg-blue-600'"
                 :disabled="noData"
                 v-if="!loading"
               >

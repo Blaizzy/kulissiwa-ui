@@ -105,9 +105,10 @@
         <!-- Message Input -->
         <div class="flex items-start justify-center w-auto">
             <div class="bg-white rounded-xl flex items-center shadow-md border border-gray-200 w-1/2 hover:border-sky-200">
-                <textarea type="text" :rows="rows" class="w-full px-4 h-auto py-3 rounded-xl focus:outline-none" placeholder="Type your message..." v-model="message" style="resize: none;"  @keydown.enter.exact.prevent="queryModel"></textarea>
-                <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center" @click.prevent="queryModel" v-if="!loading_ai_response"
+                <textarea type="text" :rows="rows" class="w-full px-4 h-auto py-3 rounded-xl focus:outline-none" placeholder="Type your message..." v-model="message" style="resize: none;"  @keydown.enter.exact.prevent="handleEnterPress"></textarea>
+                <button class="py-2 px-4 text-gray-500 inline-flex items-center" @click.prevent="queryModel" v-if="!loading_ai_response"
                 :disabled="isEmptyMessage"
+                :class="isEmptyMessage ?'hover:text-gray-500' : 'hover:text-black'"
                 >
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -461,6 +462,11 @@ export default {
                 }
             }
             return combinedMessages;
+        },
+        handleEnterPress() {
+            if (!this.isMessageEmpty) {
+                this.queryModel();
+            }
         },
         async queryModel() {
             // Prevent sending if the message is empty or only whitespace
