@@ -62,7 +62,7 @@
                                 </div>
                                 <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg py-2 px-6 inline-block ml-2" v-if="ai_messages[index]">
                                     <div v-html="renderMarkdown(ai_messages[index].content)" class="inline-block break-words prose"></div>
-                                    <div v-show="ai_messages[index].source_documents" class="pb-4">
+                                    <div v-show="ai_messages[index].source_documents" class="pb-4 mt-1">
                                         <div v-html="renderMarkdown(`**Sources 📃**`)"></div>
                                         <div v-for="(source_document, source_index) in ai_messages[index].source_documents" :key="source_index">
                                             <Disclosure v-slot="{ open }">
