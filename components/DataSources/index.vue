@@ -215,10 +215,12 @@
           }
 
         },
-
+        removeDiarectics(str) {
+          return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        },
         async handleFileUpload(event) {
           this.data = event.target.files[0]
-          this.name = event.target.files[0].name.split(".")[0]
+          this.name = this.removeDiarectics(event.target.files[0].name.split(".")[0])
           
           if (this.selectedDataType === "DOCX") {
             this.file_type = "docx"
