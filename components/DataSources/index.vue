@@ -160,7 +160,7 @@
 
         },
         resetModal() {
-          this.selectedDataType = "Text";
+          this.selectedDataType = "PDF";
           this.name = "";
           this.data = "";
           this.error = "";
