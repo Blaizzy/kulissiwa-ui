@@ -160,12 +160,15 @@
 
         },
         resetModal() {
-          this.selectedDataType = "Text";
+          this.selectedDataType = "PDF";
           this.name = "";
           this.data = "";
           this.error = "";
           this.file_type = "";
           this.loading= false;
+          // clear all inputs 
+          const inputs = document.querySelectorAll('input[type="file"]')
+          inputs.forEach(input => input.value = '')
         },
         async embedData(supabase, user_session, is_file=false) {
 

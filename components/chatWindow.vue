@@ -585,8 +585,14 @@ export default {
 
                     let index = this.ai_messages.push({sender: "ai"}) - 1;
                     this.scrollToBottom();
-                    function isPotentialJSON(chunk) {
-                        return chunk.startsWith('{') && chunk.endsWith('}') && chunk.includes('"source_documents"');
+                    function isJSON(chunk) {
+                        if (typeof chunk !== 'string') return false;
+                        try {
+                            let parsed = JSON.parse(chunk);
+                            return Array.isArray(parsed.source_documents) && parsed.source_documents.length >= 0;
+                        } catch (e) {
+                            return false;
+                        }
                     }
                     let result = '';
                     while (true) {
@@ -605,12 +611,13 @@ export default {
                         if (words.length > 1) {
                             chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
                         }
-                        if (isPotentialJSON(chunk)) {
+                        if (isJSON(chunk)) {
                             // If the chunk is a potential JSON string, parse it and add it to the result
                             let cleanedString = chunk.replace(/[\cA-\cZ]/g, "");
                             response_dict = JSON.parse(cleanedString);
                             this.ai_messages[index].content = result;
-                            this.ai_messages[index].source_documents = response_dict.source_documents;
+                            if (response_dict.source_documents.length > 0)
+                                this.ai_messages[index].source_documents = response_dict.source_documents;
                             
                         } else {
                             result += chunk.replace(/^"(.*)"$/, '$1');
@@ -633,6 +640,7 @@ export default {
                 this.loading_ai_response = false;
             }
             
+            console.log(response_dict)
 
             await this.insertData(
                 supabase,
