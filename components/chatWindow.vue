@@ -640,7 +640,6 @@ export default {
                 this.loading_ai_response = false;
             }
             
-            console.log(response_dict)
 
             await this.insertData(
                 supabase,
