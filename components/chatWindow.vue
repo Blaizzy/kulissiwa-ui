@@ -185,6 +185,7 @@ export default {
 
         marked.use({
             gfm: true,
+            tables: true,
             breaks: true,
             renderer
         });
@@ -587,9 +588,21 @@ export default {
                     this.scrollToBottom();
                     function isJSON(chunk) {
                         if (typeof chunk !== 'string') return false;
+                        // Locate the delimiters
+                        let startIndex = chunk.indexOf('||JSON_START||');
+                        let endIndex = chunk.indexOf('||JSON_END||');
+
+                        if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
+                            return false;
+                        }
+
+                        // Extract potential JSON (considering the length of '||JSON_START||' to get the actual JSON start)
+                        const potentialJSON = chunk.substring(startIndex + '||JSON_START||'.length, endIndex);
+
+
                         try {
-                            let parsed = JSON.parse(chunk);
-                            return Array.isArray(parsed.source_documents) && parsed.source_documents.length >= 0;
+                            let parsed = JSON.parse(potentialJSON);  
+                            return parsed && typeof parsed === 'object' && Array.isArray(parsed.source_documents) && parsed.source_documents.length >= 0;
                         } catch (e) {
                             return false;
                         }
@@ -614,8 +627,13 @@ export default {
                         if (isJSON(chunk)) {
                             // If the chunk is a potential JSON string, parse it and add it to the result
                             let cleanedString = chunk.replace(/[\cA-\cZ]/g, "");
-                            response_dict = JSON.parse(cleanedString);
+                            result += cleanedString.split('||JSON_START||')[0];
                             this.ai_messages[index].content = result;
+                            
+                            let startIndex = chunk.indexOf('||JSON_START||');
+                            let endIndex = chunk.indexOf('||JSON_END||');
+                            response_dict = JSON.parse(cleanedString.substring(startIndex + '||JSON_START||'.length, endIndex));
+                            
                             if (response_dict.source_documents.length > 0)
                                 this.ai_messages[index].source_documents = response_dict.source_documents;
                             
@@ -694,5 +712,4 @@ export default {
 
 };
 </script>
-
 
