@@ -182,6 +182,21 @@ export default {
                 </div>
             `;
         };
+        renderer.table = function(header, body) {
+            return `
+                <div class="overflow-x-auto overflow-y-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            ${header}
+                        </thead>
+                        <tbody>
+                            ${body}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        };
+
 
         marked.use({
             gfm: true,
