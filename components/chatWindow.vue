@@ -64,7 +64,7 @@
                                     <div v-html="renderMarkdown(ai_messages[index].content)" class="pt-2 inline-block break-words prose"></div>
                                     <div v-show="ai_messages[index].source_documents" class="pb-2 mt-1">
                                         <div v-html="renderMarkdown(`**Sources 📃**`)"></div>
-                                        <div v-for="(source_document, source_index) in ai_messages[index].source_documents" :key="source_index">
+                                        <div v-for="(source_document, source_index) in ai_messages[index].source_documents" :key="source_index" class="w-full inline-block break-words prose">
                                             <Disclosure v-slot="{ open }">
                                                 <DisclosureButton
                                                 class="flex w-full border border-gray-300 justify-between rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
