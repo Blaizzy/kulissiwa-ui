@@ -1,6 +1,15 @@
 <template>
     <!-- Content -->
     <div class="flex flex-col h-full w-full py-8 bg-white" >
+        <div 
+            v-if="showFailure" 
+            class="fixed top-4 right-4 py-2 px-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800 shadow-md transition-transform transform"
+            :class="{ 'translate-x-full opacity-0': !showFailure, 'translate-x-0 opacity-100': showFailure }"
+        >
+            <i class="fas fa-square-xmark mr-2"></i>
+                {{failureMessage}}
+        </div>
+
         <div class="flex justify-between items-center pb-4 px-8 border-b border-gray-200">
             <div class="flex items-center justiy-center">
                 <!-- <img src="~~/assets/logos/ChatGPT.png" alt="Chatbot Avatar" class="w-10 h-10 rounded-full mr-1"> -->
@@ -42,6 +51,7 @@
                 </div>
                 </div>
                 <div class="w-auto px-4 overflow-y-auto" ref="chatWindow" >
+                    <LoadingIndicator v-show="isLoading"/>
 
                     <div v-for="(user_message, index) in user_messages" :key="user_message.content">
                         <div class="my-4" >
@@ -130,6 +140,7 @@
 
 
 <script>
+import LoadingIndicator from '~/components/LoadingIndicator.vue';
 import {
     Disclosure,
     DisclosureButton,
@@ -236,6 +247,8 @@ export default {
             avatar_url: '/images/avatars/user-default-pic.png',
             file_logo: '/images/chat.png',
             noChatFound: false,
+            showFailure: false,
+            isLoading: true
         };
     },
     async created() {
@@ -277,7 +290,7 @@ export default {
             this.user_messages = [];
             this.ai_messages = [];
             this.loadMessages(supabase);
-        }
+        } 
 
         this.getDataSources(supabase)
         const user_session = await this.getSession(supabase)
@@ -302,8 +315,7 @@ export default {
     },
     methods: {
         isChatFound(){
-    
-            if (this.user_messages.length === 0) {
+            if (this.user_messages.length === 0 && this.$route.params.id === undefined) {
                 this.noChatFound = true
             } else {
                 this.noChatFound = false
@@ -343,7 +355,7 @@ export default {
 
             if (error) {
                 console.log(error)
-                alert('There was an error loading your data sources')
+                this.onShowFailure(error.message)
             }
 
             if (data) {
@@ -380,7 +392,7 @@ export default {
           const { data, error } = await supabase.auth.getSession()
           if (error) {
             console.log(error)
-            alert("Error getting session")
+            this.onShowFailure(error.message)
           }else{
             return data.session
           }
@@ -405,8 +417,8 @@ export default {
                 .eq('conversation_id', this.conversationId)
 
             if (error) {
-                console.log(error)
-                alert('There was an error loading your messages')
+                this.isLoading = false;
+                this.onShowFailure(error.message)
             }else{
                 // Assuming the backend returns an array of messages with a sender and data properties
                 messages.forEach((message) => {
@@ -416,9 +428,16 @@ export default {
                         this.user_messages.push({"sender":message.sender, "content":message.content});
                     }
                 });
-
+                this.isLoading = false;
             }
 
+        },
+        onShowFailure(message) {
+            this.showFailure = true
+            this.failureMessage = message
+            setTimeout(() => {
+                this.showDeleteFailure = false
+            }, 3000)
         },
         async insertData(supabase, table, data){
             const { error } = await supabase
@@ -713,6 +732,7 @@ export default {
         
     },
     components: {
+    LoadingIndicator,
     Disclosure,
     DisclosureButton,
     DisclosurePanel,

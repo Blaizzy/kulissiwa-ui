@@ -210,7 +210,6 @@
                 this.$emit("showSuccess")
               }
             } catch (err) {
-              console.log(err)
               this.resetModal()
               this.$emit('close')
               this.$emit('showFailure')

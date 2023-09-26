@@ -29,7 +29,7 @@ definePageMeta({
                 <button @click="newDataSource" class="text-gray-500 hover:text-gray-700 ml-5">
                     <i class="fa-solid fa-square-plus"></i>
                 </button>
-                <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onEmbedDataSuccess" @show-failure="onEmbedDataFailure"  />
+                <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onShowSuccess('Data uploaded sucessfully')" @show-failure="onShowFailure('Data upload failed!')"  />
             </div>
 
             <!-- TODO -->
@@ -155,15 +155,6 @@ definePageMeta({
                     </div>
                    <!-- </NuxtLink> -->
                 </div>
-                <!-- <div v-if="dataSources.length === 0" class="flex justify-center items-center w-full">
-                    <p class="text-gray-500">No data sources found</p>
-                    <div class="flex">
-                        <button @click="newDataSource" class=" bg-blue-50 py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
-                            <p class="text-gray-500">Add new data source</p>
-                        </button>
-                        <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" />
-                    </div>
-                </div> -->
             </div>
         </div>
     </div>
@@ -190,8 +181,8 @@ export default {
             dataSourceToDelete: null,
             noDataFound: false,
             isLoading: true,
-            successMessage:'Data uploaded successfully!',
-            failureMessage:'Data upload failed!',
+            successMessage:'',
+            failureMessage:'',
             store: store,
 
         };
@@ -302,7 +293,6 @@ export default {
                 .remove([`${item.content_data}`])
                 
                 if (file_error) {
-                    console.log(file_error)
                     this.onShowFailure("File deletion failed!")
                 }
             }
@@ -313,9 +303,7 @@ export default {
 
         
             if (error) {
-                console.log(error)
                 this.onShowFailure("Data deletion failed!")
-            
             }
             else {
                 const formData = new FormData();
@@ -332,10 +320,8 @@ export default {
 
                     if (!response.ok) {
                         const message = `An error has occured while deleting embedding data: ${response.status}`;
-                        this.onShowFailure("Data deletion failed!")
-                        console.log(message)
+                        this.onShowFailure(message)
                     }else{
-                        const data = await response.json();
                         this.onShowSuccess("Data deleted successfully!")
                         await this.onDataRefreshed()
                     }
