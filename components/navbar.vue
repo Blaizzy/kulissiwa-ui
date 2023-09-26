@@ -86,7 +86,6 @@ export default {
         supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_IN') {
                 this.store.signIn(session)
-                console.log(this.store.user_session.user)
                 const user_metadata = this.store.user_session.user.user_metadata
                 if (Object.keys(user_metadata).length > 0){
                     this.avatar_url = user_metadata.avatar_url
