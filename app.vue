@@ -1,18 +1,21 @@
 <template>
   <div class="flex h-screen">
-    <navbar v-if="!isLogin"/>
+    <navbar v-if="!isAuth"/>
     <conversations v-if="isChats"/>
     <NuxtPage />
+
   </div>
 </template>
+
 
 <script>
 
 import conversations from './components/conversations.vue'
 
-export default {
-  components: { conversations },
 
+export default {
+
+  components: { conversations },
   computed: {
     isChats() {
       if (this.$route.name == 'chats-id' || this.$route.name == 'chats') {
@@ -21,9 +24,13 @@ export default {
         return false
       }
     },
-    isLogin() {
-      return this.$route.name == 'login'
-    }
+    isAuth() {
+      if (this.$route.name == 'login' || this.$route.name == 'auth-email-verification') {
+        return true
+      }else{
+        return false
+      }
+    },
   }
 }
 
