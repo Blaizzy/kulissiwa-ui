@@ -68,18 +68,15 @@
 <script>
 import { ChevronDoubleLeftIcon, Bars3Icon } from '@heroicons/vue/20/solid'
 import { useAuthStore } from '@/stores/index'
+
 export default {
     data(){
+        const store = useAuthStore()
         return {
             name:"",
             email:"",
             avatar_url:"/images/avatars/user-default-pic.png",
             collapsed: false,
-        }
-    },
-    setup() {
-        const store = useAuthStore()
-        return {
             store: store
         }
     },
