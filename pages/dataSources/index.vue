@@ -207,6 +207,7 @@ export default {
             const iconMap = {
                 'pdf': '/images/pdf.png',
                 'vnd.openxmlformats-officedocument.wordprocessingml.document': '/images/word.png',
+                'docx': '/images/word.png',
                 'website': '/images/website.png',
                 'csv': '/images/csv.png',
                 'text': '/images/text.png',
