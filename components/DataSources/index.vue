@@ -20,7 +20,7 @@
         <div class="mb-2 text-base">
         
           <label for="data-type" class="block mb-2">Select data type:</label>
-          <select id="data-type" class="block w-full border border-gray-300 rounded-lg p-1 mb-2" v-model="selectedDataType">
+          <select id="data-type" class="block w-full border border-gray-300 rounded-lg p-1 mb-2" v-model="selectedDataType" @change="resetFiles">
             <option 
               v-for="dataType in dataTypes"
               :key="dataType.value"
@@ -148,7 +148,7 @@
               </div>
             </div>
             <div v-for="(error, index) in errors" :key="index">
-              <p class="text-red-600 text-xs">
+              <p class="text-red-600 text-xs prose break-words">
                <i class="fas fa-exclamation-circle"></i>
                {{ error }} 
               </p>
@@ -282,6 +282,9 @@ export default {
     removeFile(index) {
       this.uploadedFiles.splice(index, 1);
     },
+    resetFiles() {
+      this.uploadedFiles = [];
+    },
     resetModal() {
       this.name = "";
       this.display_name = "";
@@ -362,12 +365,14 @@ export default {
 
         let fileType = "";
         if (this.selectedDataType === "Docx") {
-          fileType = "DOCX";
+          if (file.type.split("/")[1] === "vnd.openxmlformats-officedocument.wordprocessingml.document"){
+            fileType = "docx";
+          }
         } else {
           fileType = file.type.split("/")[1];
         }
 
-        if (this.selectedDataType.toLowerCase() !== fileType.toLowerCase()) {
+        if (this.selectedDataType.toLowerCase() !== fileType.toLowerCase()) {       
           this.errors.push(`The file "${file.name}" is not a ${this.selectedDataType} file and was not added.`);
           continue;  // Skip this file
         }
