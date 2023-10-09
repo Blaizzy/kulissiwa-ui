@@ -208,7 +208,7 @@ export default {
                 'pdf': '/images/pdf.png',
                 'vnd.openxmlformats-officedocument.wordprocessingml.document': '/images/word.png',
                 'docx': '/images/word.png',
-                'website': '/images/website.png',
+                'url': '/images/web.png',
                 'csv': '/images/csv.png',
                 'text': '/images/text.png',
                 // Add more mappings as needed
@@ -232,7 +232,8 @@ export default {
         async getDataSources(supabase, refresh = false) {
             const { data, error } = await supabase
                 .from('data')
-                .select('id, name, content_data, file_type, is_file');
+                .select('id, name, content_data, file_type, is_file, created_at')
+                .order('created_at', { ascending: true });
             
             if (error) {
                 console.log(error)
