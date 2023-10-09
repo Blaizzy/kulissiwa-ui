@@ -382,6 +382,7 @@ export default {
             const { data, error } = await supabase
             .from('data')
             .select('id, name, content_data, file_type')
+            .order('created_at', { ascending: true });
 
             if (error) {
                 console.log(error)

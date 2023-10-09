@@ -232,7 +232,8 @@ export default {
         async getDataSources(supabase, refresh = false) {
             const { data, error } = await supabase
                 .from('data')
-                .select('id, name, content_data, file_type, is_file');
+                .select('id, name, content_data, file_type, is_file, created_at')
+                .order('created_at', { ascending: true });
             
             if (error) {
                 console.log(error)
