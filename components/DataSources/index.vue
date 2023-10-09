@@ -129,9 +129,9 @@
                 <input class="mr-2" type="checkbox" id="crawl" name="crawl" value="crawl" v-model="crawl">
                 <label for="crawl" class="text-md">Crawl</label><br>
                 <div class="mt-2 text-sm" v-show="onCrawl">
-                  <div class=" bg-yellow-50 p-1 px-2 rounded-md border border-yellow-300"> 
+                  <div class=" flex items-center bg-yellow-50 p-1 px-2 rounded-md border border-yellow-300"> 
                     <i class="fas fa-info-circle text-yellow-500  mr-2"></i>
-                    <span class="text-gray-700">URL crawling is limited to 300 pages per crawl. Reach out to us if you need more.</span>
+                    <p class="text-gray-700">URL crawling is limited to 300 pages per crawl. Reach out to us if you need more.</p>
                   </div>
                  
                   
