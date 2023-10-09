@@ -208,7 +208,7 @@ export default {
                 'pdf': '/images/pdf.png',
                 'vnd.openxmlformats-officedocument.wordprocessingml.document': '/images/word.png',
                 'docx': '/images/word.png',
-                'website': '/images/website.png',
+                'url': '/images/web.png',
                 'csv': '/images/csv.png',
                 'text': '/images/text.png',
                 // Add more mappings as needed

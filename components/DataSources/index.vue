@@ -31,13 +31,13 @@
             </option>
             
           </select>
-          <label for="data-type" class="block mb-2" v-show="selectedDataType=='Text' || selectedDataType=='Website'">Name:</label>
+          <label for="data-type" class="block mb-2" v-show="selectedDataType=='Text' || selectedDataType=='URL'">Name:</label>
           <input
             id="data-source-name"
             type="text"
             class="block w-full border border-gray-300 rounded-lg p-1 mb-1"
             placeholder="i.e. Docs"
-            v-model="name" v-show="selectedDataType=='Text' || selectedDataType=='Website'"/>
+            v-model="name" v-show="selectedDataType=='Text' || selectedDataType=='URL'"/>
         </div>
         <div class="mt-4">
           <form @submit.prevent>
@@ -115,14 +115,34 @@
                 </div>
               </div>
             </div>
-            <div v-if="selectedDataType === 'Website'">
+            <div v-if="selectedDataType === 'URL'">
               <label for="website-url" class="block mb-2">Website URL:</label>
               <input
                 id="website-url"
                 type="url"
                 class="block w-full border border-gray-300 rounded-lg p-1"
-                placeholder="https://example.com"
+                placeholder="https://example.com" v-model="data"
               />
+              <div class="mt-2">
+
+                <!-- checkbox for crawl -->
+                <input class="mr-2" type="checkbox" id="crawl" name="crawl" value="crawl" v-model="crawl">
+                <label for="crawl">Crawl</label><br>
+                <div class="mt-2" v-show="onCrawl">
+                  <p class="text-xs text-gray-500"> URL crawling is limited to 300 pages per crawl. Reach out to us if you need more.</p>
+                  <p class="text-xs text-gray-500"> Email: <a href="mailto:support@kulissiwa.com" class="text-blue-500">support@kulissiwa.com</a></p>
+                  <p class="text-xs text-gray-500"> Twitter: <a href="https://twitter.com/Kulissiwa" class="text-blue-500">@Kulissiwa</a></p>
+                </div>
+                <div v-for="(file, index) in uploadedFiles" :key="index">
+          
+                  <p v-if="loading" class="flex text-gray-700 text-md justify-end">{{ file.loadingProgress }}%</p>
+                  <div v-if="loading" class="mt-2">
+                    <div class="h-1 bg-white rounded-full">
+                      <div class="h-full bg-blue-600 rounded-full animate-pulse" :style="{ width: `${file.loadingProgress}%` }"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div v-if="selectedDataType === 'CSV'">
               <input
@@ -189,8 +209,8 @@
   </template>
 
 <script>
-import { faThumbsDown } from '@fortawesome/free-solid-svg-icons';
 import MyWorker from '@/assets/workers/workerData?worker'
+import EmbedURLWorker from '@/assets/workers/workerURLs?worker'
 import { useAuthStore } from '@/stores/index'
 
 
@@ -212,6 +232,7 @@ export default {
       data: "",
       errors: [],
       file_type: "",
+      crawl: false,
       loading: false,
       loadingProgress: 0,
       maxFileSize: 15,
@@ -219,7 +240,7 @@ export default {
         { label: 'PDF', value: 'PDF' },
         { label: 'Text', value: 'Text', disabled: false },
         { label: 'Docx', value: 'Docx', disabled: false },
-        { label: 'Website', value: 'Website', disabled: true },
+        { label: 'URL', value: 'URL', disabled: false },
         { label: 'CSV', value: 'CSV', disabled: true },
         { label: 'Notion', value: 'Notion', disabled: true },
         // ... add more data types as needed
@@ -227,7 +248,7 @@ export default {
       fileIcons: {
         'pdf': '/images/pdf.png',
         'docx': '/images/word.png',
-        'website': '/images/website.png',
+        'url': '/images/web.png',
         'csv': '/images/csv.png',
         'text': '/images/text.png',
       },
@@ -293,15 +314,48 @@ export default {
       this.errors = [];
       this.file_type = "";
       this.loading= false;
+      this.crawl = false;
       // clear all inputs 
       const inputs = document.querySelectorAll('input[type="file"]')
       inputs.forEach(input => input.value = '')
     },
-    async embedFileWithWorker(user_session, data_source, file, file_type, is_file=false) {
+    async embedURLWorker(file, data_source, user_session, data_type, crawl, excluded_urls){  
+      return new Promise((resolve, reject) => {
+        const worker = new EmbedURLWorker();
+        worker.postMessage({
+          data: file.data,  
+          data_source: data_source, 
+          namespace: user_session.user.id,
+          data_type: data_type, 
+          crawl: crawl,
+          excluded_urls: excluded_urls,
+        });
+        
+
+        worker.addEventListener('message', (event) => {
+          if (event.data.error) {
+              console.error(`Error processing file: ${event.data.error} ${file.display_name}`);
+              this.$emit('showFailure')
+          } else {
+              // Handle the result from the worker
+              // Maybe update some reactive properties, etc.
+
+              if (event.data.status === 'complete') {
+                worker.terminate();
+                resolve("Embedding completed");
+                this.$emit("showSuccess")
+              } else {
+                file.loadingProgress = event.data.progress;
+              }
+          }
+        });
+      });
+    },
+    async embedFileWithWorker(action, file, data_source, user_session, file_type, is_file=false) {
       return new Promise((resolve, reject) => {
         const worker = new MyWorker();
         worker.postMessage({
-          action: 'embedData',
+          action: action,
           data: file.data,  
           data_source: data_source, 
           namespace: user_session.user.id,
@@ -388,14 +442,16 @@ export default {
       }
       
     },
+    
     async uploadData() {
       const supabase = useSupabaseClient();
       const user_session = this.store.user_session
 
       this.loading = true;
-
-      if (this.selectedDataType== "Text") {
+      if (this.selectedDataType == "Text") {
         this.uploadedFiles.push({ data: this.data, display_name: this.name, name: this.name, file_type: 'text', loadingProgress: 15})
+      } else if (this.selectedDataType == "URL") {
+        this.uploadedFiles.push({ data: this.data, display_name: this.name, name: this.name, file_type: 'url', loadingProgress: 15})
       }
 
       const promises = this.uploadedFiles.map(async(file) => {
@@ -410,9 +466,22 @@ export default {
             console.error("Error uploading data:", error);
             throw error;
           } else {
-            this.embedFileWithWorker(user_session, data[0].id, file, file.file_type, false);
+            await this.embedFileWithWorker('embedData', file, data[0].id, user_session, file.file_type, false);
           }
 
+        } else if (this.selectedDataType == "URL") {
+          const { data, error } = await supabase
+            .from('data')
+            .upsert([
+              { name: file.name, content_data: file.data, user_id: `${user_session.user.id}`, file_type: 'url' },
+            ]).select();
+
+          if (error) {
+            console.error("Error uploading data:", error);
+            throw error;
+          } else {
+            await this.embedURLWorker(file, data[0].id, user_session, file.file_type, this.crawl, []);
+          }
         } else if (this.selectedDataType == "PDF" || this.selectedDataType == "Docx" || this.selectedDataType == "CSV") {
           const unique_name = `${file.name}_${Date.now()}`;
           const { data, error } = await supabase
@@ -438,7 +507,7 @@ export default {
             } else {
               file.loadingProgress = 15;
               const file_type = file.file_type.toLowerCase();
-              await this.embedFileWithWorker(user_session, insertData[0].id, file, file_type, true);
+              await this.embedFileWithWorker('embedData', file, insertData[0].id, user_session, file_type, true);
             }
           }
         }
@@ -517,6 +586,9 @@ export default {
       if (bytes === 0) return '0 Byte';
       const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
       return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+    },
+    onCrawl(){
+      return this.crawl
     }
   },
 }
