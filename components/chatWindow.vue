@@ -346,14 +346,22 @@ export default {
     methods: {
         sourcesGreaterThanOne(index){
             
-            if (this.ai_messages[index].source_documents !== null && this.ai_messages[index].source_documents.length > 1) {
+            if (
+                this.ai_messages[index] && 
+                this.ai_messages[index].source_documents && 
+                this.ai_messages[index].source_documents.length > 1
+            ) {
                 return true
             } else {
                 return false
             }
         },
         sourcesExists(index){
-            if (this.ai_messages[index].source_documents !== null && this.ai_messages[index].source_documents.length > 0) {
+            if (
+                this.ai_messages[index] && 
+                this.ai_messages[index].source_documents && 
+                this.ai_messages[index].source_documents.length > 0
+            ) {
                 return true
             } else {
                 return false
