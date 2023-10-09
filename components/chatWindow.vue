@@ -73,26 +73,54 @@
                                 <div class="flex flex-col bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg py-2 px-6 ml-2" v-if="ai_messages[index]">
                                     <div v-html="renderMarkdown(ai_messages[index].content)" class="pt-2 inline-block break-words prose"></div>
                                     <div v-show="ai_messages[index].source_documents" class="pb-2 mt-1">
-                                        <div v-html="renderMarkdown(`**Sources 📃**`)"></div>
-                                        <div v-for="(source_document, source_index) in ai_messages[index].source_documents" :key="source_index" class="flex flex-col break-words prose">
-                                            <Disclosure v-slot="{ open }">
-                                                <DisclosureButton
-                                                class="flex w-full border border-gray-300 justify-between rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
-                                                >
-                                                <span v-if="showFilePageReference(source_document)"> {{ source_document.metadata.source }}, p. {{ source_document.metadata.page }}</span>
-                                                <span v-else> {{ source_document.metadata.source }}</span>
+                                        <Disclosure v-slot="{ open }">
+                                            <DisclosureButton
+                                            class="flex w-full border border-gray-300 rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
+                                            >
+                                            <span class="bg-gray-300 rounded-full px-3 font-semibold"> {{ai_messages[index].source_documents.length}} </span>
+                                            <div class="flex w-full justify-between ml-2">
+                                            <div v-html="renderMarkdown(`**sources**`)"></div>
                                                 <ChevronUpIcon
                                                     :class="open ? 'rotate-180 transform' : ''"
                                                     class="h-5 w-5 text-gray-500"
                                                 />
-                                                </DisclosureButton>
-                                                <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
-                                                    <div v-html="renderMarkdown(source_document.page_content)"></div>
-                                                </DisclosurePanel>
-                                            </Disclosure>
-                                        </div>
-                                    </div>
+                                            </div>
+                                            </DisclosureButton>
+                                            <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
+                                                <div v-for="(source_document, source_index) in ai_messages[index].source_documents" :key="source_index" class="flex break-words prose">
                                     
+                                                    <div class="w-full link-container flex flex-col  py-2 px-4 my-2 rounded-full bg-white border border-gray-300 text-sm font-medium hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75" v-if="checkURLExists(source_document)">
+                                                        
+                                                        <span> 
+                                                            <a :href="source_document.metadata.url" target="_blank" class="mr-1.5"> 
+                                                            {{ source_document.metadata.source }} </a> 
+                                                            <i class="fas fa-solid fa-arrow-up-right-from-square link-icon"></i>
+
+                                                        </span>
+                                                        <!-- <span class="truncate"> {{ source_document.metadata.title }}</span> -->
+                                                    </div>
+                                                
+                                                    <div class="flex flex-col w-full" v-else>
+                                                        <Disclosure v-slot="{ open }">
+                                                            <DisclosureButton
+                                                            class="flex w-full border border-gray-300 justify-between rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
+                                                            >
+                                                            <span v-if="checkPageExists(source_document)"> {{ source_document.metadata.source }}, p. {{ source_document.metadata.page }}</span>
+                                                            <span v-else> {{ source_document.metadata.source }}</span>
+                                                            <ChevronUpIcon
+                                                                :class="open ? 'rotate-180 transform' : ''"
+                                                                class="h-5 w-5 text-gray-500"
+                                                            />
+                                                            </DisclosureButton>
+                                                            <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
+                                                                <div v-html="renderMarkdown(source_document.page_content)"></div>
+                                                            </DisclosurePanel>
+                                                        </Disclosure>
+                                                    </div>
+                                                </div>
+                                            </DisclosurePanel>
+                                        </Disclosure>
+                                    </div>
                                 </div>
                                 
 
@@ -387,8 +415,16 @@ export default {
         initSupabase(){
           return useSupabaseClient()
         },
-        showFilePageReference(source_document){
+        checkPageExists(source_document){
             if (typeof source_document.metadata.page === 'number' ) {
+                return true
+                
+            } else {
+                return false
+            }
+        },
+        checkURLExists(source_document){
+            if (typeof source_document.metadata.url === 'string' ) {
                 return true
                 
             } else {
@@ -644,11 +680,12 @@ export default {
                             return false;
                         }
                     }
-                    let result = '';
+                    let result = ''; // The final result
                     let jsonBuffer = ''; // Buffer for potential JSON strings
                     let collectingJSON = false; // Are we currently collecting a JSON string?   
                     let response_dict = '';
-                    let index = this.ai_messages.push({sender: "ai"}) - 1;
+                    let index=''; // Index of the ai_messages array
+                    let isFirstIteration = true; // Is this the first iteration of the while loop?
                     while (true) {
                         const { value, done } = await reader.read();
                         
@@ -661,6 +698,10 @@ export default {
                         // Split the chunk by new lines
                         const words = chunk.split('\n');
 
+                        if (isFirstIteration) {
+                            index = this.ai_messages.push({sender: "ai"}) - 1;
+                            isFirstIteration = false;
+                        }
                         // If there's more than one word, join them into a single string
                         if (words.length > 1) {
                             chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
@@ -679,7 +720,17 @@ export default {
                                     let endIndex = cleanedString.indexOf('||JSON_END||');
                                     response_dict = JSON.parse(cleanedString.substring(startIndex + '||JSON_START||'.length, endIndex));
                                     if (response_dict.source_documents.length > 0) {
+                                        // replace the source id with the source name
+                                        if (response_dict.source_documents){ 
+                                            response_dict.source_documents.forEach(item => {
+                                                let id = item.metadata.source;
+                                                item.metadata.source = this.getSourceName(id);
+                                            });
+                                        }else{
+                                            response_dict = {source_documents: []};
+                                        }
                                         this.ai_messages[index].source_documents = response_dict.source_documents;
+                                        
                                     }
 
                                     // Reset the buffer and collecting state
@@ -701,15 +752,8 @@ export default {
                         }
                         this.highlightCode();
                     }
-                    // replace the source id with the source name
-                    if (response_dict.source_documents) 
-                        response_dict.source_documents.forEach(item => {
-                            let id = item.metadata.source;
-                            item.metadata.source = this.getSourceName(id);
-                        });
-                    else
-                        response_dict = {source_documents: []};
-                    } 
+                    
+                } 
             } catch (err) {
                 console.log(err);
             } finally {
@@ -772,3 +816,15 @@ export default {
 };
 </script>
 
+<style scoped>
+/* Hide the link icon by default */
+.link-icon {
+    visibility: hidden;
+    transition: visibility 0.3s; /* optional: smooth visibility transition */
+}
+
+/* Show the link icon on container hover */
+.link-container:hover .link-icon {
+    visibility: visible;
+}
+</style>
