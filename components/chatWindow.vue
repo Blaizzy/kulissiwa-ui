@@ -79,7 +79,8 @@
                                             >
                                             <span class="bg-gray-300 rounded-full px-3 font-semibold"> {{ai_messages[index].source_documents.length}} </span>
                                             <div class="flex w-full justify-between ml-2">
-                                            <div v-html="renderMarkdown(`**sources**`)"></div>
+                                                <p class="font-semibold" v-if="ai_messages[index].source_documents.length>1">sources</p>
+                                                <p class="font-semibold" v-else>source</p>
                                                 <ChevronUpIcon
                                                     :class="open ? 'rotate-180 transform' : ''"
                                                     class="h-5 w-5 text-gray-500"
