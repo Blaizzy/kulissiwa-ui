@@ -338,7 +338,7 @@ export default {
                     'pdf': '/images/pdf.png',
                     'vnd.openxmlformats-officedocument.wordprocessingml.document': '/images/word.png',
                     'docx': '/images/word.png',
-                    'website': '/images/website.png',
+                    'url': '/images/web.png',
                     'csv': '/images/csv.png',
                     'text': '/images/text.png',
                     // Add more mappings as needed
@@ -368,7 +368,11 @@ export default {
                         file_type: dataSource.file_type,
                     })
                 })
-                this.selectedDataType = 'Chat';
+                if (data.length > 0) {
+                    this.selectedDataType = data[data.length-1].id;
+                } else {
+                    this.selectedDataType = 'Chat';
+                }
             }
         },
         highlightCode() {
@@ -644,6 +648,9 @@ export default {
                         }
                     }
                     let result = '';
+                    let jsonBuffer = ''; // Buffer for potential JSON strings
+                    let collectingJSON = false; // Are we currently collecting a JSON string?   
+                    let response_dict = '';
                     while (true) {
                         const { value, done } = await reader.read();
                         
@@ -660,19 +667,36 @@ export default {
                         if (words.length > 1) {
                             chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
                         }
-                        if (isJSON(chunk)) {
-                            // If the chunk is a potential JSON string, parse it and add it to the result
-                            let cleanedString = chunk.replace(/[\cA-\cZ]/g, "");
-                            result += cleanedString.split('||JSON_START||')[0];
-                            this.ai_messages[index].content = result;
-                            
-                            let startIndex = chunk.indexOf('||JSON_START||');
-                            let endIndex = chunk.indexOf('||JSON_END||');
-                            response_dict = JSON.parse(cleanedString.substring(startIndex + '||JSON_START||'.length, endIndex));
-                            
-                            if (response_dict.source_documents.length > 0)
-                                this.ai_messages[index].source_documents = response_dict.source_documents;
-                            
+                        if (collectingJSON || chunk.includes('||JSON_START||')) {
+                            jsonBuffer += chunk;
+
+                            // Only attempt parsing if we detect the end delimiter
+                            if (jsonBuffer.includes('||JSON_END||')) {
+                                if (isJSON(jsonBuffer)) {
+                                    let cleanedString = jsonBuffer.replace(/[\cA-\cZ]/g, "");
+                                    result += cleanedString.split('||JSON_START||')[0];
+                                    this.ai_messages[index].content = result;
+                                    
+                                    let startIndex = cleanedString.indexOf('||JSON_START||');
+                                    let endIndex = cleanedString.indexOf('||JSON_END||');
+                                    response_dict = JSON.parse(cleanedString.substring(startIndex + '||JSON_START||'.length, endIndex));
+                                    if (response_dict.source_documents.length > 0) {
+                                        this.ai_messages[index].source_documents = response_dict.source_documents;
+                                    }
+
+                                    // Reset the buffer and collecting state
+                                    jsonBuffer = '';
+                                    collectingJSON = false;
+                                } else {
+                                    // If not a valid JSON, just add to result and reset the buffer and collecting state
+                                    result += jsonBuffer;
+                                    this.ai_messages[index].content = result;
+                                    jsonBuffer = '';
+                                    collectingJSON = false;
+                                }
+                            } else {
+                                collectingJSON = true;
+                            }
                         } else {
                             result += chunk.replace(/^"(.*)"$/, '$1');
                             this.ai_messages[index].content = result;
