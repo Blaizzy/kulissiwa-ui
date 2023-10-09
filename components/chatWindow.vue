@@ -77,9 +77,9 @@
                                             <DisclosureButton
                                             class="flex w-full border border-gray-300 rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
                                             >
-                                            <span class="bg-gray-300 rounded-full px-3 font-semibold"> {{ai_messages[index].source_documents.length}} </span>
+                                            <span class="bg-gray-300 rounded-full px-3 font-semibold" v-if="sourcesExists(index)"> {{ai_messages[index].source_documents.length}} </span>
                                             <div class="flex w-full justify-between ml-2">
-                                                <p class="font-semibold" v-if="ai_messages[index].source_documents.length>1">sources</p>
+                                                <p class="font-semibold" v-if="sourcesGreaterThanOne(index)">sources</p>
                                                 <p class="font-semibold" v-else>source</p>
                                                 <ChevronUpIcon
                                                     :class="open ? 'rotate-180 transform' : ''"
@@ -341,8 +341,24 @@ export default {
         isMessageEmpty() {
             return this.message.trim().length === 0;
         },
+
     },
     methods: {
+        sourcesGreaterThanOne(index){
+            
+            if (this.ai_messages[index].source_documents !== null && this.ai_messages[index].source_documents.length > 1) {
+                return true
+            } else {
+                return false
+            }
+        },
+        sourcesExists(index){
+            if (this.ai_messages[index].source_documents !== null && this.ai_messages[index].source_documents.length > 0) {
+                return true
+            } else {
+                return false
+            }
+        },
         isChatFound(){
             if (this.user_messages.length === 0 && this.$route.params.id === undefined) {
                 this.isLoading = false;
