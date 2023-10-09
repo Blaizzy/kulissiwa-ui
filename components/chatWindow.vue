@@ -370,6 +370,7 @@ export default {
                 })
                 if (data.length > 0) {
                     this.selectedDataType = data[data.length-1].id;
+                    this.getIconForFileType();
                 } else {
                     this.selectedDataType = 'Chat';
                 }
@@ -545,8 +546,6 @@ export default {
 
             // get the last user message
             const last_user_message = this.user_messages[this.user_messages.length - 1];
-            let response_dict;
-
             try {
                 const formData = new FormData();
                 formData.append("query",last_user_message.content);
@@ -623,8 +622,6 @@ export default {
                     }
                     const reader = response.body.getReader();
                     const decoder = new TextDecoder('utf-8');
-
-                    let index = this.ai_messages.push({sender: "ai"}) - 1;
                     this.scrollToBottom();
                     function isJSON(chunk) {
                         if (typeof chunk !== 'string') return false;
@@ -651,6 +648,7 @@ export default {
                     let jsonBuffer = ''; // Buffer for potential JSON strings
                     let collectingJSON = false; // Are we currently collecting a JSON string?   
                     let response_dict = '';
+                    let index = this.ai_messages.push({sender: "ai"}) - 1;
                     while (true) {
                         const { value, done } = await reader.read();
                         
