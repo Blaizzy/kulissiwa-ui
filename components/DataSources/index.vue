@@ -116,7 +116,7 @@
               </div>
             </div>
             <div v-if="selectedDataType === 'URL'">
-              <label for="website-url" class="block mb-2">Website URL:</label>
+              <label for="website-url" class="block mb-2 text-md">Website URL:</label>
               <input
                 id="website-url"
                 type="url"
@@ -127,11 +127,14 @@
 
                 <!-- checkbox for crawl -->
                 <input class="mr-2" type="checkbox" id="crawl" name="crawl" value="crawl" v-model="crawl">
-                <label for="crawl">Crawl</label><br>
-                <div class="mt-2" v-show="onCrawl">
-                  <p class="text-xs text-gray-500"> URL crawling is limited to 300 pages per crawl. Reach out to us if you need more.</p>
-                  <p class="text-xs text-gray-500"> Email: <a href="mailto:support@kulissiwa.com" class="text-blue-500">support@kulissiwa.com</a></p>
-                  <p class="text-xs text-gray-500"> Twitter: <a href="https://twitter.com/Kulissiwa" class="text-blue-500">@Kulissiwa</a></p>
+                <label for="crawl" class="text-md">Crawl</label><br>
+                <div class="mt-2 text-sm" v-show="onCrawl">
+                  <div class=" bg-yellow-50 p-1 px-2 rounded-md border border-yellow-300"> 
+                    <i class="fas fa-info-circle text-yellow-500  mr-2"></i>
+                    <span class="text-gray-700">URL crawling is limited to 300 pages per crawl. Reach out to us if you need more.</span>
+                  </div>
+                 
+                  
                 </div>
                 <div v-for="(file, index) in uploadedFiles" :key="index">
           
