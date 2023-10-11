@@ -32,13 +32,12 @@ definePageMeta({
                 <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onShowSuccess('Data uploaded sucessfully')" @show-failure="onShowFailure('Data upload failed!')"  />
             </div>
 
-            <!-- TODO -->
-            <!-- <div class="mt-auto bg-white rounded-full flex items-center border border-gray-200 hover:border-sky-200 ">
-                <input type="search"  class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Search data sources...">
+            <div class="mt-auto bg-white rounded-full flex items-center border border-gray-200 hover:border-sky-200 ">
+                <input type="search"  class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Search data sources..." v-model="searchQuery" @keyup.prevent="searchConversations" @input="searchConversations">
                 <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center">
                     <i class="fas fa-search"></i>
                 </button>
-            </div> -->
+            </div>
         </div>
         <div class="h-full" style=" overflow-y: auto;"
         :class="noDataFound ? 'flex justify-center items-center' : ''"
@@ -165,6 +164,7 @@ import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import { ChevronDownIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/20/solid'
 import DataSkeleton from '~/components/DataSkeleton.vue'
 import { useAuthStore } from '@/stores/index'
+import Fuse from 'fuse.js'
 
 export default {
 
@@ -184,6 +184,7 @@ export default {
             successMessage:'',
             failureMessage:'',
             store: store,
+            searchQuery: '',
 
         };
     },
@@ -197,12 +198,26 @@ export default {
             }
         })
 
-        const supabase = this.initSupabase()
-        await this.getDataSources(supabase)
+        await this.getDataSources()
 
     },
     methods: {
-        
+        async searchConversations() {
+            const fuseOptions = {
+                keys: ['name'],  // Adjust this based on your field names
+                threshold: 0.3,            // Adjust for search sensitivity
+            };
+            let fuse = new Fuse(this.dataSources, fuseOptions);
+    
+            if (this.searchQuery && this.dataSources.length > 0) {
+                const result = fuse.search(this.searchQuery);
+                if (result.length > 0) {
+                    this.dataSources = result.map((result) => result.item);
+                } 
+            } else {
+                await this.getDataSources(true)
+            }
+        },
         getIconForFileType(fileType) {
             const iconMap = {
                 'pdf': '/images/pdf.png',
@@ -229,7 +244,8 @@ export default {
                 })
             })
         },
-        async getDataSources(supabase, refresh = false) {
+        async getDataSources(refresh = false) {
+            const supabase = await this.initSupabase()
             const { data, error } = await supabase
                 .from('data')
                 .select('id, name, content_data, file_type, is_file, created_at')

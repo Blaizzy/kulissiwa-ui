@@ -106,7 +106,7 @@
 </template>
 
 <script>
-
+import Fuse from 'fuse.js';
 
 export default {
     setup() {
@@ -114,7 +114,6 @@ export default {
 
         return {
           clearMessages,
-          
         };
     },
     data() {
@@ -148,9 +147,17 @@ export default {
 
     },
     methods: {
-        searchConversations() {
+        async searchConversations() {
+            const fuseOptions = {
+                keys: ['title'],  // Adjust this based on your field names
+                threshold: 0.3,  // Adjust for search sensitivity
+            };
+            let fuse = new Fuse(this.conversations, fuseOptions);
             if (this.searchQuery && this.conversations.length > 0) {
-                this.conversations = this.conversations.filter(conversation => conversation.title.toLowerCase().includes(this.searchQuery.toLowerCase()))
+                const result = fuse.search(this.searchQuery);
+                if (result.length > 0) {
+                    this.conversations = result.map(result => result.item)
+                } 
             } else {
                 this.getConversations(true)
             }
