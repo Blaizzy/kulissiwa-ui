@@ -17,7 +17,9 @@
             <div class="mt-auto bg-white rounded-full flex items-center w-full border border-gray-200 hover:border-sky-200 ">
                 <input type="search"  class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Search chats..." v-model="searchQuery" @keyup.prevent="searchConversations" @input="searchConversations">
                 <span class="py-2 px-4 text-gray-500 inline-flex items-center">
-                    <i class="fas fa-search"></i>
+                    <ClientOnly>
+                        <i class="fas fa-search"></i>
+                    </ClientOnly>
                 </span>
             </div>
         </div>
@@ -58,16 +60,17 @@
                             >
                                 <button v-show="!showDeleteConfirmation && !showTitleEditConfirmation"
                                 @click.prevent="toggleTitleEditConfirmation()">
-                                    <i
-                                    class="fas fa-pencil text-gray-600 hover:text-black"></i>
+                                    <ClientOnly>
+                                        <i class="fas fa-pencil text-gray-600 hover:text-black"></i>
+                                    </ClientOnly>
                                 </button>
 
 
                                 <button v-show="!showDeleteConfirmation && !showTitleEditConfirmation"
                                 @click.prevent="toggleDeleteConfirmation()">
-                                    <i class="fas fa-trash text-gray-600 hover:text-black"
-
-                                    ></i>
+                                    <ClientOnly>
+                                        <i class="fas fa-trash text-gray-600 hover:text-black"></i>
+                                    </ClientOnly>
                                 </button>
 
                                 <button v-show="showDeleteConfirmation"
