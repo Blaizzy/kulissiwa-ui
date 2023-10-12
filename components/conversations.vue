@@ -15,7 +15,7 @@
 
         <div class="flex justify-center items-center mb-4">
             <div class="mt-auto bg-white rounded-full flex items-center w-full border border-gray-200 hover:border-sky-200 ">
-                <input type="search"  class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Search chats..." v-model="searchQuery" @keyup.prevent="searchConversations" @input="searchConversations">
+                <input type="search"  class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Search chats..." v-model="searchQuery" @keyup.prevent="onKeyup">
                 <span class="py-2 px-4 text-gray-500 inline-flex items-center">
                     <ClientOnly>
                         <i class="fas fa-search"></i>
@@ -128,6 +128,8 @@ export default {
             showTitleEditConfirmation: false,
             typedTitle: '',
             searchQuery: '',
+            conversations_copy: [],
+            debounceTimeout: null,
         }
     },
     async created() {
@@ -140,6 +142,7 @@ export default {
     mounted() {
        
         this.getConversations()
+        this.conversations_copy = this.conversations
         if (this.showDeleteConfirmation == true) {
             this.showDeleteConfirmation = false
         }
@@ -155,14 +158,29 @@ export default {
                 keys: ['title'],  // Adjust this based on your field names
                 threshold: 0.3,  // Adjust for search sensitivity
             };
-            let fuse = new Fuse(this.conversations, fuseOptions);
-            if (this.searchQuery && this.conversations.length > 0) {
-                const result = fuse.search(this.searchQuery);
-                if (result.length > 0) {
-                    this.conversations = result.map(result => result.item)
-                } 
-            } else {
-                this.getConversations(true)
+            try {
+                let fuse = new Fuse(this.conversations_copy, fuseOptions);
+                this.conversations = this.searchQuery 
+                    ? fuse.search(this.searchQuery).map(result => result.item) 
+                    : [...this.conversations_copy];
+            }
+            catch (error) {
+                const message = `An error occurred while searching for conversations: ${error}`;
+                console.error(message);
+            }
+
+        },
+        onKeyup() {
+            if (this.debounceTimeout) {
+                clearTimeout(this.debounceTimeout);
+            }
+            this.debounceTimeout = setTimeout(() => {
+                this.searchConversations();
+            }, 300);
+        },
+        beforeDestroy() {
+            if (this.debounceTimeout) {
+                clearTimeout(this.debounceTimeout);
             }
         },
         async updateConversations() {

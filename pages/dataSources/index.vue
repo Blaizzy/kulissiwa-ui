@@ -40,7 +40,7 @@ definePageMeta({
                 <button class="px-2 text-gray-500 hover:text-black inline-flex items-center">
                     <i class="fas fa-search"></i>
                 </button>
-                <input type="search"  class="w-full px-1 py-2 rounded-full focus:outline-none bg-inherit" placeholder="Search data sources..." v-model="searchQuery" @keyup.prevent="searchConversations" @input="searchConversations">
+                <input type="search"  class="w-full px-1 py-2 rounded-full focus:outline-none bg-inherit" placeholder="Search data sources..." v-model="searchQuery" @keyup.prevent="onKeyup">
             </div>
             <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white gradient-border rounded-full px-2 shadow-lg hover:scale-105 ml-5">
                 <i class="fa-solid fa-plus"></i> <span class="pl-1 font-medium">Add New</span>
@@ -119,7 +119,7 @@ definePageMeta({
             </div>
             
         </div>
-
+        
 
         <div class="flex flex-col" v-if="!noDataFound">
             <h2 class="text-lg font-semibold pb-2 pt-4 px-4">Files</h2>         
@@ -153,7 +153,7 @@ definePageMeta({
             
             <div class="mt-2 mx-3 text-sm">
                 <!-- Table Headers -->
-                <div class="sticky top-0 backdrop-blur-sm flex flex-row justify-between text-gray-500 px-4 py-3  text-md font-normal rounded-lg bg-gray-50/30" v-if="!noDataFound && !isLoading">
+                <div class="sticky top-0 z-10 flex flex-row justify-between text-gray-500 px-4 py-3  text-md font-normal rounded-lg bg-gray-50" v-if="!noDataFound && !isLoading">
                     <span class="flex-1">Filename</span>
                     <span class="flex-1">Date Created</span>
                     <span class="flex-1">Type</span>
@@ -280,8 +280,8 @@ export default {
             showSortOptions: false,
             showFilterOptions: false,
             selectedFileType: '',
-
-
+            dataSources_copy: [],
+            debounceTimeout: null,
         };
     },
     async mounted(){
@@ -295,6 +295,7 @@ export default {
         })
         this.sort = 'date'
         await this.getDataSources()
+        this.dataSources_copy = this.dataSources
 
     },
     methods: {
@@ -353,16 +354,34 @@ export default {
             const fuseOptions = {
                 keys: ['name'],  // Adjust this based on your field names
                 threshold: 0.3,            // Adjust for search sensitivity
-            };
-            let fuse = new Fuse(this.dataSources, fuseOptions);
-    
-            if (this.searchQuery && this.dataSources.length > 0) {
-                const result = fuse.search(this.searchQuery);
-                if (result.length > 0) {
-                    this.dataSources = result.map((result) => result.item);
-                } 
-            } else {
-                await this.getDataSources(true)
+            };    
+            try {
+                let fuse = new Fuse(this.dataSources_copy, fuseOptions);
+
+                // If there's a search query, search using Fuse and update dataSources.
+                // If not, reset dataSources to its original state.
+                this.dataSources = this.searchQuery 
+                    ? fuse.search(this.searchQuery).map(result => result.item)
+                    : [...this.dataSources_copy];
+            } catch (error) {
+                const message = `An error occurred while searching: ${error}`;
+                this.onShowFailure(message);
+                // Handle the error appropriately based on your application needs.
+                // For instance, you might want to show a user-friendly error message.
+            }
+            
+        },
+        onKeyup() {
+            if (this.debounceTimeout) {
+                clearTimeout(this.debounceTimeout);
+            }
+            this.debounceTimeout = setTimeout(() => {
+                this.searchConversations();
+            }, 300);
+        },
+        beforeDestroy() {
+            if (this.debounceTimeout) {
+                clearTimeout(this.debounceTimeout);
             }
         },
         getIconForFileType(fileType) {
