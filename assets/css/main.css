@@ -27,3 +27,55 @@ body {
   }
 
 
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.gradient-border {
+    position: relative;
+    border: 2px solid transparent;  /* Set the width of your border */
+    background-clip: padding-box;  /* This clips the background to the inside edge of the border */
+}
+
+.gradient-border::before {
+    content: "";
+    position: absolute;
+    top: -2px; /* Adjust these values based on your border width */
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+    z-index: -1;
+    background: linear-gradient(135deg, #4baff2, #33b1ff, #007fb5);
+    background-size: 300% 300%;
+    animation: gradientAnimation 6s infinite;
+    border-radius: inherit;  /*Inherit the border-radius of the parent button*/
+}
+
+.gradient-border-hover::before {
+    content: "";
+    position: absolute;
+    top: -2px; /* Adjust these values based on your border width */
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+    z-index: -1;
+    background: linear-gradient(135deg, #4baff2, #33b1ff, #007fb5);
+    background-size: 300% 300%;
+    animation: gradientAnimation 1s infinite;
+    border-radius: inherit;  /* Inherit the border-radius of the parent button */
+}
+
+
+.animated-gradient-bg {
+    background: linear-gradient(135deg, #4baff2, #33b1ff, #007fb5);
+    background-size: 300% 300%;
+    animation: gradientAnimation 8s infinite;
+}
