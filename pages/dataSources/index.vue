@@ -40,7 +40,7 @@ definePageMeta({
                 <button class="px-2 text-gray-500 hover:text-black inline-flex items-center">
                     <i class="fas fa-search"></i>
                 </button>
-                <input type="search"  class="w-full px-1 py-2 rounded-full focus:outline-none bg-inherit" placeholder="Search data sources..." v-model="searchQuery" @keyup.prevent="onKeyup">
+                <input type="search"  class="w-full px-1 py-2 rounded-full focus:outline-none bg-inherit" name="search_bar" placeholder="Search data sources..." v-model="searchQuery" @keyup.prevent="onKeyup">
             </div>
             <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white gradient-border rounded-full px-2 shadow-lg hover:scale-105 ml-5">
                 <i class="fa-solid fa-plus"></i> <span class="pl-1 font-medium">Add New</span>
@@ -119,8 +119,8 @@ definePageMeta({
             </div>
             
         </div>
-        
 
+        
         <div class="flex flex-col" v-if="!noDataFound">
             <h2 class="text-lg font-semibold pb-2 pt-4 px-4">Files</h2>         
         </div>
@@ -282,7 +282,7 @@ export default {
             selectedFileType: '',
             dataSources_copy: [],
             debounceTimeout: null,
-        };
+                    };
     },
     async mounted(){
         // Load data sources from database and append to dataSources array

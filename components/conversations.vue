@@ -15,7 +15,7 @@
 
         <div class="flex justify-center items-center mb-4">
             <div class="mt-auto bg-white rounded-full flex items-center w-full border border-gray-200 hover:border-sky-200 ">
-                <input type="search"  class="w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Search chats..." v-model="searchQuery" @keyup.prevent="onKeyup">
+                <input type="search"  class="w-full px-4 py-2 rounded-full focus:outline-none" name="search_bar" placeholder="Search chats..." v-model="searchQuery" @keyup.prevent="onKeyup">
                 <span class="py-2 px-4 text-gray-500 inline-flex items-center">
                     <ClientOnly>
                         <i class="fas fa-search"></i>
