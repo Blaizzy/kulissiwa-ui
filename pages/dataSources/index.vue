@@ -119,7 +119,7 @@ definePageMeta({
             </div>
             
         </div>
-        
+
 
         <div class="flex flex-col" v-if="!noDataFound">
             <h2 class="text-lg font-semibold pb-2 pt-4 px-4">Files</h2>         
@@ -153,7 +153,7 @@ definePageMeta({
             
             <div class="mt-2 mx-3 text-sm">
                 <!-- Table Headers -->
-                <div class="flex flex-row justify-between text-gray-500 px-4 py-3  text-md font-normal rounded-lg bg-gray-50" v-if="!noDataFound && !isLoading">
+                <div class="sticky top-0 backdrop-blur-sm flex flex-row justify-between text-gray-500 px-4 py-3  text-md font-normal rounded-lg bg-gray-50/30" v-if="!noDataFound && !isLoading">
                     <span class="flex-1">Filename</span>
                     <span class="flex-1">Date Created</span>
                     <span class="flex-1">Type</span>
@@ -167,7 +167,7 @@ definePageMeta({
                 <div v-for="dataSource in dataSources" :key="dataSource.id" class="flex justify-between items-center p-4 border-b border-gray-200 hover:shadow-sm hover:rounded-lg hover:border-gray-100 hover:bg-gray-50">
                     <!-- Filename -->
                     <div class="flex items-center flex-1 truncate"  :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''">
-                        <div class="border border-gray-200 rounded-lg mr-2 p-1 px-1 bg-white">
+                        <div class="border border-gray-200 rounded-lg mr-2 p-1 px-1 bg-white flex-shrink-0" >
                             <img :src="getIconForFileType(dataSource.file_type)" :alt="dataSource.name" class="w-6 h-6 rounded-md" />
                         </div>
                         <p class="truncate text-gray-900">{{ dataSource.name }}</p>
@@ -280,7 +280,7 @@ export default {
             showSortOptions: false,
             showFilterOptions: false,
             selectedFileType: '',
-            
+
 
         };
     },
