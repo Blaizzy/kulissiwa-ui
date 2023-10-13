@@ -35,7 +35,8 @@
   },
   "overrides": {
     "vue": "latest",
-    "@supabase/supabase-js": "^2.21.0"
+    "@supabase/supabase-js": "^2.21.0",
+    "@supabase/gotrue-js": "^1.0.0"
   }
 }
 
