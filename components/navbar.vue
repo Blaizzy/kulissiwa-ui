@@ -11,37 +11,42 @@
             <button v-show="collapsed" @click="collapse" class="block py-3 px-2 mb-2 font-semibold rounded-full hover:bg-sky-100">
                 <Bars3Icon class="w-4 h-4 text-gray-600"/>
             </button>
-            <client-only>
-                <NuxtLink to="/dataSources" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50"
-                :class="{'bg-sky-100': isDataSourcesSelected}"
-                >
-                    <i class="fa-solid fa-database"></i>
-    
-                    <span v-show="!collapsed" class="pl-1.5">Data Sources</span>
-            
-            
-                </NuxtLink>
-            </client-only>
-            <client-only>
-                <NuxtLink to="/chats"  class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50"
-                :class="{'bg-sky-100': isChatsSelected}"
-                >
-                    <i class="fa-solid fa-comments fa-sm"></i>
-                    
-                    <span v-show="!collapsed" class="pl-1.5">Chats</span>
-                    
-                </NuxtLink>
-            </client-only>
+            <!-- <NuxtLink to="/dashboard" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
+                <i class="fa-solid fa-cubes"></i>
+                    <span v-show="!collapsed" class="pl-1.5">Dashboard</span>
+  
+            </NuxtLink> -->
+            <NuxtLink to="/dataSources" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50"
+            :class="{'bg-sky-100': isSelectedMenu('/dataSources')}">
+                <i class="fa-solid fa-database"></i>
+ 
+                <span v-show="!collapsed" class="pl-1.5">Data Sources</span>
+         
+        
+            </NuxtLink>
+            <NuxtLink to="/chats"  class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50"
+            :class="{'bg-sky-100': isSelectedMenu('/chats')}">
+                <i class="fa-solid fa-comments fa-sm"></i>
+                
+                <span v-show="!collapsed" class="pl-1.5">Chats</span>
+                
+            </NuxtLink>
+
+            <!-- <NuxtLink to="/billing" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
+                <i class="fa-solid fa-credit-card"></i>
+               
+                    <span v-show="!collapsed" class="pl-1.5">Billing</span>
+                
+            </NuxtLink> -->
         </nav>
 
         <hr class="mt-auto w-full h-px my-2 border dark:bg-gray-300">
 
         <div class="mb-4 py-2 px-2 flex items-start rounded-full hover:bg-sky-50">
-            <ClientOnly>
-                <button class="block" @click="signOut">
-                    <i class="fa-solid fa-right-from-bracket"></i> <span id="logOut" v-show="!collapsed" class="pl-1.5">Logout</span>
-                </button>
-            </ClientOnly>
+
+            <button class="block" @click="signOut">
+                <i class="fa-solid fa-right-from-bracket"></i> <span id="logOut" v-show="!collapsed" class="pl-1.5">Logout</span>
+            </button>
         </div>
         <div class="mb-2 flex items-start rounded-full hover:bg-sky-50">
             <div class="flex items-center">
@@ -100,18 +105,6 @@ export default {
         
         
     },
-    computed:{
-        isDataSourcesSelected() {
-            return this.isSelectedMenu('/dataSources');
-        },
-        isChatsSelected() {
-            return this.isSelectedMenu('/chats');
-        },
-        collapse() {
-            if (this.collapsed) this.collapsed = false
-            else this.collapsed = true
-        },
-    },
     methods: {
         resetProfile(){
             this.avatar_url = "/images/avatars/user-default-pic.png"
@@ -126,7 +119,10 @@ export default {
             }
    
         },
-
+        collapse() {
+            if (this.collapsed) this.collapsed = false
+            else this.collapsed = true
+        },
         isSelectedMenu(name){
             if (this.$route.path === name || this.$route.path.split('/')[1] === name.split('/')[1]) return true
         
