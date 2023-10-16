@@ -86,7 +86,7 @@ export default {
         const supabase = useSupabaseClient()
 
         supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN') {
+            if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
                 this.store.signIn(session)
                 const user_metadata = this.store.user_session.user.user_metadata
                 if (Object.keys(user_metadata).length > 0){

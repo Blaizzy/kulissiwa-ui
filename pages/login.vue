@@ -76,6 +76,7 @@
 <script>
 export default {
     data() {
+        const redirectTo = `${useRuntimeConfig().public.baseUrl}`
         return {
             email: "",
             showSuccess: false,
@@ -85,15 +86,8 @@ export default {
             emptyEmail: false,
             email_auth_loading: false,
             social_auth_loading: false,
+            redirectTo: redirectTo
         }
-    },
-    mounted() {
-        watchEffect(() => {
-            const user = useSupabaseUser()
-            if (user.value) {
-                this.$router.push('/chats')
-            }
-        })
     },
     methods: {
         getURL(){
@@ -117,6 +111,7 @@ export default {
                 email: this.email,
                 options: {
                     emailRedirectTo: 'https://app.kulissiwa.com/chats'
+                    re
                 }
             })
             if (error) {
@@ -132,13 +127,15 @@ export default {
             this.social_auth_loading = true
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
+                options: {
+                    redirectTo: this.redirectTo + '/auth/confirm'
+                }
             })
             if (error) {
                 this.onLoginFailure(error.message)
                 this.social_auth_loading = false
             } else {
                 this.onLoginSuccess("Successfully logged in with Google")
-
             }
         
             
@@ -148,6 +145,9 @@ export default {
             this.social_auth_loading = true
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'github',
+                options: {
+                    redirectTo: this.redirectTo + '/auth/confirm'
+                }
             })
             if (error) {
                 this.onLoginFailure(error.message)

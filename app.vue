@@ -25,7 +25,7 @@ export default {
       }
     },
     isAuth() {
-      if (this.$route.name == 'login' || this.$route.name == 'auth-email-verification') {
+      if (this.$route.name == 'login' || this.$route.name == 'auth-email-verification' || this.$route.name == 'auth-confirm') {
         return true
       }else{
         return false
