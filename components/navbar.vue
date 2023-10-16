@@ -6,10 +6,13 @@
         <nav class="text-base">
             <div class="flex py-3 font-semibold mb-4 text-center justify-between">
                 <img src="~~/assets/logos/kulissiwa.svg" width="32" height="32" alt="Kulissiwa Logo">
-                <ChevronDoubleLeftIcon class="w-8 h-8 text-gray-600 py-1 px-2 rounded-full hover:bg-sky-50" id="collapseButton" @click="collapse" />
+                <button v-show="!collapsed" @click="collapse" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
+                    <svg class="icon icon-tabler icon-tabler-layout-sidebar-left-collapse" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><rect height="16" rx="2" width="16" x="4" y="4"/><path d="M9 4v16"/><path d="M15 10l-2 2l2 2"/></svg>
+                </button>
+                
             </div>
-            <button v-show="collapsed" @click="collapse" class="block py-3 px-2 mb-2 font-semibold rounded-full hover:bg-sky-100">
-                <Bars3Icon class="w-4 h-4 text-gray-600"/>
+            <button v-show="collapsed" @click="collapse" class="block py-3 px-2 mb-2 font-bold rounded-full hover:bg-sky-50">
+                <Bars3Icon class="w-4 h-4 text-gray-600 "/>
             </button>
             <!-- <NuxtLink to="/dashboard" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
                 <i class="fa-solid fa-cubes"></i>
@@ -18,17 +21,19 @@
             </NuxtLink> -->
             <NuxtLink to="/dataSources" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50"
             :class="{'bg-sky-100': isSelectedMenu('/dataSources')}">
-                <i class="fa-solid fa-database"></i>
- 
-                <span v-show="!collapsed" class="pl-1.5">Data Sources</span>
+                <ClientOnly>
+                    <i class="fa-solid fa-database"></i> 
+                    <span v-show="!collapsed" class="pl-1.5">Data Sources</span>    
+                </ClientOnly>
          
         
             </NuxtLink>
             <NuxtLink to="/chats"  class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50"
             :class="{'bg-sky-100': isSelectedMenu('/chats')}">
-                <i class="fa-solid fa-comments fa-sm"></i>
-                
-                <span v-show="!collapsed" class="pl-1.5">Chats</span>
+                <ClientOnly>
+                    <i class="fa-solid fa-comments fa-sm"></i>
+                    <span v-show="!collapsed" class="pl-1.5">Chats</span>
+                </ClientOnly>
                 
             </NuxtLink>
 

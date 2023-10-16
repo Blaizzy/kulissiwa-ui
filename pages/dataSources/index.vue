@@ -300,7 +300,7 @@ export default {
     async mounted(){
         // Load data sources from database and append to dataSources array
         watchEffect(() => {
-            if (this.dataSources.length === 0 !== this.isLoading) {
+            if (this.dataSources.length === 0 !== this.isLoading && this.dataSources_copy.length === 0) {
                 this.noDataFound = true
             } else {
                 this.noDataFound = false
