@@ -25,7 +25,7 @@
         </div>
         <div class="overflow-y-auto">
 
-
+            <ConversationsSkeleton v-show="isLoading" v-for="i in 5" :key="i" />
             <div class="mb-4" v-for="conversation in conversations" :key="conversation.id">
                 <!-- <h2 class="text-xl font-semibold mb-2">Today</h2> -->
                 <nuxt-link
@@ -110,13 +110,13 @@
 
 <script>
 import Fuse from 'fuse.js';
+import ConversationsSkeleton from './ConversationsSkeleton.vue';
 
 export default {
     setup() {
         const { clearMessages } = useChat();
-
         return {
-          clearMessages,
+            clearMessages,
         };
     },
     data() {
@@ -130,45 +130,42 @@ export default {
             searchQuery: '',
             conversations_copy: [],
             debounceTimeout: null,
-        }
+            isLoading: true,
+        };
     },
     async created() {
-        const { refreshConversations } = useConversations()
-
+        const { refreshConversations } = useConversations();
         watch(refreshConversations, () => {
-            this.updateConversations()
-        })
+            this.updateConversations();
+        });
     },
     mounted() {
-       
-        this.getConversations()
-        this.conversations_copy = this.conversations
+        this.getConversations();
+        this.conversations_copy = this.conversations;
         if (this.showDeleteConfirmation == true) {
-            this.showDeleteConfirmation = false
+            this.showDeleteConfirmation = false;
         }
         if (this.showTitleEditConfirmation == true) {
-            this.showTitleEditConfirmation = false
+            this.showTitleEditConfirmation = false;
         }
-        this.selectedConversation  = this.$route.params.id ? this.$route.params.id : null
-
+        this.selectedConversation = this.$route.params.id ? this.$route.params.id : null;
     },
     methods: {
         async searchConversations() {
             const fuseOptions = {
-                keys: ['title'],  // Adjust this based on your field names
-                threshold: 0.3,  // Adjust for search sensitivity
+                keys: ['title'],
+                threshold: 0.3, // Adjust for search sensitivity
             };
             try {
                 let fuse = new Fuse(this.conversations_copy, fuseOptions);
-                this.conversations = this.searchQuery 
-                    ? fuse.search(this.searchQuery).map(result => result.item) 
+                this.conversations = this.searchQuery
+                    ? fuse.search(this.searchQuery).map(result => result.item)
                     : [...this.conversations_copy];
             }
             catch (error) {
                 const message = `An error occurred while searching for conversations: ${error}`;
                 console.error(message);
             }
-
         },
         onKeyup() {
             if (this.debounceTimeout) {
@@ -184,122 +181,118 @@ export default {
             }
         },
         async updateConversations() {
-            await this.getConversations(true)
+            await this.getConversations(true);
             if (this.conversations.length > 0) {
-                this.$route.params.id = this.conversations[0].id
-                this.setConversation(this.conversations[0].id)
+                this.$route.params.id = this.conversations[0].id;
+                this.setConversation(this.conversations[0].id);
                 this.typeTitle(this.conversations[0].title);
             }
         },
         async typeTitle(title) {
-            this.typedTitle = title;  // Use 'this' to access typedTitle
-            this.conversations[0].title = '';  // Use 'this' to access typedTitle
+            this.typedTitle = title; // Use 'this' to access typedTitle
+            this.conversations[0].title = ''; // Use 'this' to access typedTitle
             for (let i = 0; i < this.typedTitle.length; i++) {
-                await new Promise(resolve => setTimeout(resolve, 100));  // adjust the speed of typing here
-                this.conversations[0].title += this.typedTitle[i];  // Use 'this' to access typedTitle
+                await new Promise(resolve => setTimeout(resolve, 100)); // adjust the speed of typing here
+                this.conversations[0].title += this.typedTitle[i]; // Use 'this' to access typedTitle
             }
         },
         async initSupabase() {
-            return useSupabaseClient()
+            return useSupabaseClient();
         },
         setConversation(id) {
             if (this.selectedConversation !== id) {
-               this.showDeleteConfirmation = false
-               this.showTitleEditConfirmation = false
+                this.showDeleteConfirmation = false;
+                this.showTitleEditConfirmation = false;
             }
-            this.selectedConversation = id
-            this.conversationTitle = this.conversations.find(conversation => conversation.id === id).title
+            this.selectedConversation = id;
+            this.conversationTitle = this.conversations.find(conversation => conversation.id === id).title;
             // Only type out the title if this is the first conversation
             if (this.selectedConversation === this.conversations[0].id) {
-                
             }
         },
-
-        async getConversations(refresh=false) {
-            const supabase = await this.initSupabase()
+        async getConversations(refresh = false) {
+            const supabase = await this.initSupabase();
             const { data, error } = await supabase
                 .from('conversations')
                 .select('*')
-                .order('created_at', { ascending: false })
-
+                .order('created_at', { ascending: false });
             if (error) {
-                console.log(error)
-            } else {
-                if (data){
+                console.log(error);
+            }
+            else {
+                if (data) {
                     if (refresh) {
-                        this.conversations = []
+                        this.conversations = [];
                     }
                     data.forEach(conversation => {
-                        this.conversations.push(conversation)
+                        this.conversations.push(conversation);
                     });
                 }
             }
+            this.isLoading = false;
         },
         async deleteConversation() {
-            const supabase = await this.initSupabase()
+            const supabase = await this.initSupabase();
             const { data, error } = await supabase
                 .from('conversations')
                 .delete()
-                .eq('id', this.selectedConversation)
-
+                .eq('id', this.selectedConversation);
             if (error) {
-                console.log('ID' + this.selectedConversation)
-                console.log(error)
-
-            } else {
+                console.log('ID' + this.selectedConversation);
+                console.log(error);
+            }
+            else {
                 // remove from conversations from array
-                this.conversations = this.conversations.filter(conversation => conversation.id !== this.selectedConversation)
-                this.selectedConversation = null
-                this.showDeleteConfirmation = false
+                this.conversations = this.conversations.filter(conversation => conversation.id !== this.selectedConversation);
+                this.selectedConversation = null;
+                this.showDeleteConfirmation = false;
                 if (this.$route.params.id) {
-                    this.$router.push('/chats')
-                if (this.$route.name == 'chats'){
-                    window.location.reload(true)
+                    this.$router.push('/chats');
+                    if (this.$route.name == 'chats') {
+                        window.location.reload(true);
+                    }
                 }
-                }else{
-                    await this.getConversations(true)
+                else {
+                    await this.getConversations(true);
                 }
             }
-
         },
         async editConversationTitle(conversation) {
-                const supabase = await this.initSupabase()
-                const { data, error } = await supabase
-                    .from('conversations')
-                    .update({ title: this.conversationTitle })
-                    .eq('id', this.selectedConversation)
-
-                if (error) {
-                    console.log(error)
-                } else {
-                    this.showTitleEditConfirmation = false
-                    this.conversations = this.conversations.map(conversation => {
-                        if (conversation.id === this.selectedConversation) {
-                            return {
-                                ...conversation,
-                                title: this.conversationTitle
-                            }
-
-                        }
-                        return conversation
-                    })
-                }
-
+            const supabase = await this.initSupabase();
+            const { data, error } = await supabase
+                .from('conversations')
+                .update({ title: this.conversationTitle })
+                .eq('id', this.selectedConversation);
+            if (error) {
+                console.log(error);
+            }
+            else {
+                this.showTitleEditConfirmation = false;
+                this.conversations = this.conversations.map(conversation => {
+                    if (conversation.id === this.selectedConversation) {
+                        return {
+                            ...conversation,
+                            title: this.conversationTitle
+                        };
+                    }
+                    return conversation;
+                });
+            }
         },
         toggleDeleteConfirmation() {
-
             if (this.showDeleteConfirmation) {
-                this.showDeleteConfirmation = false
-            } else {
-                this.showDeleteConfirmation = true
+                this.showDeleteConfirmation = false;
+            }
+            else {
+                this.showDeleteConfirmation = true;
             }
         },
         toggleTitleEditConfirmation() {
-
             if (this.showTitleEditConfirmation) {
-                this.showTitleEditConfirmation = false
-            } else {
-                this.showTitleEditConfirmation = true
+                this.showTitleEditConfirmation = false;
+            }
+            else {
+                this.showTitleEditConfirmation = true;
             }
         },
         isSelectedConversation(id) {
@@ -308,14 +301,11 @@ export default {
         onTitleInputChange(conversation) {
             conversation.title = this.conversationTitle;
         },
-        isNewChat(){
-            return this.$route.params.id ? false : true
+        isNewChat() {
+            return this.$route.params.id ? false : true;
         },
-
     },
-   
-
-
+    components: { ConversationsSkeleton }
 }
 </script>
 

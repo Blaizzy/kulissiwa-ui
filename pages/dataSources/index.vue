@@ -295,7 +295,8 @@ export default {
             selectedFileType: '',
             dataSources_copy: [],
             debounceTimeout: null,
-                    };
+            sort: 'date',
+         };
     },
     async mounted(){
         // Load data sources from database and append to dataSources array
@@ -307,7 +308,6 @@ export default {
             }
         })
 
-        this.sort = 'date'
         await this.getDataSources()
         this.dataSources_copy = this.dataSources
 
