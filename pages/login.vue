@@ -1,5 +1,4 @@
 <template>
-    
     <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div 
             v-if="showSuccess" 
@@ -76,6 +75,7 @@
 <script>
 export default {
     data() {
+        const redirectTo = `${useRuntimeConfig().public.baseUrl}`
         return {
             email: "",
             showSuccess: false,
@@ -85,15 +85,8 @@ export default {
             emptyEmail: false,
             email_auth_loading: false,
             social_auth_loading: false,
+            redirectTo: redirectTo
         }
-    },
-    mounted() {
-        watchEffect(() => {
-            const user = useSupabaseUser()
-            if (user.value) {
-                this.$router.push('/chats')
-            }
-        })
     },
     methods: {
         getURL(){
@@ -132,13 +125,15 @@ export default {
             this.social_auth_loading = true
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
+                options: {
+                    redirectTo: this.redirectTo + '/auth/confirm'
+                }
             })
             if (error) {
                 this.onLoginFailure(error.message)
                 this.social_auth_loading = false
             } else {
                 this.onLoginSuccess("Successfully logged in with Google")
-
             }
         
             
@@ -148,6 +143,9 @@ export default {
             this.social_auth_loading = true
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'github',
+                options: {
+                    redirectTo: this.redirectTo + '/auth/confirm'
+                }
             })
             if (error) {
                 this.onLoginFailure(error.message)

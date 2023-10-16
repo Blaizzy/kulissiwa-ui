@@ -5,8 +5,10 @@
             v-if="showFailure" 
             class="fixed top-4 right-4 py-2 px-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800 shadow-md transition-transform transform"
             :class="{ 'translate-x-full opacity-0': !showFailure, 'translate-x-0 opacity-100': showFailure }"
-        >
-            <i class="fas fa-square-xmark mr-2"></i>
+        >   
+            <ClientOnly>
+                <i class="fas fa-square-xmark mr-2"></i>
+            </ClientOnly>
                 {{failureMessage}}
         </div>
 
@@ -47,7 +49,10 @@
                     <h1 class="text-4xl font-semibold m-1">No chats yet</h1>
                     <p class="text-2xl m-1">Start a new chat by typing a message below
                     </p>
-                    <i class="mt-2 p-1 fas fa-arrow-down fa-xl"></i> 
+                    <ClientOnly>
+                        <i class="mt-2 p-1 fas fa-arrow-down fa-xl"></i> 
+                    </ClientOnly>
+                    
                 </div>
                 </div>
                 <div class="w-auto px-4 overflow-y-auto" ref="chatWindow" >
@@ -95,7 +100,9 @@
                                                         <span> 
                                                             <a :href="source_document.metadata.url" target="_blank" class="mr-1.5"> 
                                                             {{ source_document.metadata.source }} </a> 
-                                                            <i class="fas fa-solid fa-arrow-up-right-from-square link-icon"></i>
+                                                            <ClientOnly>
+                                                                <i class="fas fa-solid fa-arrow-up-right-from-square link-icon"></i>
+                                                            </ClientOnly>
 
                                                         </span>
                                                         <!-- <span class="truncate"> {{ source_document.metadata.title }}</span> -->
@@ -127,9 +134,12 @@
 
                                 <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg inline-block py-2 px-6 ml-2" v-else-if="loading_ai_response">
                                     <div class="space-x-1.5">
-                                        <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0s;--fa-fade-opacity: 0.1;"></i>
-                                        <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0.3s;--fa-fade-opacity: 0.1;"></i>
-                                        <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0.6s;--fa-fade-opacity: 0.1;"></i>
+                                        <ClientOnly>
+                                            <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0s;--fa-fade-opacity: 0.1;"></i>
+                                            <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0.3s;--fa-fade-opacity: 0.1;"></i>
+                                            <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0.6s;--fa-fade-opacity: 0.1;"></i>
+                                        </ClientOnly>
+
                                     </div>
                                 </div>
                             </div>
@@ -143,19 +153,28 @@
 
         <!-- Message Input -->
         <div class="flex items-start justify-center w-auto">
-            <div class="bg-white rounded-xl flex items-center shadow-md border border-gray-200 w-1/2 hover:border-sky-200">
-                <textarea type="text" :rows="rows" class="w-full px-4 h-auto py-3 rounded-xl focus:outline-none" placeholder="Type your message..." 
-                    v-model="message" style="resize: none;"  @keydown.enter.exact.prevent="handleEnterPress">
-                </textarea>
-                <button class="py-2 px-4 text-gray-500 inline-flex items-center" @click.prevent="queryModel" v-if="!loading_ai_response"
+            <div class="rounded-xl flex items-center shadow-md px-2 border  border-gray-100 w-1/2 hover:border-gray-300">
+                <textarea 
+                    type="text" 
+                    :rows="rows" 
+                    class="bg-white w-full px-4 h-auto py-3 rounded-xl focus:outline-none" 
+                    placeholder="Type your message..." 
+                    v-model="message" 
+                    style="resize: none;"  
+                    @keydown.enter.exact.prevent="handleEnterPress"></textarea>
+                <button class="py-2 px-4 mr-1 rounded-lg inline-flex items-center " @click.prevent="queryModel" v-if="!loading_ai_response"
                 :disabled="isMessageEmpty"
-                :class="isMessageEmpty ?'hover:text-gray-500' : 'hover:text-black'"
+                :class="isMessageEmpty ?'hover:text-gray-500 text-gray-500' : 'hover:bg-sky-500 animated-gradient-bg text-white'"
                 >
-                    <i class="fas fa-paper-plane"></i>
+                    <ClientOnly>
+                        <i class="fas fa-paper-plane"></i>
+                    </ClientOnly>
                 </button>
 
                 <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center" disabled v-else >
-                    <i class="fas fa-spinner fa-spin"></i>
+                    <ClientOnly>
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </ClientOnly>
                 </button>
 
             </div>
@@ -842,7 +861,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 /* Hide the link icon by default */
 .link-icon {
     visibility: hidden;
@@ -853,4 +872,6 @@ export default {
 .link-container:hover .link-icon {
     visibility: visible;
 }
+
+
 </style>

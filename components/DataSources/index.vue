@@ -17,10 +17,10 @@
           <i class="fas fa-times" ></i>
         </button>
         <h2 class="text-xl font-semibold mb-4">New Data Source</h2>
-        <div class="mb-2 text-base">
+        <div class="text-base">
         
           <label for="data-type" class="block mb-2">Select data type:</label>
-          <select id="data-type" class="block w-full border border-gray-300 rounded-lg p-1 mb-2" v-model="selectedDataType" @change="resetFiles">
+          <select id="data-type" class="block w-full border border-gray-300 rounded-lg p-1 py-2 mb-2" v-model="selectedDataType" @change="resetFiles">
             <option 
               v-for="dataType in dataTypes"
               :key="dataType.value"
@@ -35,13 +35,13 @@
           <input
             id="data-source-name"
             type="text"
-            class="block w-full border border-gray-300 rounded-lg p-1 mb-1"
+            class="block w-full border border-gray-300 rounded-lg p-2"
             placeholder="i.e. Docs"
             v-model="name" v-show="selectedDataType=='Text' || selectedDataType=='URL'"/>
         </div>
-        <div class="mt-4">
+        <div>
           <form @submit.prevent>
-            <div v-if="selectedDataType === 'PDF' || selectedDataType === 'Docx'">
+            <div v-if="selectedDataType === 'PDF' || selectedDataType === 'Docx'" class="transition-opacity duration-300 delay-300 mt-3" :class="{ 'opacity-0': !selectedDataType, 'opacity-100': selectedDataType === 'PDF' || selectedDataType === 'Docx' }">
               <div 
                 class="file-dropzone border-2 border-dashed border-gray-300 p-5 mb-4 text-center flex flex-col justify-center items-center transition-colors duration-300 rounded"
                 @dragenter.prevent.stop="dragEnter" 
@@ -115,12 +115,12 @@
                 </div>
               </div>
             </div>
-            <div v-if="selectedDataType === 'URL'">
+            <div v-if="selectedDataType === 'URL'" class="mt-2 transition-opacity duration-300 delay-500" :class="{ 'opacity-0': !selectedDataType, 'opacity-100': selectedDataType === 'URL'}">
               <label for="website-url" class="block mb-2 text-md">Website URL:</label>
               <input
                 id="website-url"
                 type="url"
-                class="block w-full border border-gray-300 rounded-lg p-1"
+                class="block w-full border border-gray-300 rounded-lg p-2"
                 placeholder="https://example.com" v-model="data"
               />
               <div class="mt-2">
@@ -147,18 +147,12 @@
                 </div>
               </div>
             </div>
-            <div v-if="selectedDataType === 'CSV'">
-              <input
-                type="file"
-                @change="handleFileUpload"
-                accept=".csv"
-              />
-            </div>
-            <div v-if="selectedDataType === 'Text'">
-              <label for="text-data" class="block mb-2">Text Data:</label>
+
+            <div v-if="selectedDataType === 'Text'" class="mt-2 transition-opacity duration-300 delay-500" :class="{ 'opacity-0': !selectedDataType, 'opacity-100': selectedDataType === 'URL'}">
+              <label for="text-data" class="block mb-2 text-md">Text Data:</label>
               <textarea
                 id="text-data"
-                class="block w-full border border-gray-300 rounded-lg p-1"
+                class="block w-full border border-gray-300 rounded-lg p-2"
                 placeholder="Enter text here" v-model="data"
               ></textarea>
               <div v-for="(file, index) in uploadedFiles" :key="index">
@@ -571,7 +565,7 @@ export default {
   },
   computed: {
     isNameEmpty() {
-      if (this.selectedDataType=="Text") {
+      if (this.selectedDataType=="Text" || this.selectedDataType=="URL") {
         return this.name.length == 0 || this.data.length == 0
       } else if (this.selectedDataType=="PDF" || this.selectedDataType=="Docx" || this.selectedDataType=="CSV") {
         
