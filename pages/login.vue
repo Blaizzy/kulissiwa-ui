@@ -1,5 +1,4 @@
 <template>
-    
     <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div 
             v-if="showSuccess" 
@@ -111,7 +110,6 @@ export default {
                 email: this.email,
                 options: {
                     emailRedirectTo: 'https://app.kulissiwa.com/chats'
-                    re
                 }
             })
             if (error) {

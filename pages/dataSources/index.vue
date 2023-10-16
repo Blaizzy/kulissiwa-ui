@@ -51,26 +51,31 @@ definePageMeta({
                 </button>
                 <div v-show="showSortOptions" class="absolute mt-2 w-48 rounded-md shadow-lg z-50 bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100" @click="showSortOptions = false;">
                     <div class="py-1">
-                        <ClientOnly>
+                        
                             <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click="sortData('asc')">
                                 Sort Ascending
-                                <span v-show="setSort('asc')" class="float-right">
-                                    <i class="fa-solid fa-check text-sky-500"></i>
+                                <span v-show="isSort('asc')" class="float-right">
+                                    <ClientOnly>
+                                        <i class="fa-solid fa-check text-sky-500"></i>
+                                    </ClientOnly>
                                 </span>
                             </button>
                             <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click="sortData('desc')">
                                 Sort Descending
-                                <span v-show="setSort('desc')" class="float-right">
-                                    <i class="fa-solid fa-check text-sky-500"></i>
+                                <span v-show="isSort('desc')" class="float-right">
+                                    <ClientOnly>
+                                        <i class="fa-solid fa-check text-sky-500"></i>
+                                    </ClientOnly>
                                 </span>
                             </button>
                             <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click="sortData('date')">
                                 Sort by Date
-                                <span v-show="setSort('date')" class="float-right">
-                                    <i class="fa-solid fa-check text-sky-500"></i>
+                                <span v-show="isSort('date')" class="float-right">
+                                    <ClientOnly>
+                                        <i class="fa-solid fa-check text-sky-500"></i>
+                                    </ClientOnly>
                                 </span>
                             </button>
-                        </ClientOnly>
                     </div>
                 </div>
             </div>
@@ -83,26 +88,34 @@ definePageMeta({
                     <div class="py-1">
                         <button v-if="isFileTypeInDataSources('pdf')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click="selectFileType('pdf')">
                             PDF
-                            <span v-show="setFilter('pdf')" class="float-right">
-                                <i class="fa-solid fa-check text-sky-500"></i>
+                            <span v-show="isFilter('pdf')" class="float-right">
+                                <ClientOnly>
+                                    <i class="fa-solid fa-check text-sky-500"></i>
+                                </ClientOnly>
                             </span>
                         </button>
                         <button v-if="isFileTypeInDataSources('docx')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click.prevent="selectFileType('docx')">
                             DOCX
-                            <span v-show="setFilter('docx')" class="float-right">
-                                <i class="fa-solid fa-check text-sky-500"></i>
+                            <span v-show="isFilter('docx')" class="float-right">
+                                <ClientOnly>
+                                    <i class="fa-solid fa-check text-sky-500"></i>
+                                </ClientOnly>
                             </span>
                         </button>
                         <button v-if="isFileTypeInDataSources('url')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click.prevent="selectFileType('url')">
                             URL
-                            <span v-show="setFilter('url')" class="float-right">
-                                <i class="fa-solid fa-check text-sky-500"></i>
+                            <span v-show="isFilter('url')" class="float-right">
+                                <ClientOnly>
+                                    <i class="fa-solid fa-check text-sky-500"></i>
+                                </ClientOnly>
                             </span>
                         </button>
                         <button v-if="isFileTypeInDataSources('text')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click.prevent="selectFileType('text')">
                             TEXT
                             <span v-show="setFilter('text')" class="float-right">
-                                <i class="fa-solid fa-check text-sky-500"></i>
+                                <ClientOnly>
+                                    <i class="fa-solid fa-check text-sky-500"></i>
+                                </ClientOnly>
                             </span>
                         </button>
                         <!-- ... add more file types to filter by as needed ... -->
@@ -293,6 +306,7 @@ export default {
                 this.noDataFound = false
             }
         })
+
         this.sort = 'date'
         await this.getDataSources()
         this.dataSources_copy = this.dataSources
@@ -300,12 +314,12 @@ export default {
     },
     methods: {
         isFileTypeInDataSources(fileType) {
-            return this.dataSources.some(dataSource => dataSource.file_type === fileType);
+            return this.dataSources_copy.some(dataSource => dataSource.file_type === fileType);
         },
-        setFilter(fileType) {
+        isFilter(fileType) {
             return this.selectedFileType === fileType;
         },
-        setSort(sort) {
+        isSort(sort) {
             return this.sort === sort;
         },
         formatDate(dateString) {
@@ -333,15 +347,13 @@ export default {
                     return new Date(a.created_at) - new Date(b.created_at);
                 });
             }
-
         },
         selectFileType(fileType) {
             this.selectedFileType = fileType;
-
         },
         async applyFilter() {
             if (this.selectedFileType) {
-                this.dataSources = this.dataSources.filter((dataSource) => dataSource.file_type === this.selectedFileType);
+                this.dataSources = this.dataSources_copy.filter((dataSource) => dataSource.file_type === this.selectedFileType);
             }
             this.showFilterOptions = false;  
         },
