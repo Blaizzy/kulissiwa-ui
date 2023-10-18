@@ -112,7 +112,7 @@ definePageMeta({
                         </button>
                         <button v-if="isFileTypeInDataSources('text')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click.prevent="selectFileType('text')">
                             TEXT
-                            <span v-show="setFilter('text')" class="float-right">
+                            <span v-show="isFilter('text')" class="float-right">
                                 <ClientOnly>
                                     <i class="fa-solid fa-check text-sky-500"></i>
                                 </ClientOnly>
