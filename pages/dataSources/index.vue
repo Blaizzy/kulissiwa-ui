@@ -6,10 +6,15 @@ definePageMeta({
 <template>
     <div class="flex flex-col h-full w-full">
      
-        <div class="flex justify-between items-center pb-4 px-4 pt-6 border-b border-gray-200 w-full bg-white relative"> <!-- Added relative here -->
+        <div class="flex justify-between items-center pb-4 px-4 pt-4 border-b border-gray-200 w-full bg-white relative"> <!-- Added relative here -->
             <div class="flex">
-                <h1 class="text-2xl font-semibold">Data sources</h1>
+                <h1 class="text-xl font-semibold">Data sources</h1>
                 <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onShowSuccess('Data uploaded sucessfully')" @show-failure="onShowFailure('Data upload failed!')"  />
+            </div>
+            <div class="flex items-center">
+                <a href="mailto:support@kulissiwa.com?subject=Help%20with%20Kulissiwa%20" target="_blank" class="cursor-pointer hover:underline">
+                    <p class="font-semibold text-sm">Help</p>
+                </a>
             </div>
             <div class="flex absolute top-0 right-0"> <!-- Changed to absolute positioning -->
                 <div 
@@ -38,16 +43,27 @@ definePageMeta({
         <div class="flex mt-4 px-4 text-sm py-2">
             <div class="mt-auto rounded-full flex  w-1/4 items-center px-2 border-2 border-gray-200 hover:border-gray-300 text-black">
                 <button class="px-2 text-gray-500 hover:text-black inline-flex items-center">
-                    <i class="fas fa-search"></i>
+                    <ClientOnly>
+                        <i class="fas fa-search"></i>
+                    </ClientOnly>
                 </button>
                 <input type="search"  class="w-full px-1 py-2 rounded-full focus:outline-none bg-inherit" name="search_bar" placeholder="Search data sources..." v-model="searchQuery" @keyup.prevent="onKeyup">
+                <button @click="clearSearch" v-show="searchQuery.length>0" class="px-2 text-gray-500 hover:text-black inline-flex items-center">
+                    <ClientOnly>
+                        <i class="fas fa-times"></i>
+                    </ClientOnly>
+                </button>
             </div>
             <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white gradient-border rounded-full px-2 shadow-lg hover:scale-105 ml-5">
-                <i class="fa-solid fa-plus"></i> <span class="pl-1 font-medium">Add New</span>
+                <ClientOnly>
+                    <i class="fa-solid fa-plus"></i> <span class="pl-1 font-medium">Add New</span>
+                </ClientOnly>
             </button>
             <div class="ml-3">
                 <button @click="showSortOptions = !showSortOptions; showFilterOptions=false" class=" w-full h-full px-2 py-1 text-black border-2 border-gray-200 rounded-full  hover:border-gray-300 hover:text-black inline-flex items-center" v-if="!noDataFound && !isLoading">
-                    <i class="fa-solid fa-arrow-up-wide-short"></i> <span class="pl-2">Sort</span>
+                    <ClientOnly>
+                        <i class="fa-solid fa-arrow-up-wide-short"></i> <span class="pl-2">Sort</span>
+                    </ClientOnly>
                 </button>
                 <div v-show="showSortOptions" class="absolute mt-2 w-48 rounded-md shadow-lg z-50 bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100" @click="showSortOptions = false;">
                     <div class="py-1">
@@ -82,7 +98,9 @@ definePageMeta({
             <div class="ml-3">
                 <!-- Filter Button -->
                 <button @click="showFilterOptions = !showFilterOptions; showSortOptions=false" class="ml-2 w-full h-full px-2 py-1 text-black border-2 border-gray-200 rounded-full hover:border-gray-300 hover:text-black inline-flex items-center" v-if="!noDataFound && !isLoading">
-                    <i class="fa fa-filter"></i> <span class="pl-2">Filter</span>
+                    <ClientOnly>
+                        <i class="fa fa-filter"></i> <span class="pl-2">Filter</span>
+                    </ClientOnly> 
                 </button>
                 <div v-show="showFilterOptions" class="absolute mt-2 w-48 rounded-md shadow-lg z-50 bg-white ring-1 ring-black ring-opacity-5">
                     <div class="py-1">
@@ -135,7 +153,7 @@ definePageMeta({
 
         
         <div class="flex flex-col" v-if="!noDataFound">
-            <h2 class="text-lg font-semibold pb-2 pt-4 px-4">Files</h2>         
+            <h2 class="text-md font-semibold pb-2 pt-4 px-4">Files</h2>     
         </div>
         
         <div class="flex-grow overflow-y-auto pb-4"
@@ -146,20 +164,23 @@ definePageMeta({
                         <img src="~~/assets/logos/No-documents-found.png" alt="No Documents Found" class="md:w-1/2 max-lg:w-auto"> 
                         <h1 class="text-4xl font-semibold m-1">Empty folder</h1>
                         <h2 class="text-2xl m-1">Start uploading files</h2>
-                        <ul class="items-center md:text-lg max-lg:text-xl">
-                            <li>
-                                1. Click on the <i class="fa-solid fa-square-plus text-gray-500"></i> button
-                            </li>
-                            <li>
-                                2. Select a file from your computer
-                            </li>
-                            <li>
-                                3. Click on the <i class="fa-solid fa-upload text-gray-500"></i> button
-                            </li>
-                            <li>
-                                4. Wait for the upload to finish
-                            </li>
-                        </ul>
+                        <ClientOnly>
+                            <ul class="items-center md:text-lg max-lg:text-xl">
+                            
+                                <li>
+                                    1. Click on the <i class="fa-solid fa-square-plus text-gray-500"></i> button
+                                </li>
+                                <li>
+                                    2. Select a file from your computer
+                                </li>
+                                <li>
+                                    3. Click on the <i class="fa-solid fa-upload text-gray-500"></i> button
+                                </li>
+                                <li>
+                                    4. Wait for the upload to finish
+                                </li>
+                            </ul>
+                        </ClientOnly>
                     </div>
                 </div>
 
@@ -170,11 +191,12 @@ definePageMeta({
                     <span class="flex-1">Filename</span>
                     <span class="flex-1">Date Created</span>
                     <span class="flex-1">Type</span>
+                    <span class="flex-1">Active</span>
                     <span class="flex-1"></span> <!-- This is to align the dropdown menu in the rows -->
                 </div>
 
                 <!-- Display skeleton loaders when data is being fetched -->
-                <DataSkeleton v-show="isLoading" v-for="i in 5" :key="i" />
+                <DataSkeleton v-show="isLoading || isFetchingDataSource" v-for="i in 5" :key="i" />
 
                 <!-- Table rows -->
                 <div v-for="dataSource in dataSources" :key="dataSource.id" class="flex justify-between items-center p-4 border-b border-gray-200 hover:shadow-sm hover:rounded-lg hover:border-gray-100 hover:bg-gray-50">
@@ -192,12 +214,22 @@ definePageMeta({
                     <!-- File Type -->
                     <p class="text-gray-500 ml-2 flex-1"  :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''">{{ dataSource.file_type }}</p>
                     
+                    <!-- Active -->
+                    <label class="flex-1 items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only" v-model="dataSource.is_active" @click="selectDataSource(dataSource)">
+                        <div class="w-12 h-6 rounded-full transition-all flex items-center" :class="{'bg-sky-600': dataSource.is_active, 'bg-gray-300': !dataSource.is_active}">
+                        <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 ml-1" :class="{'translate-x-6': dataSource.is_active}"></div>
+                        </div>
+                    </label>
+
                     <!-- Dropdown options -->
                     <div class="text-right flex-1"   :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''">
                         <Menu as="div" class="relative inline-block text-left" @click.prevent>
                             <div>
                                 <MenuButton class="inline-flex w-full justify-center rounded-full hover:bg-gray-200 px-2 py-2 text-sm font-medium text-black">
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    <ClientOnly>
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </ClientOnly>
                                 </MenuButton>
                             </div>
                         <transition
@@ -257,6 +289,24 @@ definePageMeta({
                         </Menu>
                     </div>
                 </div>
+                <div class="flex justify-center mt-4 pb-2">
+                    <button @click="prevPage" :disabled="currentPage === 1"
+                    class="px-4 py-2 border-2 rounded-l-md"
+                    :class="{'hover:bg-gray-100': currentPage !== 1}">
+                        <ClientOnly>
+                            <i class="fas fa-chevron-left"></i>
+                        </ClientOnly>
+                    </button>
+                    <div class="px-4 py-2 border-t-2 border-b-2">{{ currentPage }} / {{ totalPages }}</div>
+                    <button @click="nextPage" :disabled="currentPage === totalPages"
+                    class="px-4 py-2 border-2 rounded-r-md"
+                    :class="{'hover:bg-gray-100': currentPage !== totalPages}"
+                    >
+                        <ClientOnly>
+                            <i class="fas fa-chevron-right"></i>
+                        </ClientOnly>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -272,7 +322,6 @@ import { useAuthStore } from '@/stores/index'
 import Fuse from 'fuse.js'
 
 export default {
-
     data() {
         const store = useAuthStore()
         return {
@@ -296,6 +345,11 @@ export default {
             dataSources_copy: [],
             debounceTimeout: null,
             sort: 'date',
+            pendingUpdates: [],
+            currentPage: 1,
+            itemsPerPage: 10,
+            totalItems: 0,
+            isFetchingDataSource: false,
          };
     },
     async mounted(){
@@ -310,9 +364,69 @@ export default {
 
         await this.getDataSources()
         this.dataSources_copy = this.dataSources
-
+        await this.updateSelectedDataSources()
     },
     methods: {
+        clearSearch() {
+            this.searchQuery = '';
+            this.onKeyup();
+        },
+        async nextPage() {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage++;    
+                await this.updatePage(this.currentPage, true);
+    
+            }
+        },
+        async prevPage() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+                await this.updatePage(this.currentPage, true);
+            }
+        },
+        async updatePage(page, refresh = false) {
+            this.isFetchingDataSource = true
+            this.currentPage = page
+            if (refresh){
+                this.dataSources = []
+            }
+            await this.getDataSources()
+            this.isFetchingDataSource = false
+        },
+        async selectDataSource(dataSource) {
+            dataSource.is_active = !dataSource.is_active;
+            this.pendingUpdates.push(dataSource);
+            await this.updateSelectedDataSources(true);
+        },
+        async updateSelectedDataSources(upsert = false) {
+            if (this.debounceTimeout) {
+                clearTimeout(this.debounceTimeout);
+            }
+            this.debounceTimeout = setTimeout(async () => {
+                if (upsert) {
+                    const supabase = useSupabaseClient()
+                    const { data, error } = await supabase
+                        .from('data')
+                        .upsert(
+                            this.pendingUpdates,
+                            { onConflict: 'id' }
+                        )
+                        .select();
+
+                    if (error) {
+                        console.log(error)
+                        const message = `An error occurred while updating data sources: ${error}`;
+                        this.onShowFailure(message)
+                    }
+                    if (data) {
+                        this.onShowSuccess('Data sources updated successfully')
+                        this.store.updateActiveDataSourcesCount(this.pendingUpdates)
+                        this.pendingUpdates = [];
+                    }
+                }
+            }, 500);
+    
+        },
         isFileTypeInDataSources(fileType) {
             return this.dataSources_copy.some(dataSource => dataSource.file_type === fileType);
         },
@@ -362,19 +476,41 @@ export default {
             await this.getDataSources(true)
             this.showFilterOptions = false;
         },
-        async searchConversations() {
-            const fuseOptions = {
-                keys: ['name'],  // Adjust this based on your field names
-                threshold: 0.3,            // Adjust for search sensitivity
-            };    
-            try {
-                let fuse = new Fuse(this.dataSources_copy, fuseOptions);
+        searchWithFuse(query) {
+            const options = {
+                keys: ['name'],
+                threshold: 0.3  // Adjust based on your needs
+            };
 
-                // If there's a search query, search using Fuse and update dataSources.
-                // If not, reset dataSources to its original state.
-                this.dataSources = this.searchQuery 
-                    ? fuse.search(this.searchQuery).map(result => result.item)
-                    : [...this.dataSources_copy];
+            const fuse = new Fuse(this.dataSources_copy, options);
+            return fuse.search(query).map(result => result.item);
+        },
+        async searchDataSources() { 
+            try {
+                if (this.searchQuery === '') {
+                    this.dataSources = this.dataSources_copy
+                    return
+                }
+
+                const fuseResults = this.searchWithFuse(this.searchQuery);
+
+                if (fuseResults.length > 0) {
+                    this.dataSources = fuseResults
+                } else {
+                    const supabase = useSupabaseClient()
+                    const { data, error } = await supabase
+                        .from('data')
+                        .select('*')
+                        .textSearch('name', `'${this.searchQuery}'`)
+
+                    if (error) {
+                        const message = `An error occurred while searching: ${error}`;
+                        this.onShowFailure(message);
+                    }
+                    if (data) {
+                        this.dataSources = data
+                    }
+                }
             } catch (error) {
                 const message = `An error occurred while searching: ${error}`;
                 this.onShowFailure(message);
@@ -388,7 +524,7 @@ export default {
                 clearTimeout(this.debounceTimeout);
             }
             this.debounceTimeout = setTimeout(() => {
-                this.searchConversations();
+                this.searchDataSources();
             }, 300);
         },
         beforeDestroy() {
@@ -415,27 +551,29 @@ export default {
             data.forEach((dataSource) => {
                 this.dataSources.push({
                     id: dataSource.id,
+                    user_id: dataSource.user_id,
                     name: dataSource.name,
                     content_data: dataSource.content_data,
                     file_type: dataSource.file_type,
                     is_file: dataSource.is_file,
                     created_at: dataSource.created_at,
+                    is_active: dataSource.is_active,
                 })
             })
         },
         async getDataSources(refresh = false) {
             const supabase = await this.initSupabase()
-            const { data, error } = await supabase
+            const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+            const endIndex = startIndex + this.itemsPerPage - 1;
+
+            const { data, error, count } = await supabase
                 .from('data')
-                .select('id, name, content_data, file_type, is_file, created_at')
-                .order('created_at', { ascending: true });
-            
-            if (error) {
-                console.log(error)
-                this.onShowFailure('There was an error loading your data sources')
-            }
+                .select('id, user_id, name, content_data, file_type, created_at, is_active', { count: 'exact' })
+                .order('created_at', { ascending: true })
+                .range(startIndex, endIndex);
 
             if (data) {
+                this.totalItems = count;
                 if (refresh) {
                     this.dataSources = []
                 }
@@ -532,6 +670,9 @@ export default {
     computed: {
         onSort() {
             return this.sort === 'asc';
+        },
+        totalPages() {
+            return Math.ceil(this.totalItems / this.itemsPerPage);
         },
     },
     components: {

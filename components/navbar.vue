@@ -14,11 +14,6 @@
             <button v-show="collapsed" @click="collapse" class="block py-3 px-2 mb-2 font-bold rounded-full hover:bg-sky-50">
                 <Bars3Icon class="w-4 h-4 text-gray-600 "/>
             </button>
-            <!-- <NuxtLink to="/dashboard" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
-                <i class="fa-solid fa-cubes"></i>
-                    <span v-show="!collapsed" class="pl-1.5">Dashboard</span>
-  
-            </NuxtLink> -->
             <NuxtLink to="/dataSources" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50"
             :class="{'bg-sky-100': isSelectedMenu('/dataSources')}">
                 <ClientOnly>
@@ -37,12 +32,6 @@
                 
             </NuxtLink>
 
-            <!-- <NuxtLink to="/billing" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50">
-                <i class="fa-solid fa-credit-card"></i>
-               
-                    <span v-show="!collapsed" class="pl-1.5">Billing</span>
-                
-            </NuxtLink> -->
         </nav>
 
         <hr class="mt-auto w-full h-px my-2 border dark:bg-gray-300">
@@ -50,7 +39,9 @@
         <div class="mb-4 py-2 px-2 flex items-start rounded-full hover:bg-sky-50">
 
             <button class="block" @click="signOut">
-                <i class="fa-solid fa-right-from-bracket"></i> <span id="logOut" v-show="!collapsed" class="pl-1.5">Logout</span>
+                <ClientOnly>
+                    <i class="fa-solid fa-right-from-bracket"></i> <span id="logOut" v-show="!collapsed" class="pl-1.5">Logout</span>
+                </ClientOnly>
             </button>
         </div>
         <div class="mb-2 flex items-start rounded-full hover:bg-sky-50">
@@ -87,10 +78,10 @@ export default {
             store: store
         }
     },
-    mounted() {
+    async mounted() {
         const supabase = useSupabaseClient()
 
-        supabase.auth.onAuthStateChange((event, session) => {
+        await supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
                 this.store.signIn(session)
                 const user_metadata = this.store.user_session.user.user_metadata
@@ -101,13 +92,19 @@ export default {
                 } else {
                     this.email = this.store.user_session.user.email
                 }
+                    
             } else if (event === 'SIGNED_OUT') {
                 this.store.signOut()
                 this.resetProfile()
                 this.$router.push('/login');
             }
         });
-        
+
+        watchEffect(() => {
+            if (this.store.user_session) {
+                this.getActiveDataSourcesCount(supabase)
+            }
+        })
         
     },
     methods: {
@@ -132,6 +129,20 @@ export default {
             if (this.$route.path === name || this.$route.path.split('/')[1] === name.split('/')[1]) return true
         
             else return false
+        },
+        async getActiveDataSourcesCount(supabase){
+            const { data, error } = await supabase
+                .from('data')
+                .select('id, user_id, is_active')
+                .eq('user_id', this.store.user_session.user.id)
+                .eq('is_active', true)
+            
+            if (error) {
+                console.log(error)
+            } 
+            if (data) {
+                this.store.updateActiveDataSourcesCount(data)
+            }
         }
     },
     components: {
