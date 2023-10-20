@@ -1,6 +1,6 @@
 <template>
     <!-- Content -->
-    <div class="flex flex-col h-full w-full py-8 bg-white" >
+    <div class="flex flex-col h-full w-full pt-4 pb-6 bg-white" >
         <div class="flex absolute top-0 right-0">
             <div 
                 v-if="showSuccess" 

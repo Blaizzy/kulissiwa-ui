@@ -6,9 +6,9 @@ definePageMeta({
 <template>
     <div class="flex flex-col h-full w-full">
      
-        <div class="flex justify-between items-center pb-4 px-4 pt-6 border-b border-gray-200 w-full bg-white relative"> <!-- Added relative here -->
+        <div class="flex justify-between items-center pb-4 px-4 pt-4 border-b border-gray-200 w-full bg-white relative"> <!-- Added relative here -->
             <div class="flex">
-                <h1 class="text-2xl font-semibold">Data sources</h1>
+                <h1 class="text-xl font-semibold">Data sources</h1>
                 <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onShowSuccess('Data uploaded sucessfully')" @show-failure="onShowFailure('Data upload failed!')"  />
             </div>
             <div class="flex items-center">
@@ -153,7 +153,7 @@ definePageMeta({
 
         
         <div class="flex flex-col" v-if="!noDataFound">
-            <h2 class="text-lg font-semibold pb-2 pt-4 px-4">Files</h2>     
+            <h2 class="text-md font-semibold pb-2 pt-4 px-4">Files</h2>     
         </div>
         
         <div class="flex-grow overflow-y-auto pb-4"

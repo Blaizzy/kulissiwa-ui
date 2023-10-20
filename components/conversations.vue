@@ -2,7 +2,7 @@
     <!-- Chat Side Navbar -->
     <div class="flex flex-col h-full w-80 bg-white p-4 border-r border-gray-200" >
         <div class="mb-2">
-            <div class="flex justify-between items-center bg-white p-2">
+            <div class="flex justify-between items-center bg-white px-2 pb-2">
                 <h1 class="text-xl font-semibold">Chats</h1>
                 <div class="font-semibold p-2 rounded-full hover:bg-sky-50">
                     <nuxt-link to="/chats" @click.native="clearMessages">
