@@ -14,7 +14,9 @@
           @click="resetModal(); $emit('close')"
           class="absolute top-6 right-6 text-gray-500 hover:text-gray-700"
         >
-          <i class="fas fa-times" ></i>
+          <ClientOnly>
+            <i class="fas fa-times" ></i>
+          </ClientOnly>
         </button>
         <h2 class="text-xl font-semibold mb-4">New Data Source</h2>
         <div class="text-base">
@@ -37,6 +39,7 @@
             type="text"
             class="block w-full border border-gray-300 rounded-lg p-2"
             placeholder="i.e. Docs"
+            name="data-source-name"
             v-model="name" v-show="selectedDataType=='Text' || selectedDataType=='URL'"/>
         </div>
         <div>
@@ -50,7 +53,9 @@
                 @drop.prevent.stop="dropFile"
                 :class="{ 'bg-gray-100': isDragging }"
               >
-                <i class="fas fa-arrow-up-from-bracket text-3xl text-gray-300 pb-2 mb-2"></i>
+                <ClientOnly>
+                  <i class="fas fa-arrow-up-from-bracket text-3xl text-gray-300 pb-2 mb-2"></i>
+                </ClientOnly>
                 <p v-if="isDragging" class="text-gray-500 text-sm">Drop your file here</p>
                 <p v-else class="text-gray-500 text-sm">Drag & Drop or <span class="text-blue-500 cursor-pointer underline hover:text-blue-600 text-semibold" @click.prevent="selectFile">Click Here</span> to upload</p>
                 <p class="text-gray-500 text-xs mt-2">Max file size: {{ maxFileSize }} MB</p>
@@ -60,6 +65,7 @@
                     type="file"
                     accept=".pdf"
                     class="hidden"
+                    name="pdf"
                     multiple
                     @change="handleFileUpload"
                   />
@@ -70,6 +76,7 @@
                     type="file"
                     accept=".docx"
                     class="hidden"
+                    name="docx"
                     multiple
                     @change="handleFileUpload"
                   />
@@ -95,7 +102,9 @@
                           :disabled="loading"
                           class="text-gray-500 ml-4"
                         >
-                          <i class="fas fa-times"></i>
+                          <ClientOnly>
+                            <i class="fas fa-times"></i>
+                          </ClientOnly>
                         </button>
                       </div>
                       <!-- File size and loading progress -->
@@ -122,6 +131,7 @@
                 type="url"
                 class="block w-full border border-gray-300 rounded-lg p-2"
                 placeholder="https://example.com" v-model="data"
+                name="website-url"
               />
               <div class="mt-2">
 
@@ -166,7 +176,9 @@
             </div>
             <div v-for="(error, index) in errors" :key="index">
               <p class="text-red-600 text-xs prose break-words">
-               <i class="fas fa-exclamation-circle"></i>
+              <ClientOnly>
+                <i class="fas fa-exclamation-circle"></i>
+              </ClientOnly>
                {{ error }} 
               </p>
             </div>
@@ -194,8 +206,9 @@
                 class="bg-blue-600 text-white py-1 px-3 rounded-lg m-1"
                 disabled v-else
               >
-                <i class="fas fa-spinner fa-spin"></i>
-
+                <ClientOnly>
+                  <i class="fas fa-spinner fa-spin"></i>
+                </ClientOnly>
               </button>
             </div>
 
@@ -464,6 +477,7 @@ export default {
             throw error;
           } else {
             await this.embedFileWithWorker('embedData', file, data[0].id, user_session, file.file_type, false);
+            this.store.updateActiveDataSourcesCount(data)
           }
 
         } else if (this.selectedDataType == "URL") {
@@ -478,6 +492,7 @@ export default {
             throw error;
           } else {
             await this.embedURLWorker(file, data[0].id, user_session, file.file_type, this.crawl, []);
+            this.store.updateActiveDataSourcesCount(data)
           }
         } else if (this.selectedDataType == "PDF" || this.selectedDataType == "Docx" || this.selectedDataType == "CSV") {
           const unique_name = `${file.name}_${Date.now()}`;
@@ -505,6 +520,7 @@ export default {
               file.loadingProgress = 15;
               const file_type = file.file_type.toLowerCase();
               await this.embedFileWithWorker('embedData', file, insertData[0].id, user_session, file_type, true);
+              this.store.updateActiveDataSourcesCount(insertData)
             }
           }
         }
