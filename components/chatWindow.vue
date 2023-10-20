@@ -62,7 +62,7 @@
 
             </div> 
             <div v-else v-show="!isLoading" class="flex flex-col mx-auto items-center justiy-center">
-                <div class="flex w-3/4">
+                <div class="flex">
                     <h1 class="text-xl font-semibold m-1 truncate">{{ conversationTitle }}</h1>
                 </div>
 
@@ -71,9 +71,9 @@
                     <p>GPT-3.5</p>                    
                 </div>
             </div>
-            <div class="flex items-center px-4">
-                <a href="mailto:support@kulissiwa.com" target="_blank" class="cursor-pointer hover:underline">
-                    <p class="font-semibold text-md">Help</p>
+            <div class="flex items-center px-4 cursor-pointer">
+                <a href="mailto:support@kulissiwa.com?subject=Help%20with%20Kulissiwa%20" target="_blank" class="hover:underline">
+                    <p class="font-semibold text-sm">Help</p>
                 </a>
             </div>
             <DataSourcesModal 
