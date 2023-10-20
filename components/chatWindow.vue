@@ -46,7 +46,7 @@
                 
 
                 <!-- Data Sources Card -->
-                <div @click="showModal = true" class="flex parent-card items-center space-x-2 bg-white p-2 px-4 rounded-lg border-2 border-gray-200 hover:border-gray-300">
+                <div @click="showModal = true" class="flex parent-card items-center space-x-2 bg-white p-2 px-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 hover:cursor-pointer">
                     <div class="p-3 rounded-full hover:scale-110 hover:text-sky-600">
                         <!-- Put your GPT icon here -->
                         <ClientOnly>
