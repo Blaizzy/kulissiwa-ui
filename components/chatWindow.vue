@@ -62,8 +62,8 @@
 
             </div> 
             <div v-else v-show="!isLoading" class="flex flex-col mx-auto items-center justiy-center">
-                <div class="flex">
-                    <h1 class="text-xl font-semibold m-1">{{ conversationTitle }}</h1>
+                <div class="flex w-3/4">
+                    <h1 class="text-xl font-semibold m-1 truncate">{{ conversationTitle }}</h1>
                 </div>
 
                 <div class="flex items-center text-gray-500 text-sm">
