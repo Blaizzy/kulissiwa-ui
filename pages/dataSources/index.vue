@@ -11,6 +11,11 @@ definePageMeta({
                 <h1 class="text-2xl font-semibold">Data sources</h1>
                 <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onShowSuccess('Data uploaded sucessfully')" @show-failure="onShowFailure('Data upload failed!')"  />
             </div>
+            <div class="flex items-center px-4">
+                <a href="mailto:support@kulissiwa.com" target="_blank" class="cursor-pointer hover:underline">
+                    <p class="font-semibold text-md">Help</p>
+                </a>
+            </div>
             <div class="flex absolute top-0 right-0"> <!-- Changed to absolute positioning -->
                 <div 
                     v-if="showSuccess" 
