@@ -61,7 +61,7 @@
                 </div>
 
             </div> 
-            <div v-else v-show="!isLoading" class="flex flex-col items-center justiy-center">
+            <div v-else v-show="!isLoading" class="flex flex-col mx-auto items-center justiy-center">
                 <div class="flex">
                     <h1 class="text-xl font-semibold m-1">{{ conversationTitle }}</h1>
                 </div>
