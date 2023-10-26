@@ -523,7 +523,7 @@ export default {
             const endIndex = startIndex + this.itemsPerPage - 1;
             const { data, error, count } = await supabase
                 .from('data')
-                .select('id, user_id, name, content_data, file_type, is_active', { count: 'exact' })
+                .select('id, user_id, name, content_data, is_file, file_type, is_active', { count: 'exact' })
                 .order('created_at', { ascending: false })
                 .range(startIndex, endIndex);
 
@@ -540,6 +540,7 @@ export default {
                         name: dataSource.name,
                         user_id: dataSource.user_id,
                         content_data: dataSource.content_data,
+                        is_file: dataSource.is_file,
                         file_type: dataSource.file_type,
                         is_active: dataSource.is_active,
                     })

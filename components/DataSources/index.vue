@@ -506,7 +506,6 @@ export default {
             throw error;
           } else {
             file.loadingProgress = 7;
-            const fileEntry = await this.listFiles(unique_name);
             const { data: insertData, error: insertError } = await supabase
               .from('data')
               .upsert([
