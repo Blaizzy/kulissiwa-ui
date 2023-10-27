@@ -1,4 +1,3 @@
 {
-    "devCommand": "nuxi dev",
-    "buildCommand": "nuxi build"
+    "devCommand": "nuxi dev"
 }
