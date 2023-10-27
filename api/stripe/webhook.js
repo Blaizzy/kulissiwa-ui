@@ -1,17 +1,16 @@
+import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
 let stripe;
 let supabase;
 const { Buffer } = require('buffer');
 try {
-    const stripeLib = require('stripe');
-    stripe = stripeLib(process.env.STRIPE_SECRET_KEY);
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 } catch (error) {
     console.error('Failed to import Stripe:', error);
 
 }
 
 try {
-
-    const { createClient } = require('@supabase/supabase-js');
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
     supabase = createClient(supabaseUrl, supabaseKey);
