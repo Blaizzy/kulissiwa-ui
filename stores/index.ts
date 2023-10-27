@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth', () => {
     const token = ref(null)
     const activeDataSources = ref(new Set())
     const activeDataSourcesCount = ref(0)
+    const subscription = ref(null)
     
     function updateActiveDataSourcesCount(data: []) {
         data.forEach((item: any) => {
@@ -18,12 +19,16 @@ export const useAuthStore = defineStore('auth', () => {
     
         activeDataSourcesCount.value = activeDataSources.value.size;
     }
+    function updateSubscription(sub: any) {
+        subscription.value = sub
+    } 
     
     function signIn(session: any) {
         user_session.value = session
         isAuthenticated.value = true
         token.value = session.access_token
     }
+    
     function signOut() {
         user_session.value = null
         isAuthenticated.value = false
@@ -33,5 +38,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
 
-    return {user_session, isAuthenticated, activeDataSourcesCount, activeDataSources, token, signIn, signOut, updateActiveDataSourcesCount }
+    return {
+        user_session, isAuthenticated, activeDataSourcesCount, 
+        activeDataSources, token, subscription, 
+        signIn, signOut, updateActiveDataSourcesCount,
+        updateSubscription 
+    }
 })

@@ -1,7 +1,7 @@
 <template>
     <!-- Side Navbar -->
     <div class="bg-white p-4 flex flex-col border-r border-gray-200"
-    :class="{'w-16 rounded': collapsed, 'w-64': !collapsed}"
+    :class="{'w-16 rounded items-center': collapsed, 'w-64': !collapsed}"
     id="mainSideNavbar">
         <nav class="text-base">
             <div class="flex py-3 font-semibold mb-4 text-center justify-between">
@@ -11,30 +11,48 @@
                 </button>
                 
             </div>
-            <button v-show="collapsed" @click="collapse" class="block py-3 px-2 mb-2 font-bold rounded-full hover:bg-sky-50">
+            <button v-show="collapsed" @click="collapse" class="block py-2 px-2 mb-2 font-bold rounded-full hover:bg-sky-50">
                 <Bars3Icon class="w-4 h-4 text-gray-600 "/>
             </button>
-            <NuxtLink to="/dataSources" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50"
-            :class="{'bg-sky-100': isSelectedMenu('/dataSources')}">
+            <NuxtLink to="/dataSources" class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-sky-50"
+            :class="{'bg-sky-100': isSelectedMenu('/dataSources'), 'justify-center': collapsed}">
                 <ClientOnly>
                     <i class="fa-solid fa-database"></i> 
                     <span v-show="!collapsed" class="pl-1.5">Data Sources</span>    
                 </ClientOnly>
-         
-        
+
             </NuxtLink>
-            <NuxtLink to="/chats"  class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50"
-            :class="{'bg-sky-100': isSelectedMenu('/chats')}">
+            <NuxtLink to="/chats"  class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-sky-50"
+            :class="{'bg-sky-100': isSelectedMenu('/chats'), 'justify-center': collapsed}">
                 <ClientOnly>
-                    <i class="fa-solid fa-comments fa-sm"></i>
+                    <i class="fa-solid fa-comments"></i>
                     <span v-show="!collapsed" class="pl-1.5">Chats</span>
                 </ClientOnly>
-                
+            </NuxtLink>
+            <NuxtLink to="/billing" class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-sky-50" v-show="!showUpgradeButton"
+            :class="{'bg-sky-100': isSelectedMenu('/billing'), 'justify-center': collapsed}">
+                <ClientOnly>
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span v-show="!collapsed" class="pl-1.5">Billing</span>
+                </ClientOnly>
+
             </NuxtLink>
 
         </nav>
+        <button class="mt-auto py-2 px-2 rounded-full hover:bg-sky-500 animated-gradient-bg text-white" v-show="showUpgradeButton">
+            <a href="/checkout">
+                <ClientOnly>
+                    <div class="relative inline-block"> <!-- Container for the icon and animation -->
+                        <i class="fa-solid fa-gift"></i>
+                        <span class="animate-ping absolute top-0 right-0 inline-flex h-1.5 w-1.5 rounded-full bg-red-600"></span> <!-- Positioning adjusted here -->
+                    </div>
+                    <span id="upgrade" v-show="!collapsed" class="pl-1.5">Upgrade</span>
+                </ClientOnly>
+            </a>
+        </button>
 
-        <hr class="mt-auto w-full h-px my-2 border dark:bg-gray-300">
+        <hr class="w-full h-px my-2 border dark:bg-gray-300"
+            :class="{'mt-auto ': !showUpgradeButton}">
 
         <div class="mb-4 py-2 px-2 flex items-start rounded-full hover:bg-sky-50">
 
@@ -49,12 +67,11 @@
                 <img class="rounded-full border-2 border-white"
                 :class="{'w-8 h-8': collapsed, 'w-12 h-12': !collapsed}"
                  id="profilePicture" :src="avatar_url" alt="Profile Picture">
-                <div id="profileDetails" class="mr-8 pr-8 pl-1.5">
-                    <span class="font-semibold" v-show="!collapsed">{{ name }}</span>
-                    <p class="text-sm text-gray-600" v-show="!collapsed">{{email}}</p>
+                <div id="profileDetails" class="mr-8 pr-8 pl-1.5" v-show="!collapsed">
+                    <span class="font-semibold">{{ name }}</span>
+                    <p class="text-sm text-gray-600">{{email}}</p>
                 </div>
             </div>
-
 
         </div>
     </div>
@@ -75,7 +92,8 @@ export default {
             email:"",
             avatar_url:"/images/avatars/user-default-pic.png",
             collapsed: false,
-            store: store
+            store: store,
+            showUpgradeButton: false,
         }
     },
     async mounted() {
@@ -103,6 +121,7 @@ export default {
         watchEffect(() => {
             if (this.store.user_session) {
                 this.getActiveDataSourcesCount(supabase)
+                this.getSubscription(supabase)
             }
         })
         
@@ -129,6 +148,32 @@ export default {
             if (this.$route.path === name || this.$route.path.split('/')[1] === name.split('/')[1]) return true
         
             else return false
+        },
+        async getSubscription(supabase){
+            const { data, error } = await supabase
+                .from('subscriptions')
+                .select('stripe_customer_id, status')
+                .eq('user_id', this.store.user_session.user.id)
+                .single()
+            
+            if (error) {
+                console.log(error)
+            } 
+            if (data) {
+                console.log(data)
+                if (data.length === 0) {
+                    this.showUpgradeButton = true
+                }
+                if (data.stripe_customer_id) {
+                    this.store.updateSubscription(data)
+                    if (data.status === 'active') {
+                        this.showUpgradeButton = false
+                    } else {
+                        this.showUpgradeButton = true
+                    }
+
+                }
+            }
         },
         async getActiveDataSourcesCount(supabase){
             const { data, error } = await supabase
