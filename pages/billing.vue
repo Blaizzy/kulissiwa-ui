@@ -19,7 +19,7 @@ definePageMeta({
 
       <button class="py-2 px-2 rounded-full hover:scale-105 animated-gradient-bg text-white" @click="redirectToBillingPortal">
         <ClientOnly>
-          <span class="pl-1.5 text-md mr-1">Manage Subscription</span>
+          <span class="text-md mr-1">Manage Subscription</span>
           <i class="fa-solid fa-up-right-from-square h-3 w-3"></i>
         </ClientOnly>
       </button>
