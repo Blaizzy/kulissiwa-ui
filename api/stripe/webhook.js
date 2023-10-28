@@ -54,7 +54,7 @@ async function handleSubscription(subscription, status) {
 }
 export default async function webhookHandler(request) {
     const sig = request.headers.get('stripe-signature');
-    const rawBody = await request.text();
+    const rawBody = request.rawBody;
     let event;
     try {
         event = await stripe.webhooks.constructEventAsync(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
