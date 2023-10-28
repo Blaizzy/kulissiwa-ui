@@ -160,7 +160,6 @@ export default {
                 console.log(error)
             } 
             if (data) {
-                console.log(data)
                 if (data.length === 0) {
                     this.showUpgradeButton = true
                 }
