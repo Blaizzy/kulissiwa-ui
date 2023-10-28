@@ -6,3 +6,17 @@
         <a href="/chats">Go to Chats</a>
     </div>
 </template>
+<script>
+export default {
+    name: 'Success',
+    data() {
+        return {
+        }
+    },
+    async mounted() {
+        // get session id from url
+        // const sessionId = this.$route.query.session_id
+        // create update
+    },
+}
+</script>
