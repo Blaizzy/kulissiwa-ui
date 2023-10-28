@@ -24,12 +24,11 @@ export const config = {
 };
 
 async function handleCustomerDeleted(customer) {
-    const user_id = customer.metadata.user_id;
     try {
         const { data, error } = await supabase
             .from('subscriptions')
             .delete()
-            .eq('user_id', user_id);
+            .eq('stripe_customer_id', customer.id)
 
         if (error) {
             console.error('Failed to delete subscription in Supabase:', error);
@@ -41,8 +40,8 @@ async function handleCustomerDeleted(customer) {
         console.error("error", err);
     }
 }
-async function handleCustomerCreated(customer) {
-    const user_id = customer.metadata.user_id;
+async function handleCustomerCreated(customer, metadata) {
+    const user_id = metadata.user_id;
     try {
         const { data, error } = await supabase
             .from('subscriptions')
@@ -117,26 +116,24 @@ export default async function webhookHandler(request) {
             const customerId = session.customer;
             const metadata = session.metadata;
 
-            // Update the customer with metadata from the session
-            await stripe.customers.update(customerId, {
-                metadata: metadata
-            });
+            console.log("Updating customer:", customerId, "with metadata:", metadata);
+            await handleCustomerCreated(session.customer, metadata);
+
+            try {
+                const updatedCustomer = await stripe.customers.update(customerId, {
+                    metadata: metadata
+                });
+                console.log("Updated customer:", updatedCustomer);
+            } catch (error) {
+                console.error("Error updating customer:", error);
+            }
             break;
-        case 'customer.created':
-            customer = event.data.object;
-            console.log(`Customer ${customer.id} created.`);
-            console.log(`Customer email: ${customer.email}.`);
-            console.log(`Customer user_id: ${customer.metadata}.`);
-            // Then define and call a method to handle the customer created.
-            // handleCustomerCreated(customer);
-            break;
+       
         case 'customer.deleted':
             customer = event.data.object;
             console.log(`Customer ${customer.id} deleted.`);
-            console.log(`Customer email: ${customer.email}.`);
-            console.log(`Customer user_id: ${customer.metadata}.`);
             // Then define and call a method to handle the customer deleted.
-            // handleCustomerDeleted(customer);
+            handleCustomerDeleted(customer);
             break;
         case 'customer.subscription.created':
             subscription = event.data.object;
