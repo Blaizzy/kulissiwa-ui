@@ -115,7 +115,7 @@ export default async function webhookHandler(request) {
         case 'customer.deleted':
             customer = event.data.object;
             console.log(`Customer ${customer.id} deleted.`);
-            // Then define and call a method to handle the customer deleted.
+            // Delete subscription in Supabase
             await handleCustomerDeleted(customer);
             break;
 
@@ -123,8 +123,7 @@ export default async function webhookHandler(request) {
             subscription = event.data.object;
             status = subscription.status;
             console.log(`Subscription status is ${status}.`);
-            // Then define and call a method to handle the subscription created.
-            // handleSubscriptionCreated(subscription);
+            // Create subscription in Supabase
             await handleSubscription(subscription, status);
             break;
 
@@ -135,7 +134,7 @@ export default async function webhookHandler(request) {
                 status = 'canceled';
             }
             console.log(`Subscription status is ${status}.`);
-    
+            // Update subscription in Supabase
             await handleSubscription(subscription, status);
             break;
 

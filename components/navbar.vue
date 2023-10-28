@@ -161,15 +161,18 @@ export default {
             if (data) {
                 if (data.length === 0) {
                     this.showUpgradeButton = true
-                }
-                if (data.stripe_customer_id) {
-                    this.store.updateSubscription(data)
-                    if (data.status === 'active') {
-                        this.showUpgradeButton = false
-                    } else {
-                        this.showUpgradeButton = true
-                    }
+                } else {
+                    if (data[0].stripe_customer_id) {
+                        this.store.updateSubscription(data)
+                        if (data[0].status === 'active') {
+                            this.showUpgradeButton = false
+                        } else if (data[0].status === 'canceled'){
+                            this.showUpgradeButton = true
+                        } else {
+                            this.showUpgradeButton = true
+                        }
 
+                    }
                 }
             }
         },

@@ -107,12 +107,18 @@ export default async function createCheckoutSession(request) {
         sessionData.customer = customerData.customerId;
     } else {
         // Otherwise, use the email to create a new customer
-        const customer = await stripe.customers.create({
-            email: customerEmail,
-        });
-        await handleCustomerCreated(customer.id, user_id);
-        sessionData.customer = customer.id;
-        sessionData.customer_email = customerEmail;
+        try {
+            const customer = await stripe.customers.create({
+                email: customerEmail,
+            });
+            await handleCustomerCreated(customer.id, user_id);
+            sessionData.customer = customer.id;
+        } catch (error) {
+            return new Response(JSON.stringify(error), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
     }
 
     try {
