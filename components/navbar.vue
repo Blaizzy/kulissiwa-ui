@@ -154,7 +154,6 @@ export default {
                 .from('subscriptions')
                 .select('stripe_customer_id, status')
                 .eq('user_id', this.store.user_session.user.id)
-                .single()
             
             if (error) {
                 console.log(error)
