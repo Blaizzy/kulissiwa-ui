@@ -54,10 +54,10 @@ async function handleSubscription(subscription, status) {
 }
 export default async function webhookHandler(request) {
     const sig = request.headers.get('stripe-signature');
-    const body = await request.text();
+    const body = request.rawBody;
     let event;
     try {
-        event = await stripe.webhooks.constructEventAsync(body, sig, process.env.STRIPE_WEBHOOK_SECRET, undefined);
+        event = await stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET, undefined);
     } catch (err) {
         console.error(`Webhook Error: ${err.message}`);
         return new Response(JSON.stringify({ received: false }), { status: 400 });
