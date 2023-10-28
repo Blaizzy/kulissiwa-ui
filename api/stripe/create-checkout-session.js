@@ -22,6 +22,28 @@ export const config = {
 
 const BASE_URL = process.env.BASE_URL;
 
+async function handleCustomerCreated(customerId, user_id) {
+    try {
+        const { data, error } = await supabase
+            .from('subscriptions')
+            .insert([
+                {
+                    user_id: user_id,
+                    stripe_customer_id: customerId,
+                    status: 'pending',
+                },
+            ]);
+        if (error) {
+            console.error('Failed to insert subscription in Supabase:', error);
+        }
+        if (data) {
+            console.log(`Subscription ${data[0].id} inserted in Supabase.`);
+        }
+    } catch (err) {
+        console.error("Failed to retrieve product from Stripe:", err);
+    }
+};
+
 async function getOrCreateStripeCustomer(customerEmail) {
     // Retrieve the Customer by Email
     let customers = await stripe.customers.list({ email: customerEmail, limit: 1 });
@@ -85,6 +107,11 @@ export default async function createCheckoutSession(request) {
         sessionData.customer = customerData.customerId;
     } else {
         // Otherwise, use the email to create a new customer
+        const customer = await stripe.customers.create({
+            email: customerEmail,
+        });
+        await handleCustomerCreated(customer.id, user_id);
+        sessionData.customer = customer.id;
         sessionData.customer_email = customerEmail;
     }
 

@@ -32,6 +32,7 @@ async function handleCustomerDeleted(customer) {
 
         if (error) {
             console.error('Failed to delete subscription in Supabase:', error);
+            
         }
         if (data) {
             console.log(`Subscription ${data[0].id} deleted in Supabase.`);
@@ -39,31 +40,8 @@ async function handleCustomerDeleted(customer) {
     } catch (err) {
         console.error("error", err);
     }
-}
-async function handleCustomerCreated(customer, metadata) {
-    const user_id = metadata.user_id;
-    try {
-        const { data, error } = await supabase
-            .from('subscriptions')
-            .insert([
-                {
-                    user_id: user_id,
-                    stripe_customer_id: customer.id,
-                    status: 'pending',
-                },
-            ]);
+};
 
-        if (error) {
-            console.error('Failed to insert subscription in Supabase:', error);
-        }
-        if (data) {
-            console.log(`Subscription ${data[0].id} inserted in Supabase.`);
-        }
-    } catch (err) {
-
-        console.error("Failed to retrieve product from Stripe:", err);
-    }
-}
 
 async function handleSubscription(subscription, status) {
     // Step 1: Extract Product ID
@@ -93,18 +71,21 @@ async function handleSubscription(subscription, status) {
     } catch (err) {
         console.error("Failed to retrieve product from Stripe:", err);
     }
-}
+};
+
 export default async function webhookHandler(request) {
     const sig = request.headers.get('stripe-signature');
     const rawBody = Buffer.from(await request.text());
     let event;
   
     try {
-        event = stripe.webhooks.constructEventAsync(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
+        event = await stripe.webhooks.constructEventAsync(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
     } catch (err) {
         console.error(`⚠️  Webhook signature verification failed.`);
         return new Response(JSON.stringify({ received: false }), { status: 400 });
     }
+
+    console.log(`🔔  Received event: ${event.type}`);
 
     let subscription;
     let status;
@@ -115,26 +96,29 @@ export default async function webhookHandler(request) {
             const session = event.data.object;
             const customerId = session.customer;
             const metadata = session.metadata;
-
             console.log("Updating customer:", customerId, "with metadata:", metadata);
-            await handleCustomerCreated(session.customer, metadata);
 
             try {
                 const updatedCustomer = await stripe.customers.update(customerId, {
-                    metadata: metadata
+                    name: session.customer_details.name,
+                    address: session.customer_details.address,
+                    phone: session.customer_details.phone,
+                    tax_exempt: session.customer_details.tax_exempt,
+                    tax_ids: session.customer_details.tax_ids,
+                    metadata: metadata,
                 });
-                console.log("Updated customer:", updatedCustomer);
-            } catch (error) {
-                console.error("Error updating customer:", error);
+            } catch (err) {
+                console.error("Failed to update customer in Stripe:", err);
             }
             break;
-       
+        
         case 'customer.deleted':
             customer = event.data.object;
             console.log(`Customer ${customer.id} deleted.`);
             // Then define and call a method to handle the customer deleted.
-            handleCustomerDeleted(customer);
+            await handleCustomerDeleted(customer);
             break;
+
         case 'customer.subscription.created':
             subscription = event.data.object;
             status = subscription.status;
@@ -143,17 +127,7 @@ export default async function webhookHandler(request) {
             // handleSubscriptionCreated(subscription);
             await handleSubscription(subscription, status);
             break;
-        case 'customer.subscription.deleted':
-            subscription = event.data.object;
-            status = subscription.status;
-            if (subscription.cancel_at_period_end) {
-                status = 'canceled';
-            }
-            console.log(`Subscription status is ${status}.`);
-            // Then define and call a method to handle the subscription deleted.
-            // handleSubscriptionDeleted(subscription);
-            await handleSubscription(subscription, status);
-            break;
+
         case 'customer.subscription.updated':
             subscription = event.data.object;
             status = subscription.status;
