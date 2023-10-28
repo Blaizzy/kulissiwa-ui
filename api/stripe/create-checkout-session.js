@@ -60,6 +60,7 @@ export default async function createCheckoutSession(request) {
                 quantity: 1,
             },
         ],
+
         mode: 'subscription',
         success_url: `${BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${BASE_URL}/cancel`,
@@ -87,13 +88,15 @@ export default async function createCheckoutSession(request) {
 
     try {
         const session = await stripe.checkout.sessions.create(sessionData);
-
+        const customer = await stripe.customers.create({
+            email: customerEmail,
+        });
         const { data, error } = await supabase
             .from('subscriptions')
             .insert([
                 {
                     user_id: user_id,
-                    stripe_customer_id: session.customer,
+                    stripe_customer_id: customer.id,
                     status: 'pending',
                 },
             ]);
