@@ -91,6 +91,7 @@ export default async function createCheckoutSession(request) {
         const customer = await stripe.customers.create({
             email: customerEmail,
         });
+        session.customer = customer.id;
         const { data, error } = await supabase
             .from('subscriptions')
             .insert([
