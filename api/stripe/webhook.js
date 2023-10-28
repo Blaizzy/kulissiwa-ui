@@ -22,6 +22,25 @@ try {
 export const config = {
     runtime: 'edge',
 };
+
+async function handleCustomerDeleted(customer) {
+    const user_id = customer.metadata.user_id;
+    try {
+        const { data, error } = await supabase
+            .from('subscriptions')
+            .delete()
+            .eq('user_id', user_id);
+
+        if (error) {
+            console.error('Failed to delete subscription in Supabase:', error);
+        }
+        if (data) {
+            console.log(`Subscription ${data[0].id} deleted in Supabase.`);
+        }
+    } catch (err) {
+        console.error("error", err);
+    }
+}
 async function handleCustomerCreated(customer) {
     const user_id = customer.metadata.user_id;
     try {
@@ -90,16 +109,30 @@ export default async function webhookHandler(request) {
 
     let subscription;
     let status;
-  
+    let customer;
     // Handle the event
     switch (event.type) {
+        case 'checkout.session.completed':
+            const session = event.data.object;
+            await stripe.customers.update(session.customer, {
+                metadata: { user_id: session.metadata.user_id },
+            });
+            break;
         case 'customer.created':
-            const customer = event.data.object;
+            customer = event.data.object;
             console.log(`Customer ${customer.id} created.`);
             console.log(`Customer email: ${customer.email}.`);
             console.log(`Customer user_id: ${customer.metadata}.`);
             // Then define and call a method to handle the customer created.
             // handleCustomerCreated(customer);
+            break;
+        case 'customer.deleted':
+            customer = event.data.object;
+            console.log(`Customer ${customer.id} deleted.`);
+            console.log(`Customer email: ${customer.email}.`);
+            console.log(`Customer user_id: ${customer.metadata}.`);
+            // Then define and call a method to handle the customer deleted.
+            // handleCustomerDeleted(customer);
             break;
         case 'customer.subscription.created':
             subscription = event.data.object;
