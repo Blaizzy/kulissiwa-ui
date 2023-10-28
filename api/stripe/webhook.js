@@ -115,7 +115,7 @@ export default async function webhookHandler(request) {
         case 'checkout.session.completed':
             const session = event.data.object;
             await stripe.customers.update(session.customer, {
-                metadata: { user_id: session.metadata.user_id },
+                metadata: session.metadata,
             });
             break;
         case 'customer.created':
