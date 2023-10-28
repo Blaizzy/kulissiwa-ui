@@ -22,6 +22,30 @@ try {
 export const config = {
     runtime: 'edge',
 };
+async function handleCustomerCreated(customer) {
+    const user_id = customer.metadata.user_id;
+    try {
+        const { data, error } = await supabase
+            .from('subscriptions')
+            .insert([
+                {
+                    user_id: user_id,
+                    stripe_customer_id: customer.id,
+                    status: 'pending',
+                },
+            ]);
+
+        if (error) {
+            console.error('Failed to insert subscription in Supabase:', error);
+        }
+        if (data) {
+            console.log(`Subscription ${data[0].id} inserted in Supabase.`);
+        }
+    } catch (err) {
+
+        console.error("Failed to retrieve product from Stripe:", err);
+    }
+}
 
 async function handleSubscription(subscription, status) {
     // Step 1: Extract Product ID
@@ -69,7 +93,14 @@ export default async function webhookHandler(request) {
   
     // Handle the event
     switch (event.type) {
-
+        case 'customer.created':
+            const customer = event.data.object;
+            console.log(`Customer ${customer.id} created.`);
+            console.log(`Customer email: ${customer.email}.`);
+            console.log(`Customer user_id: ${customer.metadata}.`);
+            // Then define and call a method to handle the customer created.
+            // handleCustomerCreated(customer);
+            break;
         case 'customer.subscription.created':
             subscription = event.data.object;
             status = subscription.status;
