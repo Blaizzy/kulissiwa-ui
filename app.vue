@@ -1,12 +1,15 @@
 <template>
+  
   <div class="flex h-screen">
+    <!-- Include custom styles for your widget -->
+    <link rel="stylesheet" href="https://kulissiwa-copilot.vercel.app/dist/styles.css">
+
     <navbar v-if="!isAuth"/>
     <conversations v-if="isChats"/>
     <NuxtPage />
 
   </div>
 </template>
-
 
 <script>
 
@@ -28,7 +31,6 @@ export default {
       if ( 
         this.$route.name == 'login' || this.$route.name == 'auth-email-verification' 
         || this.$route.name == 'auth-confirm' || this.$route.name == 'success'
-        || this.$route.name == 'checkout'
       ) {
         return true
       }else{

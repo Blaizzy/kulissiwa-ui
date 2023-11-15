@@ -29,6 +29,14 @@
                     <span v-show="!collapsed" class="pl-1.5">Chats</span>
                 </ClientOnly>
             </NuxtLink>
+            <NuxtLink to="/copilot" class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-sky-50"
+            :class="{'bg-sky-100': isSelectedMenu('/copilot'), 'justify-center': collapsed}">
+                <ClientOnly>
+                    <i class="fa-solid fa-robot"></i>
+                    <span v-show="!collapsed" class="pl-1.5">AI Copilot</span>
+                </ClientOnly>
+            </NuxtLink>
+            
             <NuxtLink to="/billing" class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-sky-50" v-show="!showUpgradeButton"
             :class="{'bg-sky-100': isSelectedMenu('/billing'), 'justify-center': collapsed}">
                 <ClientOnly>
@@ -83,16 +91,22 @@
 <script>
 import { ChevronDoubleLeftIcon, Bars3Icon } from '@heroicons/vue/20/solid'
 import { useAuthStore } from '@/stores/index'
+import { useMonthlyUsageStore } from '@/stores/monthly-usage'
+import { useTierLimits } from '~/stores/tiers'
 
 export default {
     data(){
         const store = useAuthStore()
+        const monthly_usage = useMonthlyUsageStore()
+        const tier_limits = useTierLimits()
         return {
             name:"",
             email:"",
             avatar_url:"/images/avatars/user-default-pic.png",
             collapsed: false,
             store: store,
+            monthly_usage: monthly_usage,
+            tier_limits: tier_limits,
             showUpgradeButton: false,
         }
     },
@@ -113,6 +127,8 @@ export default {
                     
             } else if (event === 'SIGNED_OUT') {
                 this.store.signOut()
+                this.monthly_usage.reset()
+                this.tier_limits.reset()
                 this.resetProfile()
                 this.$router.push('/login');
             }
@@ -122,6 +138,8 @@ export default {
             if (this.store.user_session) {
                 this.getActiveDataSourcesCount(supabase)
                 this.getSubscription(supabase)
+                this.getTiers(supabase)
+
             }
         })
         
@@ -146,13 +164,24 @@ export default {
         },
         isSelectedMenu(name){
             if (this.$route.path === name || this.$route.path.split('/')[1] === name.split('/')[1]) return true
-        
             else return false
+        },
+        async getTiers(supabase){
+            const { data, error } = await supabase
+                .from('tiers')
+                .select('id, name, file_limit, message_limit, pages_limit, concurrent_upload_limit, active_data_sources_limit')
+            
+            if (error) {
+                console.log(error)
+            } 
+            if (data) {
+                this.tier_limits.updateTiers(data)
+            }
         },
         async getSubscription(supabase){
             const { data, error } = await supabase
                 .from('subscriptions')
-                .select('stripe_customer_id, status')
+                .select('id, stripe_customer_id, tier, status')
                 .eq('user_id', this.store.user_session.user.id)
             
             if (error) {
@@ -163,7 +192,7 @@ export default {
                     this.showUpgradeButton = true
                 } else {
                     if (data[0].stripe_customer_id) {
-                        this.store.updateSubscription(data)
+                        this.monthly_usage.updateSubscription(data[0])
                         if (data[0].status === 'active') {
                             this.showUpgradeButton = false
                         } else if (data[0].status === 'canceled'){
@@ -171,10 +200,30 @@ export default {
                         } else {
                             this.showUpgradeButton = true
                         }
-
                     }
                 }
             }
+
+            const { data: monthly_usage, error: monthly_usage_error } = await supabase
+                .from('monthly_usage')
+                .select('files_uploaded, messages_sent, year_month')
+                .eq('year_month', new Date().toISOString().slice(0,7))
+
+            if (monthly_usage_error) {
+                console.log(monthly_usage_error)
+            }
+            if (monthly_usage) {
+                if (monthly_usage.length === 0) {
+                    this.monthly_usage.updateUsage({
+                        files_uploaded: 0,
+                        messages_sent: 0,
+                        year_month: new Date().toISOString().slice(0,7)
+                    })
+                } else {
+                    this.monthly_usage.updateUsage(monthly_usage[0])
+                }
+            }
+
         },
         async getActiveDataSourcesCount(supabase){
             const { data, error } = await supabase
@@ -187,7 +236,7 @@ export default {
                 console.log(error)
             } 
             if (data) {
-                this.store.updateActiveDataSourcesCount(data)
+                this.monthly_usage.updateActiveDataSourcesCount(data)
             }
         }
     },

@@ -45,9 +45,14 @@
                             <p class="truncate text-gray-900">{{ dataSource.name }}</p>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only" name="select-data-source" v-model="dataSource.is_active" @click="selectDataSource(dataSource)">
+                            <input 
+                                type="checkbox" class="sr-only" 
+                                name="select-data-source" 
+                                v-model="dataSource.is_active" 
+                                @change.prevent="selectDataSource(dataSource)"
+                                >
                             <div class="w-12 h-6 rounded-full transition-all flex items-center" :class="{'bg-sky-600': dataSource.is_active, 'bg-gray-300': !dataSource.is_active}">
-                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 ml-1" :class="{'translate-x-6': dataSource.is_active}"></div>
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 ml-1" :class="{'translate-x-6': dataSource.is_active, 'translate-x-0': !dataSource.is_active}"></div>
                             </div>
                         </label>
                     </div>
@@ -77,6 +82,10 @@
 <script>
 import Fuse from 'fuse.js'
 import { useAuthStore } from '~/stores'
+import { useMonthlyUsageStore } from '~/stores/monthly-usage'
+import { useTierLimits } from '~/stores/tiers'
+
+
 export default {
     props: {
         showModal: {
@@ -109,6 +118,7 @@ export default {
             required: true,
         },
     },
+    
     setup(props) {
         const showModal = ref(props.showModal)
         const dataSources_copy = ref(props.dataSources)
@@ -122,7 +132,11 @@ export default {
             totalItems.value = props.totalItems
             isLoading.value = props.isFetchingData
         })
-        
+        function updateDataSource(dataSource) {
+            const index = dataSources.value.findIndex(ds => ds.id === dataSource.id);
+            dataSources.value[index] = dataSource;
+        }
+
         const selectedDataType = ref(props.selectedDataType)
 
         const currentPage = ref(props.currentPage)
@@ -136,16 +150,20 @@ export default {
             currentPage,
             itemsPerPage,
             isLoading,
+            updateDataSource
         }
     },
     data() {
         const store = useAuthStore();
+        const monthly_usage = useMonthlyUsageStore();
+        const tier_limits = useTierLimits();
         return {
             searchQuery: '',
             debounceTimeout: null,
             pendingUpdates: [],
             store: store,
-            
+            monthly_usage: monthly_usage,
+            tier_limits: tier_limits,
         }
     },
     async mounted() {
@@ -234,10 +252,23 @@ export default {
                 this.searchDataSources();
             }, 300);
         },
+        canActivateMoreDataSources() {
+            const active_data_sources = this.monthly_usage.activeDataSourcesCount;
+            const tier_limit = this.tier_limits.tiers.find(tier => tier.name === this.monthly_usage.tier);
+            if (tier_limit.active_data_sources_limit === -1) {
+                return true;
+            }
+    
+            return active_data_sources < tier_limit.active_data_sources_limit 
+        },
         async selectDataSource(dataSource) {
-            dataSource.is_active = !dataSource.is_active;
-            this.pendingUpdates.push(dataSource);
-            await this.updateSelectedDataSources(true);
+            if (this.canActivateMoreDataSources() || dataSource.is_active === false) {
+                this.pendingUpdates.push(dataSource);
+                await this.updateSelectedDataSources(true);
+            } else {
+                dataSource.is_active = false;
+                this.$emit("error", "You have reached the maximum number of active data sources for your current plan. Please upgrade to activate more data sources.")
+            } 
         },
         async updateSelectedDataSources(upsert=false) {
             if (this.debounceTimeout) {
@@ -266,9 +297,7 @@ export default {
                             .filter(dataSource => dataSource.is_active)
                             .map(dataSource => dataSource.id);
                         
-                        
-                        
-                        this.store.updateActiveDataSourcesCount(this.pendingUpdates)
+                        this.monthly_usage.updateActiveDataSourcesCount(this.pendingUpdates)
                         this.pendingUpdates = [];
                     }
                 }

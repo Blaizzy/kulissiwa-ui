@@ -4,7 +4,7 @@
         <div class="flex absolute top-0 right-0">
             <div 
                 v-if="showSuccess" 
-                class="mt-4 py-2 px-4 text-lg text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800 shadow-md transition-transform transform"
+                class="mt-4 z-0 py-2 px-4 text-lg text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800 shadow-md transition-transform transform"
                 :class="{ '-translate-x-full opacity-0': !showSuccess, 'translate-x-0 opacity-100': showSuccess }"
             >   
                 <ClientOnly>
@@ -14,7 +14,7 @@
             </div>
             <div 
                 v-if="showFailure" 
-                class="fixed top-4 right-4 py-2 px-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800 shadow-md transition-transform transform"
+                class="fixed z-0 top-4 right-4 py-2 px-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800 shadow-md transition-transform transform"
                 :class="{ 'translate-x-full opacity-0': !showFailure, 'translate-x-0 opacity-100': showFailure }"
             >   
                 <ClientOnly>
@@ -82,7 +82,7 @@
                 :is-fetching-data="isFetchingDataSource"
                 @close-modal="showModal = false"
                 @update-page="updatePage"
-                @failure="onShowFailure" @success="onShowSuccess"/>
+                @error="onShowFailure" @success="onShowSuccess"/>
         </div>
 
 
@@ -256,13 +256,14 @@ import {
   } from '@headlessui/vue';
 
 import { ChevronUpIcon, CheckIcon } from '@heroicons/vue/20/solid';
-import { marked } from 'marked';
+import { marked, use } from 'marked';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism-okaidia.css';
 import ClipboardJS from 'clipboard';
 import { parse } from '@fortawesome/fontawesome-svg-core';
 import { useAuthStore } from '@/stores/index'
+import { useMonthlyUsageStore } from '@/stores/monthly-usage'
 import DataSourcesModal from '@/components/DataSources/modal.vue'
 
 const maxRows = 4;
@@ -342,6 +343,7 @@ export default {
     },
     data() {
         const store = useAuthStore();
+        const monthly_usage = useMonthlyUsageStore();
         return {
             showModal: false,
             conversationId: '',
@@ -368,6 +370,7 @@ export default {
             pendingUpdates: [],
             isDropdownOpen: false,
             store: store,
+            monthly_usage: monthly_usage,
             currentPage: 1,
             itemsPerPage: 5,
             totalItems: 0,
@@ -423,7 +426,7 @@ export default {
         watchEffect(() => {
             this.isChatFound()
             this.getActiveDataSourcesCount()
-            this.selectedDataType = Array.from(this.store.activeDataSources)
+            this.selectedDataType = Array.from(this.monthly_usage.activeDataSources)
         })
         
     },
@@ -512,7 +515,7 @@ export default {
             this.avatar_url = avatar_url;
         },
         getActiveDataSourcesCount() {
-            return this.store.activeDataSourcesCount;
+            return this.monthly_usage.activeDataSourcesCount;
         },
         
         async getDataSources( supabase = null ){
@@ -622,7 +625,7 @@ export default {
             this.showFailure = true
             this.failureMessage = message
             setTimeout(() => {
-                this.showDeleteFailure = false
+                this.showFailure = false
             }, 3000)
         },
         onShowSuccess(message) {
@@ -706,28 +709,31 @@ export default {
 
             this.user_messages.push({sender: "human", content: this.message});
             this.message = '';
-
+            let titlePromise;
             this.loading_ai_response = true;
-            
+
             if (this.$route.params.id==undefined && this.conversationId=='') {
-
-                const title = await this.autoTitle(this.user_messages[0].content)
-                await this.insertData(supabase, 'conversations', [{user_id: user_session.user.id, title: title.content}])
-                const { data, error } = await supabase
-                    .from('conversations')
-                    .select('id, created_at')
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-
-                if (error) {
-                    console.log(error)
-                }
-                if (data) {
-                    this.conversationId = data[0].id;
-                    const { refresh } = useConversations();
-                    refresh();
+                titlePromise = this.autoTitle(this.user_messages[0].content)
+                .then(async (title) => {
+                    return await this.insertData(supabase, 'conversations', [{user_id: user_session.user.id, title: title.content}]);
+                })
+                .then(async () => {
+                    const {data, error} =  await supabase
+                        .from('conversations')
+                        .select('id, created_at')
+                        .order('created_at', { ascending: false })
+                        .limit(1)
                     
-                }
+                    if (error) {
+                        console.log(error)
+                        this.onShowFailure(error.message)
+                    }
+                    if (data) {
+                        this.conversationId = data[0].id;
+                        const { refresh } = useConversations();
+                        refresh();
+                    }
+                });
             }
 
             // get the last user message
@@ -735,181 +741,189 @@ export default {
             try {
                 const formData = new FormData();
                 formData.append("query",last_user_message.content);
+                    if (this.selectedDataType.length === 0){
+                        // Create a history variable that contains list of all user and ai messages
+                        // Convert sender key to type
+                        // Copy user_messages and ai_messages
+                        let user_messages = this.user_messages.slice(0, -1).map(this.transformMessage);
+                        let ai_messages = ''
+                        if (this.ai_messages.length > 0){
+                            ai_messages = this.ai_messages.map(this.transformMessage);
+                        }
+                        else{
+                            ai_messages = [];
+                        }
+                        // Combine the two lists one element at a time
+                        let history = this.combineMessages(user_messages, ai_messages);
+                        // Convert the history to a string and append to formData
+                        formData.append("history", JSON.stringify({"messages": history}));
+                        const response = await fetch("https://blaizzy--kulissiwa-chat-chat.modal.run/", {
+                            method: 'POST',
+                            body: formData,
+                        });
 
-                if (this.selectedDataType.length === 0){
-                    // Create a history variable that contains list of all user and ai messages
-                    // Convert sender key to type
-                    // Copy user_messages and ai_messages
-                    let user_messages = this.user_messages.slice(0, -1).map(this.transformMessage);
-                    let ai_messages = ''
-                    if (this.ai_messages.length > 0){
-                        ai_messages = this.ai_messages.map(this.transformMessage);
-                    }
-                    else{
-                        ai_messages = [];
-                    }
-                    // Combine the two lists one element at a time
-                    let history = this.combineMessages(user_messages, ai_messages);
-                    // Convert the history to a string and append to formData
-                    formData.append("history", JSON.stringify({"messages": history}));
-                    const response = await fetch("https://blaizzy--kulissiwa-chat-chat.modal.run/", {
-                        method: 'POST',
-                        body: formData,
-                    });
+                        if (!response.body) {
+                            throw new Error('ReadableStream not supported');
+                        }
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder('utf-8');
 
-                    if (!response.body) {
-                        throw new Error('ReadableStream not supported');
-                    }
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder('utf-8');
+                        let index=''; // Index of the ai_messages array
+                        this.scrollToBottom();
+                        let result = '';
+                        let isFirstIteration = true; // Is this the first iteration of the while loop?
+                        while (true) {
+                            const { value, done } = await reader.read();
+                            
+                            if (done) {
+                                break;
+                            }
+                            if (isFirstIteration) {
+                                index = this.ai_messages.push({sender: "ai"}) - 1;
+                                isFirstIteration = false;
+                            }
+                            let chunk = decoder.decode(value, { stream: true }).replace(/data: /g, '').trim();
+            
+                            // Split the chunk by new lines
+                            const words = chunk.split('\n');
 
-                    let index=''; // Index of the ai_messages array
-                    this.scrollToBottom();
-                    let result = '';
-                    let isFirstIteration = true; // Is this the first iteration of the while loop?
-                    while (true) {
-                        const { value, done } = await reader.read();
+                            // If there's more than one word, join them into a single string
+                            if (words.length > 1) {
+                                chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
+                            }
                         
-                        if (done) {
-                            break;
-                        }
-                        if (isFirstIteration) {
-                            index = this.ai_messages.push({sender: "ai"}) - 1;
-                            isFirstIteration = false;
-                        }
-                        let chunk = decoder.decode(value, { stream: true }).replace(/data: /g, '').trim();
-        
-                        // Split the chunk by new lines
-                        const words = chunk.split('\n');
+                            result += chunk.replace(/^"(.*)"$/, '$1');
 
-                        // If there's more than one word, join them into a single string
-                        if (words.length > 1) {
-                            chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
+                            this.ai_messages[index].content = result;
+                            
+                            this.highlightCode();
                         }
-                       
-                        result += chunk.replace(/^"(.*)"$/, '$1');
-
-                        this.ai_messages[index].content = result;
                         
-                        this.highlightCode();
-                    }
-                    
-                }
-                else{
-                    formData.append("data_source", this.selectedDataType);
-                    formData.append("namespace", user_session.user.id);
-                    
-
-                    const response = await fetch("https://blaizzy--kulissiwa-chat-with-sources-chat-with-sources.modal.run", {
-                        method: 'POST',
-                        body: formData,
-                    });
-
-                    if (!response.body) {
-                        throw new Error('ReadableStream not supported');
-                    }
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder('utf-8');
-                    this.scrollToBottom();
-                    function isJSON(chunk) {
-                        if (typeof chunk !== 'string') return false;
-                        // Locate the delimiters
-                        let startIndex = chunk.indexOf('||JSON_START||');
-                        let endIndex = chunk.indexOf('||JSON_END||');
-
-                        if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
-                            return false;
-                        }
-
-                        // Extract potential JSON (considering the length of '||JSON_START||' to get the actual JSON start)
-                        const potentialJSON = chunk.substring(startIndex + '||JSON_START||'.length, endIndex);
-
-
-                        try {
-                            let parsed = JSON.parse(potentialJSON);  
-                            return parsed && typeof parsed === 'object' && Array.isArray(parsed.source_documents) && parsed.source_documents.length >= 0;
-                        } catch (e) {
-                            return false;
-                        }
-                    }
-                    let result = ''; // The final result
-                    let jsonBuffer = ''; // Buffer for potential JSON strings
-                    let collectingJSON = false; // Are we currently collecting a JSON string?   
-                    let response_dict = '';
-                    let index=''; // Index of the ai_messages array
-                    let isFirstIteration = true; // Is this the first iteration of the while loop?
-                    while (true) {
-                        const { value, done } = await reader.read();
+                    } else{
+                        formData.append("data_source", this.selectedDataType);
+                        formData.append("namespace", user_session.user.id);
                         
-                        if (done) {
-                            break;
-                        }
 
-                        let chunk = decoder.decode(value, { stream: true }).replace(/data: /g, '').trim();
-        
-                        // Split the chunk by new lines
-                        const words = chunk.split('\n');
+                        const response = await fetch("https://blaizzy--kulissiwa-chat-with-sources-chat-with-sources.modal.run", {
+                            method: 'POST',
+                            body: formData,
+                        });
 
-                        if (isFirstIteration) {
-                            index = this.ai_messages.push({sender: "ai"}) - 1;
-                            isFirstIteration = false;
+                        if (!response.body) {
+                            throw new Error('ReadableStream not supported');
                         }
-                        // If there's more than one word, join them into a single string
-                        if (words.length > 1) {
-                            chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
-                        }
-                        if (collectingJSON || chunk.includes('||JSON_START||')) {
-                            jsonBuffer += chunk;
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder('utf-8');
+                        this.scrollToBottom();
+                        function isJSON(chunk) {
+                            if (typeof chunk !== 'string') return false;
+                            // Locate the delimiters
+                            let startIndex = chunk.indexOf('||JSON_START||');
+                            let endIndex = chunk.indexOf('||JSON_END||');
 
-                            // Only attempt parsing if we detect the end delimiter
-                            if (jsonBuffer.includes('||JSON_END||')) {
-                                if (isJSON(jsonBuffer)) {
-                                    let cleanedString = jsonBuffer.replace(/[\cA-\cZ]/g, "");
-                                    result += cleanedString.split('||JSON_START||')[0];
-                                    this.ai_messages[index].content = result;
-                                    
-                                    let startIndex = cleanedString.indexOf('||JSON_START||');
-                                    let endIndex = cleanedString.indexOf('||JSON_END||');
-                                    response_dict = JSON.parse(cleanedString.substring(startIndex + '||JSON_START||'.length, endIndex));
-                                    if (response_dict.source_documents.length > 0) {
-                                        // replace the source id with the source name
-                                        if (response_dict.source_documents){ 
-                                            response_dict.source_documents.forEach(item => {
-                                                let id = item.metadata.source;
-                                                item.metadata.source = this.getSourceName(id);
-                                            });
-                                        }else{
-                                            response_dict = {source_documents: []};
-                                        }
-                                        this.ai_messages[index].source_documents = response_dict.source_documents;
+                            if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
+                                return false;
+                            }
+
+                            // Extract potential JSON (considering the length of '||JSON_START||' to get the actual JSON start)
+                            const potentialJSON = chunk.substring(startIndex + '||JSON_START||'.length, endIndex);
+
+
+                            try {
+                                let parsed = JSON.parse(potentialJSON);  
+                                return parsed && typeof parsed === 'object' && Array.isArray(parsed.source_documents) && parsed.source_documents.length >= 0;
+                            } catch (e) {
+                                return false;
+                            }
+                        }
+                        let result = ''; // The final result
+                        let jsonBuffer = ''; // Buffer for potential JSON strings
+                        let collectingJSON = false; // Are we currently collecting a JSON string?   
+                        let response_dict = '';
+                        let index=''; // Index of the ai_messages array
+                        let isFirstIteration = true; // Is this the first iteration of the while loop?
+                        while (true) {
+                            const { value, done } = await reader.read();
+                            
+                            if (done) {
+                                break;
+                            }
+
+                            let chunk = decoder.decode(value, { stream: true }).replace(/data: /g, '').trim();
+            
+                            // Split the chunk by new lines
+                            const words = chunk.split('\n');
+
+                            if (isFirstIteration) {
+                                index = this.ai_messages.push({sender: "ai"}) - 1;
+                                isFirstIteration = false;
+                            }
+                            // If there's more than one word, join them into a single string
+                            if (words.length > 1) {
+                                chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
+                            }
+                            if (collectingJSON || chunk.includes('||JSON_START||')) {
+                                jsonBuffer += chunk;
+
+                                // Only attempt parsing if we detect the end delimiter
+                                if (jsonBuffer.includes('||JSON_END||')) {
+                                    if (isJSON(jsonBuffer)) {
+                                        let cleanedString = jsonBuffer.replace(/[\cA-\cZ]/g, "");
+                                        result += cleanedString.split('||JSON_START||')[0];
+                                        this.ai_messages[index].content = result;
                                         
-                                    }
+                                        let startIndex = cleanedString.indexOf('||JSON_START||');
+                                        let endIndex = cleanedString.indexOf('||JSON_END||');
+                                        response_dict = JSON.parse(cleanedString.substring(startIndex + '||JSON_START||'.length, endIndex));
+                                        if (response_dict.source_documents.length > 0) {
+                                            // replace the source id with the source name
+                                            if (response_dict.source_documents){ 
+                                                response_dict.source_documents.forEach(item => {
+                                                    let id = item.metadata.source;
+                                                    item.metadata.source = this.getSourceName(id);
+                                                });
+                                            }else{
+                                                response_dict = {source_documents: []};
+                                            }
+                                            this.ai_messages[index].source_documents = response_dict.source_documents;
+                                            
+                                        }
 
-                                    // Reset the buffer and collecting state
-                                    jsonBuffer = '';
-                                    collectingJSON = false;
+                                        // Reset the buffer and collecting state
+                                        jsonBuffer = '';
+                                        collectingJSON = false;
+                                    } else {
+                                        // If not a valid JSON, just add to result and reset the buffer and collecting state
+                                        result += jsonBuffer;
+                                        this.ai_messages[index].content = result;
+                                        jsonBuffer = '';
+                                        collectingJSON = false;
+                                    }
                                 } else {
-                                    // If not a valid JSON, just add to result and reset the buffer and collecting state
-                                    result += jsonBuffer;
-                                    this.ai_messages[index].content = result;
-                                    jsonBuffer = '';
-                                    collectingJSON = false;
+                                    collectingJSON = true;
                                 }
                             } else {
-                                collectingJSON = true;
+                                result += chunk.replace(/^"(.*)"$/, '$1');
+                                this.ai_messages[index].content = result;
                             }
-                        } else {
-                            result += chunk.replace(/^"(.*)"$/, '$1');
-                            this.ai_messages[index].content = result;
+                            this.highlightCode();
                         }
-                        this.highlightCode();
+                        
                     }
-                    
-                } 
+                             
             } catch (err) {
                 console.log(err);
             } finally {
                 this.loading_ai_response = false;
+            }
+
+            if (titlePromise) {
+                try {
+                    await titlePromise;
+                } catch (err) {
+                    console.log(err);
+                    this.onShowFailure(err.message)
+                }
             }
 
             await this.insertData(
