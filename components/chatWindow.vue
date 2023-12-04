@@ -832,7 +832,6 @@ export default {
                             if (dataLineIndex >= 0) {
                                 const dataLine = message.slice(dataLineIndex + 5).trim();
                                 const data = JSON.parse(dataLine);
-                                console.log(data);
                                 if (data.ops[0].path === '/logs/FindDocs/final_output') {
                                     if (isFirstIteration) {
                                         index = this.ai_messages.push({sender: "ai", content: ''}) - 1;

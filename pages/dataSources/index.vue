@@ -289,7 +289,7 @@ definePageMeta({
                         </Menu>
                     </div>
                 </div>
-                <div class="flex justify-center mt-4 pb-2">
+                <div class="flex justify-center mt-4 pb-2" v-if="!noDataFound">
                     <button @click="prevPage" :disabled="currentPage === 1"
                     class="px-4 py-2 border-2 rounded-l-md"
                     :class="{'hover:bg-gray-100': currentPage !== 1}">
@@ -403,6 +403,9 @@ export default {
         canUploadDataSource() {
             const filesUploaded = this.monthly_usage.filesUploaded;   
             const tier_limit = this.tier_limits.tiers.find(tier => tier.name === this.monthly_usage.tier);
+            if (tier_limit === undefined) {
+                return false;
+            }
             if (tier_limit.file_limit === -1) {
                 return true;
             }         
@@ -411,6 +414,9 @@ export default {
         canActivateMoreDataSources() {
             const active_data_sources = this.monthly_usage.activeDataSourcesCount;
             const tier_limit = this.tier_limits.tiers.find(tier => tier.name === this.monthly_usage.tier);
+            if (tier_limit === undefined) {
+                return false;
+            }
             if (tier_limit.active_data_sources_limit === -1) {
                 return true;
             }
