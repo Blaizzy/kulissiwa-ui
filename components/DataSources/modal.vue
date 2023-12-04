@@ -255,6 +255,9 @@ export default {
         canActivateMoreDataSources() {
             const active_data_sources = this.monthly_usage.activeDataSourcesCount;
             const tier_limit = this.tier_limits.tiers.find(tier => tier.name === this.monthly_usage.tier);
+            if (tier_limit === undefined) {
+                return false;
+            }
             if (tier_limit.active_data_sources_limit === -1) {
                 return true;
             }

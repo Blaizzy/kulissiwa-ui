@@ -28,7 +28,7 @@ async function processFileForEmbedding(data,  data_source, namespace, data_type,
     formData.append("data_source", data_source);
     formData.append("data_type", data_type);
 
-    const response = await fetch("https://blaizzy--kulissiwa-data-data-dev.modal.run/embed_data", {
+    const response = await fetch("https://blaizzy--kulissiwa-data-data.modal.run/embed_data", {
         method: 'POST',
         body: formData,
     });
