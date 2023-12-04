@@ -82,7 +82,7 @@ export default {
         const data = await response.json();
         
         if (data) {
-            this.prices = data.data.reverse().filter(price => price.product && price.product.active);
+            this.prices = data.data.filter(price => price.product && price.product.active);
         } else {
             console.error("Error fetching prices:", data.message);
         }
