@@ -5,8 +5,6 @@ export const useAuthStore = defineStore('auth', () => {
     const isAuthenticated = ref(false)
     const token = ref(null)
 
-
-    
     function signIn(session: any) {
         user_session.value = session
         isAuthenticated.value = true
@@ -18,7 +16,6 @@ export const useAuthStore = defineStore('auth', () => {
         isAuthenticated.value = false
         token.value = null
     }
-
 
     return {
         user_session, isAuthenticated, 

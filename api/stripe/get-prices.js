@@ -1,7 +1,6 @@
 import Stripe from 'stripe';
 let stripe;
 try {
-    // const stripeLib = require('stripe');
     stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 } catch (error) {
     console.error('Failed to require Stripe:', error);

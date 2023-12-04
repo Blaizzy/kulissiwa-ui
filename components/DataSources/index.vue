@@ -222,6 +222,7 @@
 import MyWorker from '@/assets/workers/workerData?worker'
 import EmbedURLWorker from '@/assets/workers/workerURLs?worker'
 import { useAuthStore } from '@/stores/index'
+import { useMonthlyUsageStore } from '@/stores/monthly-usage'
 
 
 export default {
@@ -233,8 +234,10 @@ export default {
   },
   data() {
     const store = useAuthStore()
+    const monthly_usage_store = useMonthlyUsageStore()
     return {
       store: store,
+      monthly_usage_store: monthly_usage_store,
       selectedDataType: "PDF",
       name: "",
       display_name: "",
@@ -477,7 +480,7 @@ export default {
             throw error;
           } else {
             await this.embedFileWithWorker('embedData', file, data[0].id, user_session, file.file_type, false);
-            this.store.updateActiveDataSourcesCount(data)
+            this.monthly_usage_store.updateActiveDataSourcesCount(data)
           }
 
         } else if (this.selectedDataType == "URL") {
@@ -492,7 +495,7 @@ export default {
             throw error;
           } else {
             await this.embedURLWorker(file, data[0].id, user_session, file.file_type, this.crawl, []);
-            this.store.updateActiveDataSourcesCount(data)
+            this.monthly_usage_store.updateActiveDataSourcesCount(data)
           }
         } else if (this.selectedDataType == "PDF" || this.selectedDataType == "Docx" || this.selectedDataType == "CSV") {
           const unique_name = `${file.name}_${Date.now()}`;
@@ -519,7 +522,7 @@ export default {
               file.loadingProgress = 15;
               const file_type = file.file_type.toLowerCase();
               await this.embedFileWithWorker('embedData', file, insertData[0].id, user_session, file_type, true);
-              this.store.updateActiveDataSourcesCount(insertData)
+              this.monthly_usage_store.updateActiveDataSourcesCount(insertData)
             }
           }
         }

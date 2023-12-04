@@ -29,7 +29,6 @@ export const useMonthlyUsageStore = defineStore('monthly_usage',() => {
                 activeDataSources.value.delete(item.id);
             }
         });
-    
         activeDataSourcesCount.value = activeDataSources.value.size;
     }
 

@@ -80,8 +80,9 @@ export default {
     try {
         const response = await fetch('/api/stripe/get-prices');
         const data = await response.json();
+        
         if (data) {
-            this.prices = data.data.reverse();
+            this.prices = data.data.reverse().filter(price => price.product && price.product.active);
         } else {
             console.error("Error fetching prices:", data.message);
         }

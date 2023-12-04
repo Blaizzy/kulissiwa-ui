@@ -2,7 +2,6 @@
   
   <div class="flex h-screen">
     <!-- Include custom styles for your widget -->
-    <link rel="stylesheet" href="https://kulissiwa-copilot.vercel.app/dist/styles.css">
 
     <navbar v-if="!isAuth"/>
     <conversations v-if="isChats"/>

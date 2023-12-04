@@ -7,7 +7,6 @@ try {
     stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 } catch (error) {
     console.error('Failed to import Stripe:', error);
-
 }
 
 try {
@@ -17,7 +16,6 @@ try {
 } catch (error) {
     console.error('Failed to import Supabase:', error);
 }
-
 
 export const config = {
     runtime: 'edge',
@@ -32,7 +30,6 @@ async function handleCustomerDeleted(customer) {
 
         if (error) {
             console.error('Failed to delete subscription in Supabase:', error);
-            
         }
         if (data) {
             console.log(`Subscription ${data[0].id} deleted in Supabase.`);
@@ -42,12 +39,11 @@ async function handleCustomerDeleted(customer) {
     }
 };
 
-
 async function handleSubscription(subscription, status) {
-    // Step 1: Extract Product ID
+    // Extract Product ID
     let productID = subscription.items.data[0].price.product;
 
-    // Step 2: Fetch product details from Stripe
+    // Fetch product details from Stripe
     try {
         const product = await stripe.products.retrieve(productID);
         const productName = product.name;
@@ -56,22 +52,23 @@ async function handleSubscription(subscription, status) {
         const { data, error } = await supabase
             .from('subscriptions')
             .update({
-                tier: productName,
+                tier: productName, // Ensure 'tier' matches your Supabase column name
                 status: status
             })
             .eq('stripe_customer_id', subscription.customer);
         
         if (error) {
             console.error('Failed to update subscription in Supabase:', error);
-        } else {
+        } 
+
+        if (data) {
             console.log(`Subscription ${subscription.id} updated in Supabase.`);
         }
-
-
     } catch (err) {
         console.error("Failed to retrieve product from Stripe:", err);
     }
-};
+}
+
 
 export default async function webhookHandler(request) {
     const sig = request.headers.get('stripe-signature');
@@ -97,7 +94,6 @@ export default async function webhookHandler(request) {
             const customerId = session.customer;
             const metadata = session.metadata;
             console.log("Updating customer:", customerId, "with metadata:", metadata);
-
             try {
                 const updatedCustomer = await stripe.customers.update(customerId, {
                     name: session.customer_details.name,
