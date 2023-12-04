@@ -73,11 +73,20 @@ body {
     border-radius: inherit;  /* Inherit the border-radius of the parent button */
 }
 
-
+.animated-gradient-text {
+    background: linear-gradient(135deg, #4baff2, #33b1ff, #007fb5);
+    background-size: 300% 300%;
+    animation: gradientAnimation 8s infinite;
+    color: transparent;  /* This makes the text color transparent */
+    -webkit-background-clip: text; /* This clips the background to the text, so the gradient appears as the text color */
+    background-clip: text;
+    display: inline-block; /* Needed to make the background apply correctly */
+}
 .animated-gradient-bg {
     background: linear-gradient(135deg, #4baff2, #33b1ff, #007fb5);
     background-size: 300% 300%;
     animation: gradientAnimation 8s infinite;
+    
 }
 
 input[type="search"]::-webkit-search-decoration,

@@ -1,12 +1,14 @@
 <template>
+  
   <div class="flex h-screen">
+    <!-- Include custom styles for your widget -->
+
     <navbar v-if="!isAuth"/>
     <conversations v-if="isChats"/>
     <NuxtPage />
 
   </div>
 </template>
-
 
 <script>
 
@@ -25,7 +27,10 @@ export default {
       }
     },
     isAuth() {
-      if (this.$route.name == 'login' || this.$route.name == 'auth-email-verification' || this.$route.name == 'auth-confirm') {
+      if ( 
+        this.$route.name == 'login' || this.$route.name == 'auth-email-verification' 
+        || this.$route.name == 'auth-confirm' || this.$route.name == 'success'
+      ) {
         return true
       }else{
         return false

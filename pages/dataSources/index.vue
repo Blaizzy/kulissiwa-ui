@@ -19,7 +19,7 @@ definePageMeta({
             <div class="flex absolute top-0 right-0"> <!-- Changed to absolute positioning -->
                 <div 
                     v-if="showSuccess" 
-                    class="mt-4 py-2 px-4 text-lg text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800 shadow-md transition-transform transform"
+                    class="mt-4 mr-1 py-2 px-4 text-lg text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800 shadow-md transition-transform transform"
                     :class="{ '-translate-x-full opacity-0': !showSuccess, 'translate-x-0 opacity-100': showSuccess }"
                 >   
                     <ClientOnly>
@@ -28,8 +28,8 @@ definePageMeta({
                     {{successMessage}}
                 </div>
                 <div 
-                    v-if="showSuccess" 
-                    class="mt-4 py-2 px-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800 shadow-md transition-transform transform"
+                    v-if="showFailure" 
+                    class="mt-4 mr-1 py-2 px-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800 shadow-md transition-transform transform"
                     :class="{ '-translate-x-full opacity-0': !showFailure, 'translate-x-0 opacity-100': showFailure }"
                 >   
                     <ClientOnly>
@@ -216,7 +216,7 @@ definePageMeta({
                     
                     <!-- Active -->
                     <label class="flex-1 items-center cursor-pointer">
-                        <input type="checkbox" class="sr-only" v-model="dataSource.is_active" @click="selectDataSource(dataSource)">
+                        <input type="checkbox" class="sr-only" v-model="dataSource.is_active" @change.prevent="selectDataSource(dataSource)">
                         <div class="w-12 h-6 rounded-full transition-all flex items-center" :class="{'bg-sky-600': dataSource.is_active, 'bg-gray-300': !dataSource.is_active}">
                         <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 ml-1" :class="{'translate-x-6': dataSource.is_active}"></div>
                         </div>
@@ -319,11 +319,16 @@ import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import { ChevronDownIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/20/solid'
 import DataSkeleton from '~/components/DataSkeleton.vue'
 import { useAuthStore } from '@/stores/index'
+import { useMonthlyUsageStore } from '~/stores/monthly-usage'
+import { useTierLimits } from '~/stores/tiers'
+
 import Fuse from 'fuse.js'
 
 export default {
     data() {
         const store = useAuthStore()
+        const monthly_usage = useMonthlyUsageStore()
+        const tier_limits = useTierLimits();
         return {
             isGroup: false,
             dataSources: [],
@@ -338,6 +343,8 @@ export default {
             successMessage:'',
             failureMessage:'',
             store: store,
+            monthly_usage: monthly_usage,
+            tier_limits: tier_limits,
             searchQuery: '',
             showSortOptions: false,
             showFilterOptions: false,
@@ -393,10 +400,31 @@ export default {
             await this.getDataSources()
             this.isFetchingDataSource = false
         },
+        canUploadDataSource() {
+            const filesUploaded = this.monthly_usage.filesUploaded;   
+            const tier_limit = this.tier_limits.tiers.find(tier => tier.name === this.monthly_usage.tier);
+            if (tier_limit.file_limit === -1) {
+                return true;
+            }         
+            return filesUploaded < tier_limit.file_limit;
+        },
+        canActivateMoreDataSources() {
+            const active_data_sources = this.monthly_usage.activeDataSourcesCount;
+            const tier_limit = this.tier_limits.tiers.find(tier => tier.name === this.monthly_usage.tier);
+            if (tier_limit.active_data_sources_limit === -1) {
+                return true;
+            }
+    
+            return active_data_sources < tier_limit.active_data_sources_limit 
+        },
         async selectDataSource(dataSource) {
-            dataSource.is_active = !dataSource.is_active;
-            this.pendingUpdates.push(dataSource);
-            await this.updateSelectedDataSources(true);
+            if (this.canActivateMoreDataSources() || dataSource.is_active === false) {
+                this.pendingUpdates.push(dataSource);
+                await this.updateSelectedDataSources(true);
+            } else {
+                dataSource.is_active = false;
+                this.onShowFailure('You have reached your active data sources limit. Please upgrade your plan to activate more data sources.');
+            } 
         },
         async updateSelectedDataSources(upsert = false) {
             if (this.debounceTimeout) {
@@ -420,7 +448,7 @@ export default {
                     }
                     if (data) {
                         this.onShowSuccess('Data sources updated successfully')
-                        this.store.updateActiveDataSourcesCount(this.pendingUpdates)
+                        this.monthly_usage.updateActiveDataSourcesCount(this.pendingUpdates)
                         this.pendingUpdates = [];
                     }
                 }
@@ -597,11 +625,16 @@ export default {
             this.showFailure = true
             this.failureMessage = message
             setTimeout(() => {
-                this.showDeleteFailure = false
+                this.showFailure = false
+                this.failureMessage = ''
             }, 3000)
         },
         newDataSource() {
-            this.newDataSourceModalOpen = true;
+            if (this.canUploadDataSource()) {
+                this.newDataSourceModalOpen = true;
+            } else {
+                this.onShowFailure('You have reached your file upload limit. Please upgrade your plan to upload more files');
+            }
         },
         closeNewDataSource() {
             this.newDataSourceModalOpen = false;
@@ -639,8 +672,7 @@ export default {
         
             if (error) {
                 this.onShowFailure("Data deletion failed!")
-            }
-            else {
+            } else {
                 const formData = new FormData();
 
                 formData.append("namespace", user_session.user.id);
@@ -658,6 +690,9 @@ export default {
                         this.onShowFailure(message)
                     }else{
                         this.onShowSuccess("Data deleted successfully!")
+                        if (this.monthly_usage.filesUploaded > 0){
+                            this.monthly_usage.filesUploaded -= 1;
+                        }
                         await this.onDataRefreshed()
                     }
                 } catch (err) {

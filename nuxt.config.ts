@@ -8,7 +8,9 @@ export default defineNuxtConfig({
         link: [
           { rel: 'icon', type: 'image/svg', href: '/favicon.png' }
         ],
-      }
+      },
+      
+      
   },
 
   modules: [
@@ -52,4 +54,5 @@ export default defineNuxtConfig({
   devtools: {
     enabled: false,
   },
+
 })
