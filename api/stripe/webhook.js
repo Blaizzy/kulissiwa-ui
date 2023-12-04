@@ -52,7 +52,7 @@ async function handleSubscription(subscription, status) {
         const { data, error } = await supabase
             .from('subscriptions')
             .update({
-                tier: productName, // Ensure 'tier' matches your Supabase column name
+                tier: productName, 
                 status: status
             })
             .eq('stripe_customer_id', subscription.customer);
