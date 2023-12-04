@@ -8,7 +8,7 @@ self.addEventListener('message', async (event) => {
     formData.append("crawl", crawl);
     formData.append("excluded_urls", excluded_urls);
 
-    const response = await fetch("https://blaizzy--kulissiwa-data-data.modal.run/embed_url", {
+    const response = await fetch("https://blaizzy--kulissiwa-data-data-dev.modal.run/embed_url", {
         method: 'POST',
         body: formData,
     });

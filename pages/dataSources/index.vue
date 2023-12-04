@@ -400,6 +400,14 @@ export default {
             await this.getDataSources()
             this.isFetchingDataSource = false
         },
+        canUploadDataSource() {
+            const filesUploaded = this.monthly_usage.filesUploaded;   
+            const tier_limit = this.tier_limits.tiers.find(tier => tier.name === this.monthly_usage.tier);
+            if (tier_limit.file_limit === -1) {
+                return true;
+            }         
+            return filesUploaded < tier_limit.file_limit;
+        },
         canActivateMoreDataSources() {
             const active_data_sources = this.monthly_usage.activeDataSourcesCount;
             const tier_limit = this.tier_limits.tiers.find(tier => tier.name === this.monthly_usage.tier);
@@ -622,7 +630,11 @@ export default {
             }, 3000)
         },
         newDataSource() {
-            this.newDataSourceModalOpen = true;
+            if (this.canUploadDataSource()) {
+                this.newDataSourceModalOpen = true;
+            } else {
+                this.onShowFailure('You have reached your file upload limit. Please upgrade your plan to upload more files');
+            }
         },
         closeNewDataSource() {
             this.newDataSourceModalOpen = false;
@@ -660,8 +672,7 @@ export default {
         
             if (error) {
                 this.onShowFailure("Data deletion failed!")
-            }
-            else {
+            } else {
                 const formData = new FormData();
 
                 formData.append("namespace", user_session.user.id);
@@ -679,6 +690,9 @@ export default {
                         this.onShowFailure(message)
                     }else{
                         this.onShowSuccess("Data deleted successfully!")
+                        if (this.monthly_usage.filesUploaded > 0){
+                            this.monthly_usage.filesUploaded -= 1;
+                        }
                         await this.onDataRefreshed()
                     }
                 } catch (err) {

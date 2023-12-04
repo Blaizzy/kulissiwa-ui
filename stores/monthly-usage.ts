@@ -3,15 +3,18 @@ import { defineStore } from 'pinia'
 export const useMonthlyUsageStore = defineStore('monthly_usage',() => {
     const stripe_customer_id = ref(null);
     const tier = ref(null);
+    const tier_id = ref(null);
     const status = ref(null);
     const filesUploaded = ref(null);
     const messagesSent = ref(null);
     const activeDataSources = ref(new Set())
     const activeDataSourcesCount = ref(0)
+    const year_month = ref(null)
 
     function updateSubscription(data: any) {
         stripe_customer_id.value = data.stripe_customer_id
         tier.value = data.tier
+
         status.value = data.status
         
     }
@@ -19,6 +22,11 @@ export const useMonthlyUsageStore = defineStore('monthly_usage',() => {
     function updateUsage(data: any) {
         filesUploaded.value = data.files_uploaded
         messagesSent.value = data.messages_sent
+        year_month.value = data.year_month
+    }
+
+    function updateTierId(id: any) {
+        tier_id.value = id
     }
 
     function updateActiveDataSourcesCount(data: []) {
@@ -42,8 +50,9 @@ export const useMonthlyUsageStore = defineStore('monthly_usage',() => {
 
 
     return {
-        tier, filesUploaded, messagesSent, activeDataSources, activeDataSourcesCount,
+        tier, filesUploaded, messagesSent, activeDataSources, 
+        activeDataSourcesCount, year_month, tier_id,
         updateSubscription, updateActiveDataSourcesCount, reset,
-        updateUsage
+        updateUsage, updateTierId,
     }
 })

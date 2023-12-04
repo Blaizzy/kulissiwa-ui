@@ -481,6 +481,7 @@ export default {
           } else {
             await this.embedFileWithWorker('embedData', file, data[0].id, user_session, file.file_type, false);
             this.monthly_usage_store.updateActiveDataSourcesCount(data)
+            this.monthly_usage_store.filesUploaded += 1;
           }
 
         } else if (this.selectedDataType == "URL") {
@@ -496,6 +497,7 @@ export default {
           } else {
             await this.embedURLWorker(file, data[0].id, user_session, file.file_type, this.crawl, []);
             this.monthly_usage_store.updateActiveDataSourcesCount(data)
+            this.monthly_usage_store.filesUploaded += 1;
           }
         } else if (this.selectedDataType == "PDF" || this.selectedDataType == "Docx" || this.selectedDataType == "CSV") {
           const unique_name = `${file.name}_${Date.now()}`;
@@ -523,6 +525,7 @@ export default {
               const file_type = file.file_type.toLowerCase();
               await this.embedFileWithWorker('embedData', file, insertData[0].id, user_session, file_type, true);
               this.monthly_usage_store.updateActiveDataSourcesCount(insertData)
+              this.monthly_usage_store.filesUploaded += 1;
             }
           }
         }

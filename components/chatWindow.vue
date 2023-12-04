@@ -171,7 +171,9 @@
                                                             />
                                                             </DisclosureButton>
                                                             <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
-                                                                <div v-html="renderMarkdown(source_document.page_content)"></div>
+                                                                
+                                                                <div v-html="renderMarkdown(source_document.page_content)" v-if="source_document.page_content"></div>
+                                                                <div v-html="renderMarkdown(source_document.pageContent)" v-else></div>
                                                             </DisclosurePanel>
                                                         </Disclosure>
                                                     </div>
@@ -375,6 +377,9 @@ export default {
             itemsPerPage: 5,
             totalItems: 0,
             isFetchingDataSource: false,
+            models: [
+                {name: 'gpt-3.5-turbo-1106', selected: true},
+            ]
         };
     },
     async created() {
@@ -672,17 +677,9 @@ export default {
             let _type = userMessage.sender;
             let content = userMessage.content;
 
-            let senderName = _type === 'human' ? 'Human' : 'AI';
-
-            return {
-                type: _type,
-                data: {
-                    content: content,
-                    additional_kwargs: {
-                        // sender_name: senderName
-                    }
-                }
-            };
+            let transformedMessage = {};
+            transformedMessage[_type] = content;
+            return transformedMessage;
         },
         combineMessages(user_messages, ai_messages) {
             let combinedMessages = [];
@@ -736,181 +733,127 @@ export default {
                 });
             }
 
+            // Create a history variable that contains list of all user and ai messages
+            // Convert sender key to type
+            // Copy user_messages and ai_messages
+            let user_messages = [...this.user_messages]
+            user_messages = this.user_messages.slice(0, -1).map(this.transformMessage);
+            let ai_messages = [...this.ai_messages]
+            if (this.ai_messages.length > 0){
+                ai_messages = ai_messages.map(this.transformMessage);
+            }
+            else{
+                ai_messages = [];
+            }
+
+            // Gt the last 5 messages
+            user_messages = user_messages.slice(-5);
+            ai_messages = ai_messages.slice(-5);
+
+            // Combine the two lists one element at a time
+            let history = this.combineMessages(user_messages, ai_messages);
+
             // get the last user message
             const last_user_message = this.user_messages[this.user_messages.length - 1];
+
             try {
-                const formData = new FormData();
-                formData.append("query",last_user_message.content);
-                    if (this.selectedDataType.length === 0){
-                        // Create a history variable that contains list of all user and ai messages
-                        // Convert sender key to type
-                        // Copy user_messages and ai_messages
-                        let user_messages = this.user_messages.slice(0, -1).map(this.transformMessage);
-                        let ai_messages = ''
-                        if (this.ai_messages.length > 0){
-                            ai_messages = this.ai_messages.map(this.transformMessage);
-                        }
-                        else{
-                            ai_messages = [];
-                        }
-                        // Combine the two lists one element at a time
-                        let history = this.combineMessages(user_messages, ai_messages);
-                        // Convert the history to a string and append to formData
-                        formData.append("history", JSON.stringify({"messages": history}));
-                        const response = await fetch("https://blaizzy--kulissiwa-chat-chat.modal.run/", {
-                            method: 'POST',
-                            body: formData,
-                        });
+                let index=''; // Index of the ai_messages array
+                let isFirstIteration = true;
+                if (this.selectedDataType.length === 0){
+                    
+                    const response = await fetch("https://kulissiwa.prince-gdt.workers.dev/api/v1/chat", {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            input: last_user_message.content,
+                            model_name: this.models[0].name,
+                            chat_history: history,
+                        }),
+                    });
 
-                        if (!response.body) {
-                            throw new Error('ReadableStream not supported');
-                        }
-                        const reader = response.body.getReader();
-                        const decoder = new TextDecoder('utf-8');
-
-                        let index=''; // Index of the ai_messages array
-                        this.scrollToBottom();
-                        let result = '';
-                        let isFirstIteration = true; // Is this the first iteration of the while loop?
-                        while (true) {
-                            const { value, done } = await reader.read();
-                            
-                            if (done) {
-                                break;
-                            }
-                            if (isFirstIteration) {
-                                index = this.ai_messages.push({sender: "ai"}) - 1;
-                                isFirstIteration = false;
-                            }
-                            let chunk = decoder.decode(value, { stream: true }).replace(/data: /g, '').trim();
-            
-                            // Split the chunk by new lines
-                            const words = chunk.split('\n');
-
-                            // If there's more than one word, join them into a single string
-                            if (words.length > 1) {
-                                chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
-                            }
-                        
-                            result += chunk.replace(/^"(.*)"$/, '$1');
-
-                            this.ai_messages[index].content = result;
-                            
-                            this.highlightCode();
-                        }
-                        
-                    } else{
-                        formData.append("data_source", this.selectedDataType);
-                        formData.append("namespace", user_session.user.id);
-                        
-
-                        const response = await fetch("https://blaizzy--kulissiwa-chat-with-sources-chat-with-sources.modal.run", {
-                            method: 'POST',
-                            body: formData,
-                        });
-
-                        if (!response.body) {
-                            throw new Error('ReadableStream not supported');
-                        }
-                        const reader = response.body.getReader();
-                        const decoder = new TextDecoder('utf-8');
-                        this.scrollToBottom();
-                        function isJSON(chunk) {
-                            if (typeof chunk !== 'string') return false;
-                            // Locate the delimiters
-                            let startIndex = chunk.indexOf('||JSON_START||');
-                            let endIndex = chunk.indexOf('||JSON_END||');
-
-                            if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
-                                return false;
-                            }
-
-                            // Extract potential JSON (considering the length of '||JSON_START||' to get the actual JSON start)
-                            const potentialJSON = chunk.substring(startIndex + '||JSON_START||'.length, endIndex);
-
-
-                            try {
-                                let parsed = JSON.parse(potentialJSON);  
-                                return parsed && typeof parsed === 'object' && Array.isArray(parsed.source_documents) && parsed.source_documents.length >= 0;
-                            } catch (e) {
-                                return false;
-                            }
-                        }
-                        let result = ''; // The final result
-                        let jsonBuffer = ''; // Buffer for potential JSON strings
-                        let collectingJSON = false; // Are we currently collecting a JSON string?   
-                        let response_dict = '';
-                        let index=''; // Index of the ai_messages array
-                        let isFirstIteration = true; // Is this the first iteration of the while loop?
-                        while (true) {
-                            const { value, done } = await reader.read();
-                            
-                            if (done) {
-                                break;
-                            }
-
-                            let chunk = decoder.decode(value, { stream: true }).replace(/data: /g, '').trim();
-            
-                            // Split the chunk by new lines
-                            const words = chunk.split('\n');
-
-                            if (isFirstIteration) {
-                                index = this.ai_messages.push({sender: "ai"}) - 1;
-                                isFirstIteration = false;
-                            }
-                            // If there's more than one word, join them into a single string
-                            if (words.length > 1) {
-                                chunk = words.map(word => word.replace(/^"(.*)"$/, '$1')).join('');
-                            }
-                            if (collectingJSON || chunk.includes('||JSON_START||')) {
-                                jsonBuffer += chunk;
-
-                                // Only attempt parsing if we detect the end delimiter
-                                if (jsonBuffer.includes('||JSON_END||')) {
-                                    if (isJSON(jsonBuffer)) {
-                                        let cleanedString = jsonBuffer.replace(/[\cA-\cZ]/g, "");
-                                        result += cleanedString.split('||JSON_START||')[0];
-                                        this.ai_messages[index].content = result;
-                                        
-                                        let startIndex = cleanedString.indexOf('||JSON_START||');
-                                        let endIndex = cleanedString.indexOf('||JSON_END||');
-                                        response_dict = JSON.parse(cleanedString.substring(startIndex + '||JSON_START||'.length, endIndex));
-                                        if (response_dict.source_documents.length > 0) {
-                                            // replace the source id with the source name
-                                            if (response_dict.source_documents){ 
-                                                response_dict.source_documents.forEach(item => {
-                                                    let id = item.metadata.source;
-                                                    item.metadata.source = this.getSourceName(id);
-                                                });
-                                            }else{
-                                                response_dict = {source_documents: []};
-                                            }
-                                            this.ai_messages[index].source_documents = response_dict.source_documents;
-                                            
-                                        }
-
-                                        // Reset the buffer and collecting state
-                                        jsonBuffer = '';
-                                        collectingJSON = false;
-                                    } else {
-                                        // If not a valid JSON, just add to result and reset the buffer and collecting state
-                                        result += jsonBuffer;
-                                        this.ai_messages[index].content = result;
-                                        jsonBuffer = '';
-                                        collectingJSON = false;
-                                    }
-                                } else {
-                                    collectingJSON = true;
-                                }
-                            } else {
-                                result += chunk.replace(/^"(.*)"$/, '$1');
-                                this.ai_messages[index].content = result;
-                            }
-                            this.highlightCode();
-                        }
-                        
+                    if (!response.body) {
+                        throw new Error('ReadableStream not supported');
                     }
-                             
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder(); 
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        
+                        if (done) {
+                            break;
+                        }
+                        
+                        let chunk = decoder.decode(value, { stream: true });
+                        for (const message of chunk.split('\n\n')) {
+                            const dataLineIndex = message.indexOf('data:');
+                            if (dataLineIndex >= 0) {
+                                const dataLine = message.slice(dataLineIndex + 5).trim();   
+                                if (dataLine.includes('/streamed_output/-')){
+                                    const data = JSON.parse(dataLine);
+                                     
+                                    if (isFirstIteration) {
+                                        index = this.ai_messages.push({sender: "ai", content: ''}) - 1;
+                                        isFirstIteration = false;
+                                    }                             
+                                    this.ai_messages[index].content += data.ops[0].value;                        
+                                    
+                                } 
+                            }
+                        }
+                    }   
+                } else {
+                    
+                    const response = await fetch("https://kulissiwa.prince-gdt.workers.dev/api/v1/chat/sources", {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            input: last_user_message.content,
+                            model_name: this.models[0].name,
+                            namespace: user_session.user.id,
+                            data_source: this.selectedDataType,
+                            chat_history: history,
+                        }),
+                    });
+
+                    if (!response.body) {
+                        throw new Error('ReadableStream not supported');
+                    }
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+            
+                    let response_dict = '';
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        
+                        if (done) {
+                            break;
+                        }
+                        let chunk = decoder.decode(value, { stream: true });
+                        for (const message of chunk.split('\n\n')) {
+                            const dataLineIndex = message.indexOf('data:');
+                            if (dataLineIndex >= 0) {
+                                const dataLine = message.slice(dataLineIndex + 5).trim();
+                                const data = JSON.parse(dataLine);
+                                console.log(data);
+                                if (data.ops[0].path === '/logs/FindDocs/final_output') {
+                                    if (isFirstIteration) {
+                                        index = this.ai_messages.push({sender: "ai", content: ''}) - 1;
+                                        isFirstIteration = false;
+                                    }
+                                    if (data.ops[0].value.output.length > 0) {
+                                        response_dict = JSON.parse(JSON.stringify(data.ops[0].value.output));
+                                        response_dict.forEach(item => {
+                                            let id = item.metadata.source;
+                                            item.metadata.source = this.getSourceName(id);
+                                        });
+                                        this.ai_messages[index].source_documents = response_dict;
+                                    }  
+                                }
+                                if (data.ops[0].path === '/streamed_output/-') {                                
+                                    this.ai_messages[index].content += data.ops[0].value;                        
+                                }
+                            }
+                        }
+                    }   
+                }      
             } catch (err) {
                 console.log(err);
             } finally {
@@ -932,12 +875,12 @@ export default {
                 [
                     {
                         conversation_id: this.conversationId, 
-                        sender: this.user_messages[this.user_messages.length - 1]["sender"], content: this.user_messages[this.user_messages.length - 1]["content"] , 
+                        sender: "human", content: this.user_messages[this.user_messages.length - 1]["content"] , 
                         source_documents: []
                     },
                     {
                         conversation_id: this.conversationId,
-                        sender: this.ai_messages[this.ai_messages.length - 1]["sender"], content: this.ai_messages[this.ai_messages.length - 1]["content"], 
+                        sender: "ai", content: this.ai_messages[this.ai_messages.length - 1]["content"], 
                         source_documents: this.ai_messages[this.ai_messages.length - 1]["source_documents"]
                     }
                 ]

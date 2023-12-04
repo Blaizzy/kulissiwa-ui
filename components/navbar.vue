@@ -29,13 +29,7 @@
                     <span v-show="!collapsed" class="pl-1.5">Chats</span>
                 </ClientOnly>
             </NuxtLink>
-            <NuxtLink to="/copilot" class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-sky-50"
-            :class="{'bg-sky-100': isSelectedMenu('/copilot'), 'justify-center': collapsed}">
-                <ClientOnly>
-                    <i class="fa-solid fa-robot"></i>
-                    <span v-show="!collapsed" class="pl-1.5">AI Copilot</span>
-                </ClientOnly>
-            </NuxtLink>
+            
             
             <NuxtLink to="/billing" class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-sky-50" v-show="!showUpgradeButton"
             :class="{'bg-sky-100': isSelectedMenu('/billing'), 'justify-center': collapsed}">
@@ -126,6 +120,22 @@ export default {
                 }
                     
             } else if (event === 'SIGNED_OUT') {
+                const { data, error } = supabase
+                    .from('monthly_usage')
+                    .update([
+                        { 
+                            files_uploaded: this.monthly_usage.filesUploaded,
+                            messages_sent: this.monthly_usage.messagesSent,
+                            active_data_sources: this.monthly_usage.activeDataSourcesCount,
+                        }
+                    ])
+                    .eq('user_id', this.store.user_session.user.id)
+                    .eq('year_month', new Date().toISOString().slice(0,7))
+
+                if (error) {
+                    console.log(error)
+                }
+
                 this.store.signOut()
                 this.monthly_usage.reset()
                 this.tier_limits.reset()
@@ -134,12 +144,27 @@ export default {
             }
         });
 
-        watchEffect(() => {
+        watchEffect(async() => {
             if (this.store.user_session) {
                 this.getActiveDataSourcesCount(supabase)
                 this.getSubscription(supabase)
                 this.getTiers(supabase)
 
+            }
+            if (this.monthly_usage.filesUploaded){
+                const { data, error } = await supabase
+                    .from('monthly_usage')
+                    .update([
+                        { 
+                            files_uploaded: this.monthly_usage.filesUploaded,
+                        }
+                    ])
+                    .eq('user_id', this.store.user_session.user.id)
+                    .eq('year_month', new Date().toISOString().slice(0,7))
+                
+                if (error) {
+                    console.log(error)
+                }
             }
         })
         
@@ -176,6 +201,8 @@ export default {
             } 
             if (data) {
                 this.tier_limits.updateTiers(data)
+                const tier_id = data.filter(tier => tier.name === this.monthly_usage.tier)[0].id
+                this.monthly_usage.updateTierId(tier_id)
             }
         },
         async getSubscription(supabase){
@@ -214,11 +241,35 @@ export default {
             }
             if (monthly_usage) {
                 if (monthly_usage.length === 0) {
+                    const tier_id = this.monthly_usage.tier_id
+                    const user_id = this.store.user_session.user.id
+                    const files_uploaded = 0
+                    const messages_sent = this.monthly_usage.messagesSent
+                    const active_data_sources = this.monthly_usage.activeDataSourcesCount
+                    const year_month = new Date().toISOString().slice(0,7)
+
+                    const { data, error } = await supabase
+                        .from('monthly_usage')
+                        .insert([
+                            { 
+                                user_id: user_id,
+                                tier_id: tier_id,
+                                files_uploaded: files_uploaded,
+                                messages_sent: messages_sent,
+                                year_month: year_month,
+                                active_data_sources: active_data_sources,
+                            }
+                        ])
+                    if (error) {
+                        console.log(error)
+                    }
+
                     this.monthly_usage.updateUsage({
-                        files_uploaded: 0,
-                        messages_sent: 0,
-                        year_month: new Date().toISOString().slice(0,7)
+                        files_uploaded: files_uploaded,
+                        messages_sent: messages_sent,
+                        year_month: year_month,
                     })
+
                 } else {
                     this.monthly_usage.updateUsage(monthly_usage[0])
                 }
