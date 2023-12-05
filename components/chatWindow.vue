@@ -860,7 +860,11 @@ export default {
                                             this.ai_messages[index].source_documents = response_dict;
                                         }  
                                     }
-                                    if (data.ops[0].path === '/streamed_output/-') {                                
+                                    if (data.ops[0].path === '/streamed_output/-') { 
+                                        if (isFirstIteration) {
+                                            index = this.ai_messages.push({sender: "ai", content: ''}) - 1;
+                                            isFirstIteration = false;
+                                        }                                 
                                         this.ai_messages[index].content += data.ops[0].value;                        
                                     }
                                 }
