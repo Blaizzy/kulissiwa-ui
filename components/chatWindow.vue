@@ -759,99 +759,122 @@ export default {
             try {
                 let index=''; // Index of the ai_messages array
                 let isFirstIteration = true;
-                if (this.selectedDataType.length === 0){
+                
                     
-                    const response = await fetch("https://kulissiwa.prince-gdt.workers.dev/api/v1/chat", {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            input: last_user_message.content,
-                            model_name: this.models[0].name,
-                            chat_history: history,
-                        }),
-                    });
+                const response = await fetch("https://kulissiwa.prince-gdt.workers.dev/api/v1/chat", {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        input: last_user_message.content,
+                        model_name: this.models[0].name,
+                        chat_history: history,
+                    }),
+                });
 
-                    if (!response.body) {
-                        throw new Error('ReadableStream not supported');
-                    }
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder(); 
-                    while (true) {
-                        const { value, done } = await reader.read();
-                        
-                        if (done) {
-                            break;
-                        }
-                        
-                        let chunk = decoder.decode(value, { stream: true });
-                        for (const message of chunk.split('\n\n')) {
-                            const dataLineIndex = message.indexOf('data:');
-                            if (dataLineIndex >= 0) {
-                                const dataLine = message.slice(dataLineIndex + 5).trim();   
-                                if (dataLine.includes('/streamed_output/-')){
-                                    const data = JSON.parse(dataLine);
-                                     
-                                    if (isFirstIteration) {
-                                        index = this.ai_messages.push({sender: "ai", content: ''}) - 1;
-                                        isFirstIteration = false;
-                                    }                             
-                                    this.ai_messages[index].content += data.ops[0].value;                        
-                                    
-                                } 
-                            }
-                        }
-                    }   
-                } else {
+                if (!response.body) {
+                    throw new Error('ReadableStream not supported');
+                }
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder(); 
+                let func_args = null;
+                while (true) {
+                    const { value, done } = await reader.read();
                     
-                    const response = await fetch("https://kulissiwa.prince-gdt.workers.dev/api/v1/chat/sources", {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            input: last_user_message.content,
-                            model_name: this.models[0].name,
-                            namespace: user_session.user.id,
-                            data_source: this.selectedDataType,
-                            chat_history: history,
-                        }),
-                    });
-
-                    if (!response.body) {
-                        throw new Error('ReadableStream not supported');
+                    if (done) {
+                        break;
                     }
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder();
-            
-                    let response_dict = '';
-                    while (true) {
-                        const { value, done } = await reader.read();
-                        
-                        if (done) {
-                            break;
-                        }
-                        let chunk = decoder.decode(value, { stream: true });
-                        for (const message of chunk.split('\n\n')) {
-                            const dataLineIndex = message.indexOf('data:');
-                            if (dataLineIndex >= 0) {
-                                const dataLine = message.slice(dataLineIndex + 5).trim();
+                    
+                    let chunk = decoder.decode(value, { stream: true });
+                    for (const message of chunk.split('\n\n')) {
+                        const dataLineIndex = message.indexOf('data:');
+                        if (dataLineIndex >= 0) {
+                            const dataLine = message.slice(dataLineIndex + 5).trim();  
+                            if (dataLine.includes('function_call')) {
                                 const data = JSON.parse(dataLine);
-                                if (data.ops[0].path === '/logs/FindDocs/final_output') {
-                                    if (isFirstIteration) {
-                                        index = this.ai_messages.push({sender: "ai", content: ''}) - 1;
-                                        isFirstIteration = false;
+                                if (data.ops[0].path === '/final_output'){
+                                    const action = data.ops[0].value.kwargs.additional_kwargs
+                                    if (action.function_call.name === 'retriever'){
+                                        func_args = JSON.parse(action.function_call.arguments)
+                                        break;
                                     }
-                                    if (data.ops[0].value.output.length > 0) {
-                                        response_dict = JSON.parse(JSON.stringify(data.ops[0].value.output));
-                                        response_dict.forEach(item => {
-                                            let id = item.metadata.source;
-                                            item.metadata.source = this.getSourceName(id);
-                                        });
-                                        this.ai_messages[index].source_documents = response_dict;
-                                    }  
                                 }
-                                if (data.ops[0].path === '/streamed_output/-') {                                
-                                    this.ai_messages[index].content += data.ops[0].value;                        
+
+                            } else if (dataLine.includes('/logs/ChatOpenAI/streamed_output_str/-')){
+                                const data = JSON.parse(dataLine);
+                                if (isFirstIteration && data.ops[0].value !== '') {
+                                    index = this.ai_messages.push({sender: "ai", content: ''}) - 1;
+                                    isFirstIteration = false;
+                                }    
+                                if (index !== '') {                         
+                                    this.ai_messages[index].content += data.ops[0].value; 
+                                }                       
+                                
+                            } 
+                        }
+                    }
+                }   
+
+                if (func_args) {
+                    if (this.selectedDataType.length > 0) {
+                     
+                        const response = await fetch("https://kulissiwa.prince-gdt.workers.dev/api/v1/chat/sources", {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                input: func_args.user_query,
+                                model_name: this.models[0].name,
+                                namespace: user_session.user.id,
+                                data_source: this.selectedDataType,
+                                chat_history: history,
+                            }),
+                        });
+
+                        if (!response.body) {
+                            throw new Error('ReadableStream not supported');
+                        }
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder();
+                
+                        let response_dict = '';
+                        while (true) {
+                            const { value, done } = await reader.read();
+                            
+                            if (done) {
+                                break;
+                            }
+                            let chunk = decoder.decode(value, { stream: true });
+                            for (const message of chunk.split('\n\n')) {
+                                const dataLineIndex = message.indexOf('data:');
+                                if (dataLineIndex >= 0) {
+                                    const dataLine = message.slice(dataLineIndex + 5).trim();
+                                    const data = JSON.parse(dataLine);
+                                    if (data.ops[0].path === '/logs/FindDocs/final_output') {
+                                        if (data.ops[0].value.output.length > 0) {
+                                            response_dict = JSON.parse(JSON.stringify(data.ops[0].value.output));
+                                            response_dict.forEach(item => {
+                                                let id = item.metadata.source;
+                                                item.metadata.source = this.getSourceName(id);
+                                            });
+                                            if (isFirstIteration) {
+                                                index = this.ai_messages.push({sender: "ai", content: ''}) - 1;
+                                                isFirstIteration = false;
+                                            }  
+                                            this.ai_messages[index].source_documents = response_dict;
+                                        }  
+                                    }
+                                    if (data.ops[0].path === '/streamed_output/-') {                                
+                                        this.ai_messages[index].content += data.ops[0].value;                        
+                                    }
                                 }
                             }
-                        }
-                    }   
+                        }   
+                    } else {
+                        if (isFirstIteration) {
+                            index = this.ai_messages.push({sender: "ai", content: ''}) - 1;
+                            isFirstIteration = false;
+                        }  
+                        this.ai_messages[index].content = 
+                            "No data sources active. Please select a data source to search from. \n\n" +
+                            `Click on the database icon on the bottom right corner of the chat window to select a data source or add a new one [here](/dataSources).`;
+                    }
                 }      
             } catch (err) {
                 console.log(err);
