@@ -17,7 +17,7 @@
           <div class="rounded-full p-3"
           >
             <h3 
-            :class="{'animated-gradient-text font-bold text-2xl': price.product.name == 'Pro', 'text-gray-700 font-semibold text-lg': price.product.name != 'Pro'}"
+            :class="{'animated-gradient-text font-bold text-2xl': price.product.name == 'Premium', 'text-gray-700 font-semibold text-lg': price.product.name != 'Premium'}"
             >{{ price.product.name }}</h3>
           </div>
           <div class="flex items-center py-1">
@@ -80,6 +80,8 @@ export default {
     try {
         const response = await fetch('/api/stripe/get-prices');
         const data = await response.json();
+        // sort prices by price
+        data.data.sort((a, b) => a.unit_amount_decimal - b.unit_amount_decimal);
         
         if (data) {
             this.prices = data.data.filter(price => price.product && price.product.active);
