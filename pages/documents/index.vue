@@ -160,20 +160,28 @@ definePageMeta({
         :class="noDataFound ? 'flex justify-center items-center' : ''"
         >
             <div class="flex justify-center items-center" v-if="noDataFound">
-                    <div class="flex justify-center items-center flex-col">
+                    <div class="flex justify-center items-center flex-col" v-if="canUploadDataSource()">
                         <img src="~~/assets/logos/No-documents-found.png" alt="No Documents Found" class="md:w-1/2 max-lg:w-auto"> 
                         <h1 class="text-2xl font-semibold m-1">No documents found</h1>
                         <h2 class="text-lg m-1">Upload a new document to get started.</h2>
-                        <button v-if="canUploadDataSource()" @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white py-1 gradient-border rounded-full px-2 shadow-lg hover:scale-105">
+                        <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white py-1 gradient-border rounded-full px-2 shadow-lg hover:scale-105">
                             <ClientOnly>
                                 <i class="fa-solid fa-circle-arrow-up"></i> <span class="pl-1 font-medium">Upload</span>
                             </ClientOnly>
                         </button>
-                        <button v-else @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white py-1 gradient-border rounded-full px-2 shadow-lg hover:scale-105">
-                            <ClientOnly>
-                                <i class="fa-solid fa-gift"></i> <span class="pl-1 font-medium">Upgrade</span>
-                            </ClientOnly>
-                        </button>
+                    </div>
+                    <div class="flex justify-center items-center flex-col" v-else @click="newDataSource();">
+                        <i class="fa-solid fa-circle-exclamation fa-2xl text-red-500"></i>
+                        <h1 class="text-2xl font-semibold m-1">Exceeded upload limit</h1>
+                        <h2 class="text-lg m-1">In the FREE plan, you are limited to uploading only 1 file.</h2>
+                        <NuxtLink to="/checkout">
+                            <button class="text-white py-1 gradient-border rounded-full px-2 shadow-lg hover:scale-105" >
+                                <ClientOnly>
+                                    <i class="fa-solid fa-gift"></i> <span class="pl-1 font-medium">Upgrade</span>
+                                </ClientOnly>
+                            </button>
+                        </NuxtLink>
+
                     </div>
                 </div>
 
