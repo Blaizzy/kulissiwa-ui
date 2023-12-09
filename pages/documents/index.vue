@@ -435,7 +435,7 @@ export default {
                 await this.updateSelectedDataSources(true);
             } else {
                 dataSource.is_active = false;
-                this.onShowFailure('You have reached your active data sources limit. Please upgrade your plan to activate more data sources.');
+                this.onShowFailure('Exceed active data sources limit. Please upgrade your plan to activate more data sources.');
             } 
         },
         async updateSelectedDataSources(upsert = false) {
@@ -645,7 +645,7 @@ export default {
             if (this.canUploadDataSource()) {
                 this.newDataSourceModalOpen = true;
             } else {
-                this.onShowFailure('You have reached your file upload limit. Please upgrade your plan to upload more files');
+                this.onShowFailure('Exceeded your file upload limit. Please upgrade your plan to upload more files');
             }
         },
         closeNewDataSource() {
