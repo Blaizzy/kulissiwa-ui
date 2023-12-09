@@ -14,9 +14,7 @@ export const useMonthlyUsageStore = defineStore('monthly_usage',() => {
     function updateSubscription(data: any) {
         stripe_customer_id.value = data.stripe_customer_id
         tier.value = data.tier
-
         status.value = data.status
-        
     }
 
     function updateUsage(data: any) {

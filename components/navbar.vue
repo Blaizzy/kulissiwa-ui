@@ -14,11 +14,11 @@
             <button v-show="collapsed" @click="collapse" class="block py-2 px-2 mb-2 font-bold rounded-full hover:bg-sky-50">
                 <Bars3Icon class="w-4 h-4 text-gray-600 "/>
             </button>
-            <NuxtLink to="/dataSources" class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-sky-50"
-            :class="{'bg-sky-100': isSelectedMenu('/dataSources'), 'justify-center': collapsed}">
+            <NuxtLink to="/documents" class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-sky-50"
+            :class="{'bg-sky-100': isSelectedMenu('/documents'), 'justify-center': collapsed}">
                 <ClientOnly>
                     <i class="fa-solid fa-database"></i> 
-                    <span v-show="!collapsed" class="pl-1.5">Data Sources</span>    
+                    <span v-show="!collapsed" class="pl-1.5">Documents</span>    
                 </ClientOnly>
 
             </NuxtLink>
@@ -149,14 +149,32 @@ export default {
                 this.getActiveDataSourcesCount(supabase)
                 this.getSubscription(supabase)
                 this.getTiers(supabase)
-
             }
+            
+            // Update Files Uploaded
             if (this.monthly_usage.filesUploaded){
                 const { data, error } = await supabase
                     .from('monthly_usage')
                     .update([
                         { 
                             files_uploaded: this.monthly_usage.filesUploaded,
+                        }
+                    ])
+                    .eq('user_id', this.store.user_session.user.id)
+                    .eq('year_month', new Date().toISOString().slice(0,7))
+                
+                if (error) {
+                    console.log(error)
+                }
+            }
+            
+            // Update Tier ID
+            if (this.monthly_usage.tier_id) {
+                const { data, error } = await supabase
+                    .from('monthly_usage')
+                    .update([
+                        { 
+                            tier_id: this.monthly_usage.tier_id,
                         }
                     ])
                     .eq('user_id', this.store.user_session.user.id)
@@ -201,8 +219,10 @@ export default {
             } 
             if (data) {
                 this.tier_limits.updateTiers(data)
-                const tier_id = data.filter(tier => tier.name === this.monthly_usage.tier)[0].id
-                this.monthly_usage.updateTierId(tier_id)
+                if (this.monthly_usage.tier_id) {
+                    const tier = data.filter(tier => tier.id === this.monthly_usage.tier_id)[0]
+                    this.monthly_usage.updateTier(tier)
+                }
             }
         },
         async getSubscription(supabase){

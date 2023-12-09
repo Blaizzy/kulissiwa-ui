@@ -55,7 +55,7 @@
                     </div>
                     
                     <div>       
-                        <p class="font-semibold text-md">Data Sources</p>
+                        <p class="font-semibold text-md">Documents</p>
                         <p class="text-gray-500 text-xs">{{ getActiveDataSourcesCount() }} active</p>
                     </div>     
                 </div>
@@ -231,7 +231,7 @@
                 </button>
 
             </div>
-            <button class="py-2 px-4 ml-2 rounded-full inline-flex items-center" @click="showModal=true" :class="{'hover:text-gray-500 text-gray-500': !hasDataSources, 'hover:border-gray-300 border-2 border-gray-200 text-gray-500': hasDataSources}">
+            <button class="py-2 px-4 ml-2 rounded-full inline-flex items-center" @click="showModal=true" :class="{'invisible': !hasDataSources, 'hover:border-gray-300 border-2 border-gray-200 text-gray-500': hasDataSources}">
                 <ClientOnly>
                     <i class="fas fa-database"></i>
                 </ClientOnly>

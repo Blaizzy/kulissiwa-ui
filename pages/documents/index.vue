@@ -8,7 +8,7 @@ definePageMeta({
      
         <div class="flex justify-between items-center pb-4 px-4 pt-4 border-b border-gray-200 w-full bg-white relative"> <!-- Added relative here -->
             <div class="flex">
-                <h1 class="text-xl font-semibold">Data sources</h1>
+                <h1 class="text-xl font-semibold">Documents</h1>
                 <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onShowSuccess('Data uploaded sucessfully')" @show-failure="onShowFailure('Data upload failed!')"  />
             </div>
             <div class="flex items-center">
@@ -40,7 +40,7 @@ definePageMeta({
             </div>
         </div>
 
-        <div class="flex mt-4 px-4 text-sm py-2">
+        <div class="flex mt-4 px-4 text-sm py-2" v-if="!noDataFound">
             <div class="mt-auto rounded-full flex  w-1/4 items-center px-2 border-2 border-gray-200 hover:border-gray-300 text-black">
                 <button class="px-2 text-gray-500 hover:text-black inline-flex items-center">
                     <ClientOnly>
@@ -56,7 +56,7 @@ definePageMeta({
             </div>
             <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white gradient-border rounded-full px-2 shadow-lg hover:scale-105 ml-5">
                 <ClientOnly>
-                    <i class="fa-solid fa-plus"></i> <span class="pl-1 font-medium">Add New</span>
+                    <i class="fa-solid fa-circle-arrow-up"></i> <span class="pl-1 font-medium">Upload</span>
                 </ClientOnly>
             </button>
             <div class="ml-3">
@@ -160,27 +160,28 @@ definePageMeta({
         :class="noDataFound ? 'flex justify-center items-center' : ''"
         >
             <div class="flex justify-center items-center" v-if="noDataFound">
-                    <div class="flex justify-center items-center flex-col">
+                    <div class="flex justify-center items-center flex-col" v-if="canUploadDataSource()">
                         <img src="~~/assets/logos/No-documents-found.png" alt="No Documents Found" class="md:w-1/2 max-lg:w-auto"> 
-                        <h1 class="text-4xl font-semibold m-1">Empty folder</h1>
-                        <h2 class="text-2xl m-1">Start uploading files</h2>
-                        <ClientOnly>
-                            <ul class="items-center md:text-lg max-lg:text-xl">
-                            
-                                <li>
-                                    1. Click on the <i class="fa-solid fa-square-plus text-gray-500"></i> button
-                                </li>
-                                <li>
-                                    2. Select a file from your computer
-                                </li>
-                                <li>
-                                    3. Click on the <i class="fa-solid fa-upload text-gray-500"></i> button
-                                </li>
-                                <li>
-                                    4. Wait for the upload to finish
-                                </li>
-                            </ul>
-                        </ClientOnly>
+                        <h1 class="text-2xl font-semibold m-1">No documents found</h1>
+                        <h2 class="text-lg m-1">Upload a new document to get started.</h2>
+                        <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white py-1 gradient-border rounded-full px-2 shadow-lg hover:scale-105">
+                            <ClientOnly>
+                                <i class="fa-solid fa-circle-arrow-up"></i> <span class="pl-1 font-medium">Upload</span>
+                            </ClientOnly>
+                        </button>
+                    </div>
+                    <div class="flex justify-center items-center flex-col" v-else @click="newDataSource();">
+                        <i class="fa-solid fa-circle-exclamation fa-2xl text-red-500"></i>
+                        <h1 class="text-2xl font-semibold m-1">Exceeded upload limit</h1>
+                        <h2 class="text-lg m-1">In the FREE plan, you are limited to uploading only 1 file.</h2>
+                        <NuxtLink to="/checkout">
+                            <button class="text-white py-1 gradient-border rounded-full px-2 shadow-lg hover:scale-105" >
+                                <ClientOnly>
+                                    <i class="fa-solid fa-gift"></i> <span class="pl-1 font-medium">Upgrade</span>
+                                </ClientOnly>
+                            </button>
+                        </NuxtLink>
+
                     </div>
                 </div>
 
@@ -401,22 +402,27 @@ export default {
             this.isFetchingDataSource = false
         },
         canUploadDataSource() {
-            const filesUploaded = this.monthly_usage.filesUploaded;   
-            const tier_limit = this.tier_limits.tiers.find(tier => tier.name === this.monthly_usage.tier);
-            if (tier_limit === undefined) {
-                return false;
+            const filesUploaded = this.monthly_usage.filesUploaded; 
+            let tier_mame = this.monthly_usage.tier; 
+            if (this.monthly_usage.tier == null) {
+                tier_mame = 'FREE';
             }
+            const tier_limit = this.tier_limits.tiers.find(tier => tier.name === tier_mame);
+        
             if (tier_limit.file_limit === -1) {
                 return true;
             }         
+           
             return filesUploaded < tier_limit.file_limit;
         },
         canActivateMoreDataSources() {
             const active_data_sources = this.monthly_usage.activeDataSourcesCount;
-            const tier_limit = this.tier_limits.tiers.find(tier => tier.name === this.monthly_usage.tier);
-            if (tier_limit === undefined) {
-                return false;
+            let tier_mame = this.monthly_usage.tier; 
+            if (this.monthly_usage.tier == null) {
+                tier_mame = 'FREE';
             }
+            const tier_limit = this.tier_limits.tiers.find(tier => tier.name === tier_mame);
+
             if (tier_limit.active_data_sources_limit === -1) {
                 return true;
             }

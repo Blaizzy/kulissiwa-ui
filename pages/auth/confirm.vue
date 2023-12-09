@@ -13,7 +13,7 @@ export default {
         watchEffect(() => {
             const user = useSupabaseUser()
             if (user.value) {
-                navigateTo('/chats')
+                navigateTo('/documents')
             }
         })
     },
