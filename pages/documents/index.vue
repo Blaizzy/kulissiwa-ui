@@ -164,9 +164,14 @@ definePageMeta({
                         <img src="~~/assets/logos/No-documents-found.png" alt="No Documents Found" class="md:w-1/2 max-lg:w-auto"> 
                         <h1 class="text-2xl font-semibold m-1">No documents found</h1>
                         <h2 class="text-lg m-1">Upload a new document to get started.</h2>
-                        <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white py-1 gradient-border rounded-full px-2 shadow-lg hover:scale-105">
+                        <button v-if="canUploadDataSource()" @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white py-1 gradient-border rounded-full px-2 shadow-lg hover:scale-105">
                             <ClientOnly>
                                 <i class="fa-solid fa-circle-arrow-up"></i> <span class="pl-1 font-medium">Upload</span>
+                            </ClientOnly>
+                        </button>
+                        <button v-else @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white py-1 gradient-border rounded-full px-2 shadow-lg hover:scale-105">
+                            <ClientOnly>
+                                <i class="fa-solid fa-gift"></i> <span class="pl-1 font-medium">Upgrade</span>
                             </ClientOnly>
                         </button>
                     </div>
@@ -395,18 +400,20 @@ export default {
                 tier_mame = 'FREE';
             }
             const tier_limit = this.tier_limits.tiers.find(tier => tier.name === tier_mame);
+        
             if (tier_limit.file_limit === -1) {
                 return true;
             }         
+           
             return filesUploaded < tier_limit.file_limit;
         },
         canActivateMoreDataSources() {
             const active_data_sources = this.monthly_usage.activeDataSourcesCount;
-            const tier_limit = this.tier_limits.tiers.find(tier => tier.name === this.monthly_usage.tier);
             let tier_mame = this.monthly_usage.tier; 
             if (this.monthly_usage.tier == null) {
                 tier_mame = 'FREE';
             }
+            const tier_limit = this.tier_limits.tiers.find(tier => tier.name === tier_mame);
 
             if (tier_limit.active_data_sources_limit === -1) {
                 return true;
