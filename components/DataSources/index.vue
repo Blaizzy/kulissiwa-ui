@@ -235,6 +235,7 @@ export default {
   data() {
     const store = useAuthStore()
     const monthly_usage_store = useMonthlyUsageStore()
+    const config = useRuntimeConfig()
     return {
       store: store,
       monthly_usage_store: monthly_usage_store,
@@ -266,7 +267,7 @@ export default {
         'text': '/images/text.png',
       },
       isDragging: false,
-
+      config: config,
     };
   },
   methods: {
@@ -336,6 +337,7 @@ export default {
       return new Promise((resolve, reject) => {
         const worker = new EmbedURLWorker();
         worker.postMessage({
+          data_api: this.config.public.dataAPI,
           data: file.data,  
           data_source: data_source, 
           namespace: user_session.user.id,
@@ -369,6 +371,7 @@ export default {
         const worker = new MyWorker();
         worker.postMessage({
           action: action,
+          data_api: this.config.public.dataAPI,
           data: file.data,  
           data_source: data_source, 
           namespace: user_session.user.id,

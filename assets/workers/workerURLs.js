@@ -1,5 +1,5 @@
 self.addEventListener('message', async (event) => {
-    const { data,  data_source, namespace, data_type, crawl, excluded_urls} = event.data;
+    const { data_api, data,  data_source, namespace, data_type, crawl, excluded_urls} = event.data;
     const formData = new FormData();
     formData.append("data", data);
     formData.append("namespace", namespace);
@@ -7,17 +7,14 @@ self.addEventListener('message', async (event) => {
     formData.append("data_type", data_type);
     formData.append("crawl", crawl);
     formData.append("excluded_urls", excluded_urls);
-
-    const response = await fetch("https://blaizzy--kulissiwa-data-data.modal.run/embed_url", {
+    
+    const response = await fetch(data_api + `/embed_url`, {
         method: 'POST',
         body: formData,
     });
 
     if (!response.ok) {
-        this.error = "Error embedding data, please refresh and try again"
-        setTimeout(() => {
-        this.error = ""
-        }, 2000);
+        postMessage({ error: "Error embedding data, please refresh and try again" });
     }
 
     const reader = response.body.getReader();

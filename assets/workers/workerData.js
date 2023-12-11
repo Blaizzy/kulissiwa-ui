@@ -1,12 +1,10 @@
-let progressCounter = 1;
-
 self.addEventListener('message', async (event) => {
 
-    const { action, data,  data_source, namespace, data_type, is_file} = event.data;
+    const { action, data_api, data,  data_source, namespace, data_type, is_file} = event.data;
     switch(action) {
         case 'embedData':
             try {
-                const result = await processFileForEmbedding(data,  data_source, namespace, data_type, is_file); 
+                const result = await processFileForEmbedding(data_api, data,  data_source, namespace, data_type, is_file); 
                 postMessage(result);
             } catch (error) {
                 postMessage({ error: error.message });
@@ -17,7 +15,7 @@ self.addEventListener('message', async (event) => {
 });
 
 
-async function processFileForEmbedding(data,  data_source, namespace, data_type, is_file) {
+async function processFileForEmbedding(data_api, data,  data_source, namespace, data_type, is_file) {
     const formData = new FormData();
     if (is_file){
         formData.append("file", data);
@@ -27,8 +25,8 @@ async function processFileForEmbedding(data,  data_source, namespace, data_type,
     formData.append("namespace", namespace);
     formData.append("data_source", data_source);
     formData.append("data_type", data_type);
-
-    const response = await fetch("https://blaizzy--kulissiwa-data-data.modal.run/embed_data", {
+    
+    const response = await fetch(data_api + `/embed_data`, {
         method: 'POST',
         body: formData,
     });

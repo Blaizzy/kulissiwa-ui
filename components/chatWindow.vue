@@ -338,14 +338,16 @@ export default {
             // Convert the tokens back to HTML
             return marked.parser(tokens);
         };
+
         return {
-            renderMarkdown,
+            renderMarkdown
         };
 
     },
     data() {
         const store = useAuthStore();
         const monthly_usage = useMonthlyUsageStore();
+        const config = useRuntimeConfig()
         return {
             showModal: false,
             conversationId: '',
@@ -379,7 +381,8 @@ export default {
             isFetchingDataSource: false,
             models: [
                 {name: 'gpt-3.5-turbo-1106', selected: true},
-            ]
+            ],
+            config: config,
         };
     },
     async created() {
@@ -761,7 +764,7 @@ export default {
                 let isFirstIteration = true;
                 
                     
-                const response = await fetch("https://kulissiwa.prince-gdt.workers.dev/api/v1/chat", {
+                const response = await fetch(this.config.public.chatAPI + `/api/v1/chat`, {
                     method: 'POST',
                     body: JSON.stringify({
                         input: last_user_message.content,
@@ -816,7 +819,7 @@ export default {
                 if (func_args) {
                     if (this.selectedDataType.length > 0) {
                      
-                        const response = await fetch("https://kulissiwa.prince-gdt.workers.dev/api/v1/chat/sources", {
+                        const response = await fetch(this.config.public.chatAPI + `/api/v1/chat/sources`, {
                             method: 'POST',
                             body: JSON.stringify({
                                 input: func_args.user_query,
@@ -840,13 +843,15 @@ export default {
                             if (done) {
                                 break;
                             }
+
                             let chunk = decoder.decode(value, { stream: true });
+                            
                             for (const message of chunk.split('\n\n')) {
                                 const dataLineIndex = message.indexOf('data:');
                                 if (dataLineIndex >= 0) {
                                     const dataLine = message.slice(dataLineIndex + 5).trim();
-                                    const data = JSON.parse(dataLine);
-                                    if (data.ops[0].path === '/logs/FindDocs/final_output') {
+                                    if (dataLine.includes('/logs/FindDocs/final_output')) {
+                                        const data = JSON.parse(dataLine);
                                         if (data.ops[0].value.output.length > 0) {
                                             response_dict = JSON.parse(JSON.stringify(data.ops[0].value.output));
                                             response_dict.forEach(item => {
@@ -860,7 +865,8 @@ export default {
                                             this.ai_messages[index].source_documents = response_dict;
                                         }  
                                     }
-                                    if (data.ops[0].path === '/streamed_output/-') { 
+                                    if (dataLine.includes('/streamed_output/-')) { 
+                                        const data = JSON.parse(dataLine);
                                         if (isFirstIteration) {
                                             index = this.ai_messages.push({sender: "ai", content: ''}) - 1;
                                             isFirstIteration = false;
