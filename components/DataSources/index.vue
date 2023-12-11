@@ -255,8 +255,6 @@ export default {
         { label: 'Text', value: 'Text', disabled: false },
         { label: 'Docx', value: 'Docx', disabled: false },
         { label: 'URL', value: 'URL', disabled: false },
-        { label: 'CSV', value: 'CSV', disabled: true },
-        { label: 'Notion', value: 'Notion', disabled: true },
         // ... add more data types as needed
       ],
       fileIcons: {
