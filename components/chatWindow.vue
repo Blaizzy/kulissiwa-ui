@@ -779,6 +779,7 @@ export default {
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder(); 
                 let func_args = null;
+                let buffer = '';
                 while (true) {
                     const { value, done } = await reader.read();
                     
@@ -786,8 +787,13 @@ export default {
                         break;
                     }
                     
-                    let chunk = decoder.decode(value, { stream: true });
-                    for (const message of chunk.split('\n\n')) {
+                    buffer += decoder.decode(value, { stream: true });
+
+                    // Split the buffer into messages based on your event delimiter
+                    const messages = buffer.split('\n\n');
+                    buffer = messages.pop(); // Keep the last incomplete message in the buffer
+
+                    for (const message of messages) {
                         const dataLineIndex = message.indexOf('data:');
                         if (dataLineIndex >= 0) {
                             const dataLine = message.slice(dataLineIndex + 5).trim();  
@@ -837,6 +843,7 @@ export default {
                         const decoder = new TextDecoder();
                 
                         let response_dict = '';
+                        let buffer = '';
                         while (true) {
                             const { value, done } = await reader.read();
                             
@@ -844,9 +851,13 @@ export default {
                                 break;
                             }
 
-                            let chunk = decoder.decode(value, { stream: true });
-                            
-                            for (const message of chunk.split('\n\n')) {
+                            buffer += decoder.decode(value, { stream: true });
+
+                            // Split the buffer into messages based on your event delimiter
+                            const messages = buffer.split('\n\n');
+                            buffer = messages.pop(); // Keep the last incomplete message in the buffer
+
+                            for (const message of messages) {
                                 const dataLineIndex = message.indexOf('data:');
                                 if (dataLineIndex >= 0) {
                                     const dataLine = message.slice(dataLineIndex + 5).trim();
