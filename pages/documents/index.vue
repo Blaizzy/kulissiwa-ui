@@ -4,18 +4,22 @@ definePageMeta({
 });
 </script>
 <template>
-    <div class="flex flex-col h-full w-full">
+    <div class="flex flex-col items-center dark:text-gray-400 dark:bg-neutral-950 dark:rounded-l-lg">
      
-        <div class="flex justify-between items-center pb-4 px-4 pt-4 border-b border-gray-200 w-full bg-white relative"> <!-- Added relative here -->
-            <div class="flex">
-                <h1 class="text-xl font-semibold">Documents</h1>
-                <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onShowSuccess('Data uploaded sucessfully')" @show-failure="onShowFailure('Data upload failed!')"  />
-            </div>
-            <div class="flex items-center">
-                <a href="mailto:support@kulissiwa.com?subject=Help%20with%20Kulissiwa%20" target="_blank" class="cursor-pointer hover:underline">
-                    <p class="font-semibold text-sm">Help</p>
-                </a>
-            </div>
+        <div class="flex justify-between items-center pb-4 px-4 pt-4 w-1/3"> <!-- Added relative here -->
+            
+                <div class="flex">
+                    <h1 class="text-2xl dark:text-gray-200">Documents</h1>
+                    <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onShowSuccess('Data uploaded sucessfully')" @show-failure="onShowFailure('Data upload failed!')"  />
+                </div>
+                <div class="flex w-5 h-5">
+                    <a href="mailto:support@kulissiwa.com?subject=Help%20with%20Kulissiwa%20" target="_blank" class="cursor-pointer hover:text-white dark:text-gray-200 dark:hover:bg-sky-500 dark:hover:rounded-full">
+                        <ClientOnly>
+                            <i class="fa-solid fa-question-circle"></i>
+                        </ClientOnly>
+                    </a>
+                </div>
+
             <div class="flex absolute top-0 right-0"> <!-- Changed to absolute positioning -->
                 <div 
                     v-if="showSuccess" 
@@ -39,36 +43,36 @@ definePageMeta({
                 </div>
             </div>
         </div>
-
-        <div class="flex mt-4 px-4 text-sm py-2" v-if="!noDataFound">
-            <div class="mt-auto rounded-full flex  w-1/4 items-center px-2 border-2 border-gray-200 hover:border-gray-300 text-black">
+        <hr class="w-full border-gray-200 dark:border-neutral-800" />
+        <div class="flex mt-4 px-4 text-sm py-2 w-1/3" v-if="!noDataFound">
+            <div class="mt-auto rounded-full flex  w-1/2 items-center px-2 border-2 border-gray-200 hover:border-gray-300 dark:border-neutral-700 dark:hover:border-neutral-500">
                 <button class="px-2 text-gray-500 hover:text-black inline-flex items-center">
                     <ClientOnly>
                         <i class="fas fa-search"></i>
                     </ClientOnly>
                 </button>
-                <input type="search"  class="w-full px-1 py-2 rounded-full focus:outline-none bg-inherit" name="search_bar" placeholder="Search data sources..." v-model="searchQuery" @keyup.prevent="onKeyup">
+                <input type="search"  class="w-full px-1 py-2 rounded-full focus:outline-none bg-inherit dark:bg-neutral-950" name="search_bar" placeholder="Search data sources..." v-model="searchQuery" @keyup.prevent="onKeyup">
                 <button @click="clearSearch" v-show="searchQuery.length>0" class="px-2 text-gray-500 hover:text-black inline-flex items-center">
                     <ClientOnly>
                         <i class="fas fa-times"></i>
                     </ClientOnly>
                 </button>
             </div>
-            <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white gradient-border rounded-full px-2 shadow-lg hover:scale-105 ml-5">
+            <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white animated-gradient-bg rounded-full px-2 shadow-lg hover:scale-105 ml-5">
                 <ClientOnly>
                     <i class="fa-solid fa-circle-arrow-up"></i> <span class="pl-1 font-medium">Upload</span>
                 </ClientOnly>
             </button>
             <div class="ml-3">
-                <button @click="showSortOptions = !showSortOptions; showFilterOptions=false" class=" w-full h-full px-2 py-1 text-black border-2 border-gray-200 rounded-full  hover:border-gray-300 hover:text-black inline-flex items-center" v-if="!noDataFound && !isLoading">
+                <button @click="showSortOptions = !showSortOptions; showFilterOptions=false" class=" w-full h-full px-2 py-1 border-2 border-gray-200 rounded-full  hover:border-gray-300 inline-flex items-center dark:border-neutral-700 dark:hover:border-neutral-500" v-if="!noDataFound && !isLoading">
                     <ClientOnly>
                         <i class="fa-solid fa-arrow-up-wide-short"></i> <span class="pl-2">Sort</span>
                     </ClientOnly>
                 </button>
-                <div v-show="showSortOptions" class="absolute mt-2 w-48 rounded-md shadow-lg z-50 bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100" @click="showSortOptions = false;">
+                <div v-show="showSortOptions" class="absolute mt-2 w-48 rounded-md shadow-lg z-50 bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:bg-neutral-900" @click="showSortOptions = false;">
                     <div class="py-1">
                         
-                            <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click="sortData('asc')">
+                            <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-gray-300" @click="sortData('asc')">
                                 Sort Ascending
                                 <span v-show="isSort('asc')" class="float-right">
                                     <ClientOnly>
@@ -76,7 +80,7 @@ definePageMeta({
                                     </ClientOnly>
                                 </span>
                             </button>
-                            <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click="sortData('desc')">
+                            <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-gray-300" @click="sortData('desc')">
                                 Sort Descending
                                 <span v-show="isSort('desc')" class="float-right">
                                     <ClientOnly>
@@ -84,7 +88,7 @@ definePageMeta({
                                     </ClientOnly>
                                 </span>
                             </button>
-                            <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click="sortData('date')">
+                            <button class="block w-full text-left px-4 py-2 text-sm  hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-gray-300" @click="sortData('date')">
                                 Sort by Date
                                 <span v-show="isSort('date')" class="float-right">
                                     <ClientOnly>
@@ -97,14 +101,14 @@ definePageMeta({
             </div>
             <div class="ml-3">
                 <!-- Filter Button -->
-                <button @click="showFilterOptions = !showFilterOptions; showSortOptions=false" class="ml-2 w-full h-full px-2 py-1 text-black border-2 border-gray-200 rounded-full hover:border-gray-300 hover:text-black inline-flex items-center" v-if="!noDataFound && !isLoading">
+                <button @click="showFilterOptions = !showFilterOptions; showSortOptions=false" class="ml-2 w-full h-full px-2 py-1 border-2 border-gray-200 rounded-full hover:border-gray-300 inline-flex items-center dark:border-neutral-700 dark:hover:border-neutral-500" v-if="!noDataFound && !isLoading">
                     <ClientOnly>
                         <i class="fa fa-filter"></i> <span class="pl-2">Filter</span>
                     </ClientOnly> 
                 </button>
-                <div v-show="showFilterOptions" class="absolute mt-2 w-48 rounded-md shadow-lg z-50 bg-white ring-1 ring-black ring-opacity-5">
+                <div v-show="showFilterOptions" class="absolute mt-2 w-48 rounded-md shadow-lg z-50 bg-white ring-1 ring-black ring-opacity-5 dark:bg-neutral-900">
                     <div class="py-1">
-                        <button v-if="isFileTypeInDataSources('pdf')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click="selectFileType('pdf')">
+                        <button v-if="isFileTypeInDataSources('pdf')" class="block w-full text-left px-4 py-2 text-sm  hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-gray-300" @click="selectFileType('pdf')">
                             PDF
                             <span v-show="isFilter('pdf')" class="float-right">
                                 <ClientOnly>
@@ -112,7 +116,7 @@ definePageMeta({
                                 </ClientOnly>
                             </span>
                         </button>
-                        <button v-if="isFileTypeInDataSources('docx')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click.prevent="selectFileType('docx')">
+                        <button v-if="isFileTypeInDataSources('docx')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-gray-300" @click.prevent="selectFileType('docx')">
                             DOCX
                             <span v-show="isFilter('docx')" class="float-right">
                                 <ClientOnly>
@@ -120,7 +124,7 @@ definePageMeta({
                                 </ClientOnly>
                             </span>
                         </button>
-                        <button v-if="isFileTypeInDataSources('url')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click.prevent="selectFileType('url')">
+                        <button v-if="isFileTypeInDataSources('url')" class="block w-full text-left px-4 py-2 text-sm  hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-gray-300" @click.prevent="selectFileType('url')">
                             URL
                             <span v-show="isFilter('url')" class="float-right">
                                 <ClientOnly>
@@ -128,7 +132,7 @@ definePageMeta({
                                 </ClientOnly>
                             </span>
                         </button>
-                        <button v-if="isFileTypeInDataSources('text')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click.prevent="selectFileType('text')">
+                        <button v-if="isFileTypeInDataSources('text')" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-gray-300" @click.prevent="selectFileType('text')">
                             TEXT
                             <span v-show="isFilter('text')" class="float-right">
                                 <ClientOnly>
@@ -138,11 +142,11 @@ definePageMeta({
                         </button>
                         <!-- ... add more file types to filter by as needed ... -->
                     </div>
-                    <div class="flex justify-between border-t border-gray-200 mt-2">
-                        <button class="w-1/2 px-4 py-2 text-sm text-gray-700 border-r hover:bg-gray-100 hover:text-gray-900" @click="applyFilter">
+                    <div class="flex justify-between border-t border-gray-200 mt-2 dark:border-neutral-800">
+                        <button class="w-1/2 px-4 py-2 text-sm border-r dark:border-neutral-800 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-gray-300 rounded-l-lg" @click="applyFilter">
                             Apply
                         </button>
-                        <button class="w-1/2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" @click="resetFilter">
+                        <button class="w-1/2 px-4 py-2 text-sm hover:bg-gray-100 dark:border-neutral-800 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-gray-300 dark:hover:rounded-r-lg" @click="resetFilter">
                             Reset
                         </button>
                     </div>
@@ -152,11 +156,11 @@ definePageMeta({
         </div>
 
         
-        <div class="flex flex-col" v-if="!noDataFound">
+        <div class="flex flex-col w-1/3" v-if="!noDataFound">
             <h2 class="text-md font-semibold pb-2 pt-4 px-4">Files</h2>     
         </div>
         
-        <div class="flex-grow overflow-y-auto pb-4"
+        <div class="flex-grow overflow-y-auto pb-4 w-1/3"
         :class="noDataFound ? 'flex justify-center items-center' : ''"
         >
             <div class="flex justify-center items-center" v-if="noDataFound">
@@ -175,7 +179,7 @@ definePageMeta({
                         <h1 class="text-2xl font-semibold m-1">Exceeded upload limit</h1>
                         <h2 class="text-lg m-1">In the FREE plan, you are limited to uploading only 1 file.</h2>
                         <NuxtLink to="/checkout">
-                            <button class="text-white py-1 gradient-border rounded-full px-2 shadow-lg hover:scale-105" >
+                            <button class="text-white py-1 animated-gradient-bg rounded-full px-2 shadow-lg hover:scale-105" >
                                 <ClientOnly>
                                     <i class="fa-solid fa-gift"></i> <span class="pl-1 font-medium">Upgrade</span>
                                 </ClientOnly>
@@ -188,7 +192,7 @@ definePageMeta({
             
             <div class="mt-2 mx-3 text-sm">
                 <!-- Table Headers -->
-                <div class="sticky top-0 z-10 flex flex-row justify-between text-gray-500 px-4 py-3  text-md font-normal rounded-lg bg-gray-50" v-if="!noDataFound && !isLoading">
+                <div class="sticky top-0 z-10 flex flex-row justify-between text-gray-500 px-4 py-3  text-md font-normal rounded-t-lg bg-neutral-100/50 dark:bg-neutral-900 dark:text-gray-300" v-if="!noDataFound && !isLoading">
                     <span class="flex-1">Filename</span>
                     <span class="flex-1">Date Created</span>
                     <span class="flex-1">Type</span>
@@ -200,13 +204,13 @@ definePageMeta({
                 <DataSkeleton v-show="isLoading || isFetchingDataSource" v-for="i in 5" :key="i" />
 
                 <!-- Table rows -->
-                <div v-for="dataSource in dataSources" :key="dataSource.id" class="flex justify-between items-center p-4 border-b border-gray-200 hover:shadow-sm hover:rounded-lg hover:border-gray-100 hover:bg-gray-50">
+                <div v-for="dataSource in dataSources" :key="dataSource.id" class="flex justify-between items-center p-4 border-b group border-gray-200 hover:shadow-sm hover:border-gray-100 hover:bg-neutral-100/50 dark:border-neutral-800 dark:hover:bg-neutral-900">
                     <!-- Filename -->
                     <div class="flex items-center flex-1 truncate"  :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''">
-                        <div class="border border-gray-200 rounded-lg mr-2 p-1 px-1 bg-white flex-shrink-0" >
-                            <img :src="getIconForFileType(dataSource.file_type)" :alt="dataSource.name" class="w-6 h-6 rounded-md" />
+                        <div class="border border-gray-200 rounded-lg mr-2 p-1 px-1 bg-white flex-shrink-0 dark:bg-transparent dark:border-neutral-600 dark:group-hover:bg-neutral-950" >
+                            <img :src="getIconForFileType(dataSource.file_type)" :alt="dataSource.name" class="w-6 h-6 rounded-md"/>
                         </div>
-                        <p class="truncate text-gray-900">{{ dataSource.name }}</p>
+                        <p class="truncate">{{ dataSource.name }}</p>
                     </div>
 
                     <!-- Date Created -->
@@ -218,7 +222,7 @@ definePageMeta({
                     <!-- Active -->
                     <label class="flex-1 items-center cursor-pointer">
                         <input type="checkbox" class="sr-only" v-model="dataSource.is_active" @change.prevent="selectDataSource(dataSource)">
-                        <div class="w-12 h-6 rounded-full transition-all flex items-center" :class="{'bg-sky-600': dataSource.is_active, 'bg-gray-300': !dataSource.is_active}">
+                        <div class="w-12 h-6 rounded-full transition-all flex items-center" :class="{'bg-sky-600': dataSource.is_active, 'bg-gray-300 dark:bg-neutral-700': !dataSource.is_active}">
                         <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 ml-1" :class="{'translate-x-6': dataSource.is_active}"></div>
                         </div>
                     </label>
@@ -227,7 +231,7 @@ definePageMeta({
                     <div class="text-right flex-1"   :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''">
                         <Menu as="div" class="relative inline-block text-left" @click.prevent>
                             <div>
-                                <MenuButton class="inline-flex w-full justify-center rounded-full hover:bg-gray-200 px-2 py-2 text-sm font-medium text-black">
+                                <MenuButton class="inline-flex w-full justify-center rounded-full hover:bg-gray-200 px-2 py-2 text-sm font-medium text-black dark:text-inherit dark:hover:bg-neutral-800">
                                     <ClientOnly>
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </ClientOnly>
@@ -292,15 +296,15 @@ definePageMeta({
                 </div>
                 <div class="flex justify-center mt-4 pb-2" v-if="!noDataFound">
                     <button @click="prevPage" :disabled="currentPage === 1"
-                    class="px-4 py-2 border-2 rounded-l-md"
+                    class="px-4 py-2 border-2 rounded-l-md dark:border-neutral-700 dark:hover:border-neutral-500"
                     :class="{'hover:bg-gray-100': currentPage !== 1}">
                         <ClientOnly>
                             <i class="fas fa-chevron-left"></i>
                         </ClientOnly>
                     </button>
-                    <div class="px-4 py-2 border-t-2 border-b-2">{{ currentPage }} / {{ totalPages }}</div>
+                    <div class="px-4 py-2 border-t-2 border-b-2 dark:border-neutral-700">{{ currentPage }} / {{ totalPages }}</div>
                     <button @click="nextPage" :disabled="currentPage === totalPages"
-                    class="px-4 py-2 border-2 rounded-r-md"
+                    class="px-4 py-2 border-2 rounded-r-md dark:border-neutral-700 dark:hover:border-neutral-500"
                     :class="{'hover:bg-gray-100': currentPage !== totalPages}"
                     >
                         <ClientOnly>
