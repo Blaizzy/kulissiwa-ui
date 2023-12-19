@@ -1,6 +1,6 @@
 <template>
     <!-- Side Navbar -->
-    <div class="hidden md:flex h-screen flex-col dark:text-gray-400 bg-neutral-100/50 dark:bg-neutral-900 p-4 border-r border-gray-200 dark:border-0"
+    <div class="hidden lg:flex h-screen flex-col dark:text-gray-400 bg-neutral-100/50 dark:bg-neutral-900 p-4 border-r border-gray-200 dark:border-0"
     :class="{'w-16 items-center': collapsed, 'w-64': !collapsed}"
     id="mainSideNavbar">
     <pricing :show-modal="open" @close-modal="open = false"/>
@@ -109,11 +109,11 @@
             </button>
         </div>
 
-        <!-- <hr class="w-full h-px my-2 border-gray-300 dark:border-neutral-700"
+        <hr class="w-full h-px my-2 border-gray-300 dark:border-neutral-700"
             :class="{'mt-auto ': !showUpgradeButton}">
 
        
-        <div class="mb-2 flex items-start rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
+        <div class="flex items-start rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
             <NuxtLink to="/settings/account">
                 <div class="flex items-center py-1">
                     <div class="flex items-center">
@@ -135,11 +135,11 @@
                 </div>
             </NuxtLink>
             
-        </div> -->
+        </div>
     </div>
 
 
-    <div class="md:hidden fixed bottom-0 left-0 z-50 h-16 w-full bg-white border-t border-gray-200 dark:bg-neutral-900 dark:border-none">
+    <div class="lg:hidden fixed bottom-0 left-0 z-50 h-16 w-full bg-white border-t border-gray-200 dark:bg-neutral-900 dark:border-none">
         <div class="grid h-full max-w-lg grid-cols-3 mx-auto font-medium ">
             <NuxtLink to="/documents" class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:bg-neutral-900 dark:hover:bg-neutral-800 group">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mb-2 text-gray-500 dark:text-gray-400 group-hover:text-sky-600 dark:group-hover:text-sky-600">

@@ -12,7 +12,7 @@
       </div>
     </div>
     <hr class="w-full border-gray-200 dark:border-neutral-800" />
-    <div class="overflow-y-auto h-[80%]">
+    <div class="overflow-y-auto h-[80%] md:h-[70%]">
       <div class="flex justify-center md:text-center">
         <p class="font-light text-gray-500 dark:text-gray-400 my-2 px-4 xl:w-1/2">
           Save hours of reading and researching documents everyday with Kulissiwa Pro.

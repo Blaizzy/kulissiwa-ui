@@ -1,6 +1,6 @@
 <template>
     <!-- Content -->
-    <div class="flex flex-col pt-4 pb-6 bg-white dark:bg-neutral-950 dark:text-gray-400" >
+    <div class="flex flex-col pb-6 bg-white dark:bg-neutral-950 dark:text-gray-400" >
         <div class="flex absolute top-0 right-0">
             <div 
                 v-if="showSuccess" 
@@ -25,7 +25,7 @@
         </div>
         
 
-        <div class="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-neutral-800">
+        <div class=" sticky top-0 flex justify-between items-center pt-4 pb-4 border-b border-gray-200 dark:border-neutral-800 dark:bg-neutral-950">
             <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 hover:bg-neutral-100 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600"
             
             >
@@ -64,125 +64,124 @@
                 @error="onShowFailure" @success="onShowSuccess"/>
         </div>
 
-
-        <div class="sm:flex md:flex-grow overflow-y-auto mb-4 sm:h-[83%] xs:h-[65vh]"
-        :class="'{{ $route.name }}' == 'chats-id' || '{{ $route.name }}' == 'chats' ? 'h-[83%] xs:h-[65vh]' : 'h-[83%] xs:h-[65vh]'">
-            
-            <div class="flex w-full justify-center p-2"
-            :class="noChatFound ? 'flex-col h-full' : ''"
-            >
-                <div class="flex justify-center items-cente text-center" v-if="noChatFound">
-                    <div class="flex justify-center items-center flex-col dark:bg-transparent">
-                        <h1 class="text-xl lg:text-2xl font-semibold m-1">No chats yet</h1>
-                        <p class="text-lg lg:text-xl m-1">Start a new chat by typing a message below
-                        </p>
-                        <ClientOnly>
-                            <i class="mt-2 p-1 fas fa-arrow-down fa-xl"></i> 
-                        </ClientOnly>
-                        
+        <div class="flex flex-col justify-center space-y-10 h-screen">
+            <div class="flex-grow overflow-y-auto">
+                
+                <div class="flex w-full justify-center p-2"
+                :class="noChatFound ? 'flex-col h-full' : ''"
+                >
+                    <div class="flex justify-center items-cente text-center" v-if="noChatFound">
+                        <div class="flex justify-center items-center flex-col dark:bg-transparent">
+                            <h1 class="text-xl lg:text-2xl font-semibold m-1">No chats yet</h1>
+                            <p class="text-lg lg:text-xl m-1">Start a new chat by typing a message below
+                            </p>
+                            <ClientOnly>
+                                <i class="mt-2 p-1 fas fa-arrow-down fa-xl"></i> 
+                            </ClientOnly>
+                            
+                        </div>
                     </div>
-                </div>
-                <div class="w-auto px-4 overflow-y-auto" ref="chatWindow" >
-                    <LoadingIndicator v-show="isLoading"/>
+                    <div class="w-auto px-4 overflow-y-auto" ref="chatWindow" >
+                        <LoadingIndicator v-show="isLoading"/>
 
-                    <div v-for="(user_message, index) in user_messages" :key="user_message.content">
-                        <div class="my-4" >
-                            <div class="flex items-start justify-end">
-                                <!-- User Message -->
-                                <div class="bg-sky-500 shadow rounded-b-lg rounded-l-lg px-4 mr-2 dark:bg-sky-600" >
-                                    <div v-html="renderMarkdown(user_message.content)" class="text-md inline-block prose break-words py-2 text-white dark:text-gray-200"></div>
+                        <div v-for="(user_message, index) in user_messages" :key="user_message.content">
+                            <div class="my-4" >
+                                <div class="flex items-start justify-end">
+                                    <!-- User Message -->
+                                    <div class="bg-sky-500 shadow rounded-b-lg rounded-l-lg px-4 mr-2 dark:bg-sky-600" >
+                                        <div v-html="renderMarkdown(user_message.content)" class="text-md inline-block prose break-words py-2 text-white dark:text-gray-200"></div>
+                                    </div>
+                                    <img :src="avatar_url" alt="User Avatar" class="w-8 h-8 rounded-full">
                                 </div>
-                                <img :src="avatar_url" alt="User Avatar" class="w-8 h-8 rounded-full">
                             </div>
-                        </div>
 
-                        <!-- Chatbot Message -->
-                        <div class="my-4 pb-2">
-                            <p class="font-semibold text-md dark:text-gray-500 pt-2 px-2 py-2" v-if="ai_messages[index]">Kulissiwa AI</p>
-                            <div class="flex items-start w-auto">
-                                
-                                <div class="flex flex-col bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg py-2 px-6 ml-2 dark:bg-neutral-900 " v-if="ai_messages[index]">
+                            <!-- Chatbot Message -->
+                            <div class="my-4 pb-2">
+                                <p class="font-semibold text-md dark:text-gray-500 pt-2 px-2 py-2" v-if="ai_messages[index]">Kulissiwa AI</p>
+                                <div class="flex items-start w-auto">
                                     
-                                    <div v-html="renderMarkdown(ai_messages[index].content)" class="py-2 inline-block break-words prose dark:text-gray-300 text-sm font-normal leading-6"></div>
-                                    <div v-show="ai_messages[index].source_documents" class="pb-2 mt-1">
-                                        <Disclosure v-slot="{ open }">
-                                            <DisclosureButton
-                                            class="flex w-full border border-gray-300 rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75 dark:bg-neutral-800 dark:text-gray-400 dark:border-none"
-                                            >
-                                            <span class="bg-gray-300 rounded-full px-3 font-semibold dark:bg-neutral-600 dark:text-gray-400" v-if="sourcesExists(index)"> {{ai_messages[index].source_documents.length}} </span>
-                                            <div class="flex w-full justify-between ml-2">
-                                                <p class="font-semibold" v-if="sourcesGreaterThanOne(index)">sources</p>
-                                                <p class="font-semibold" v-else>source</p>
-                                                <ChevronUpIcon
-                                                    :class="open ? 'rotate-180 transform' : ''"
-                                                    class="h-5 w-5 text-gray-500"
-                                                />
-                                            </div>
-                                            </DisclosureButton>
-                                            <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
-                                                <div v-for="(source_document, source_index) in ai_messages[index].source_documents" :key="source_index" class="flex break-words prose">
-                                    
-                                                    <div class="w-full link-container flex flex-col  py-2 px-4 my-2 rounded-full bg-white border border-gray-300 text-sm font-medium hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75 dark:bg-neutral-900 dark:text-gray-400" v-if="checkURLExists(source_document)">
-                                                        
-                                                        <span> 
-                                                            {{ source_document.metadata.source }}: 
-                                                            <a :href="source_document.metadata.url" target="_blank" class="mr-1.5"> 
-                                                            {{ source_document.metadata.url }} </a> 
-                                                            <ClientOnly>
-                                                                <i class="fas fa-solid fa-arrow-up-right-from-square link-icon"></i>
-                                                            </ClientOnly>
-
-                                                        </span>
-                                                    </div>
-                                                
-                                                    <div class="flex flex-col w-full" v-else>
-                                                        <Disclosure v-slot="{ open }">
-                                                            <DisclosureButton
-                                                            class="flex w-full border border-gray-300 justify-between rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75 dark:bg-neutral-800 dark:text-gray-400 dark:border-none"
-                                                            >
-                                                            <span v-if="checkPageExists(source_document)"> {{ source_document.metadata.source }}, p. {{ source_document.metadata.page }}</span>
-                                                            <span v-else> {{ source_document.metadata.source }}</span>
-                                                            <ChevronUpIcon
-                                                                :class="open ? 'rotate-180 transform' : ''"
-                                                                class="h-5 w-5 text-gray-500"
-                                                            />
-                                                            </DisclosureButton>
-                                                            <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
-                                                                
-                                                                <div v-html="renderMarkdown(source_document.page_content)" v-if="source_document.page_content"></div>
-                                                                <div v-html="renderMarkdown(source_document.pageContent)" v-else></div>
-                                                            </DisclosurePanel>
-                                                        </Disclosure>
-                                                    </div>
+                                    <div class="flex flex-col bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg py-2 px-6 ml-2 dark:bg-neutral-900 " v-if="ai_messages[index]">
+                                        
+                                        <div v-html="renderMarkdown(ai_messages[index].content)" class="py-2 inline-block break-words prose dark:text-gray-300 text-sm font-normal leading-6"></div>
+                                        <div v-show="ai_messages[index].source_documents" class="pb-2 mt-1">
+                                            <Disclosure v-slot="{ open }">
+                                                <DisclosureButton
+                                                class="flex w-full border border-gray-300 rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75 dark:bg-neutral-800 dark:text-gray-400 dark:border-none"
+                                                >
+                                                <span class="bg-gray-300 rounded-full px-3 font-semibold dark:bg-neutral-600 dark:text-gray-400" v-if="sourcesExists(index)"> {{ai_messages[index].source_documents.length}} </span>
+                                                <div class="flex w-full justify-between ml-2">
+                                                    <p class="font-semibold" v-if="sourcesGreaterThanOne(index)">sources</p>
+                                                    <p class="font-semibold" v-else>source</p>
+                                                    <ChevronUpIcon
+                                                        :class="open ? 'rotate-180 transform' : ''"
+                                                        class="h-5 w-5 text-gray-500"
+                                                    />
                                                 </div>
-                                            </DisclosurePanel>
-                                        </Disclosure>
+                                                </DisclosureButton>
+                                                <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
+                                                    <div v-for="(source_document, source_index) in ai_messages[index].source_documents" :key="source_index" class="flex break-words prose">
+                                        
+                                                        <div class="w-full link-container flex flex-col  py-2 px-4 my-2 rounded-full bg-white border border-gray-300 text-sm font-medium hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75 dark:bg-neutral-900 dark:text-gray-400" v-if="checkURLExists(source_document)">
+                                                            
+                                                            <span> 
+                                                                {{ source_document.metadata.source }}: 
+                                                                <a :href="source_document.metadata.url" target="_blank" class="mr-1.5"> 
+                                                                {{ source_document.metadata.url }} </a> 
+                                                                <ClientOnly>
+                                                                    <i class="fas fa-solid fa-arrow-up-right-from-square link-icon"></i>
+                                                                </ClientOnly>
+
+                                                            </span>
+                                                        </div>
+                                                    
+                                                        <div class="flex flex-col w-full" v-else>
+                                                            <Disclosure v-slot="{ open }">
+                                                                <DisclosureButton
+                                                                class="flex w-full border border-gray-300 justify-between rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75 dark:bg-neutral-800 dark:text-gray-400 dark:border-none"
+                                                                >
+                                                                <span v-if="checkPageExists(source_document)"> {{ source_document.metadata.source }}, p. {{ source_document.metadata.page }}</span>
+                                                                <span v-else> {{ source_document.metadata.source }}</span>
+                                                                <ChevronUpIcon
+                                                                    :class="open ? 'rotate-180 transform' : ''"
+                                                                    class="h-5 w-5 text-gray-500"
+                                                                />
+                                                                </DisclosureButton>
+                                                                <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
+                                                                    
+                                                                    <div v-html="renderMarkdown(source_document.page_content)" v-if="source_document.page_content"></div>
+                                                                    <div v-html="renderMarkdown(source_document.pageContent)" v-else></div>
+                                                                </DisclosurePanel>
+                                                            </Disclosure>
+                                                        </div>
+                                                    </div>
+                                                </DisclosurePanel>
+                                            </Disclosure>
+                                        </div>
                                     </div>
-                                </div>
-                                
+                                    
 
-                                <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg inline-block py-2 px-6 ml-2 dark:bg-neutral-800 dark:text-gray-400" v-else-if="loading_ai_response">
-                                    <div class="space-x-1.5">
-                                        <ClientOnly>
-                                            <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0s;--fa-fade-opacity: 0.1;"></i>
-                                            <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0.3s;--fa-fade-opacity: 0.1;"></i>
-                                            <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0.6s;--fa-fade-opacity: 0.1;"></i>
-                                        </ClientOnly>
+                                    <div class="bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg inline-block py-2 px-6 ml-2 dark:bg-neutral-800 dark:text-gray-400" v-else-if="loading_ai_response">
+                                        <div class="space-x-1.5">
+                                            <ClientOnly>
+                                                <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0s;--fa-fade-opacity: 0.1;"></i>
+                                                <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0.3s;--fa-fade-opacity: 0.1;"></i>
+                                                <i class="fa-solid fa-square fa-beat-fade fa-2xs" style="--fa-animation-delay: 0.6s;--fa-fade-opacity: 0.1;"></i>
+                                            </ClientOnly>
 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
 
         <!-- Message Input -->
-        <div class="flex items-center justify-center px-4 w-auto sm:flex-grow pb-5 mb-8 md:pb-0 md:mb-0">
-            <div class="rounded-xl flex items-center px-2 border-2 border-gray-200  w-full lg:w-1/2 hover:border-gray-300 dark:bg-inherit dark:border-neutral-700 dark:hover:border-neutral-600">
+        <div class="sticky bottom-10 px-4 pb-2 w-auto pt-2 ">
+            <div class="rounded-xl flex items-center px-2 border-2 border-gray-200 w-full xl:w-1/2 hover:border-gray-300 dark:bg-neutral-950 dark:border-neutral-700 dark:hover:border-neutral-600">
                 <textarea 
                     type="text" 
                     :rows="rows" 
@@ -210,6 +209,7 @@
             </div>
            
         </div>
+    </div>
 
     </div>
 
