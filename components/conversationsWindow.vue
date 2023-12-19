@@ -36,10 +36,10 @@
         <div class="w-4/5 xl:w-1/3 px-4" v-if="!noDataFound">
             <h2 class="text-md font-semibold pb-2 pt-4">Conversations</h2>     
         </div>
-        <div class="overflow-y-visible w-4/5 xl:w-1/3 px-4 mt-4 bg-neutral-100/50 dark:bg-neutral-900 rounded-lg">
+        <div class="overflow-y-auto h-[50vh] xl:h-full w-4/5 xl:w-1/3 px-4 mt-4 bg-neutral-100/50 dark:bg-neutral-900 rounded-lg">
 
             <ListSkeleton v-show="isLoading" v-for="i in 5" :key="i" />
-            <div v-for="(conversation, index) in conversations" :key="conversation.id" class="rounded-lg">
+            <div v-for="(conversation, index) in conversations" :key="conversation.id" class="rounded-lg  overflow-y-visible">
                 <!-- <h2 class="text-xl font-semibold mb-2">Today</h2> -->
                 <NuxtLink
                         :to="`/chats/${conversation.id}`" 

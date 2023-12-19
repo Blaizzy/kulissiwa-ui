@@ -1,6 +1,6 @@
 <template>
     <!-- Side Navbar -->
-    <div class="hidden md:flex flex-col dark:text-gray-400 bg-neutral-100/50 dark:bg-neutral-900 p-4 border-r border-gray-200 dark:border-0"
+    <div class="hidden lg:flex flex-col dark:text-gray-400 bg-neutral-100/50 dark:bg-neutral-900 p-4 border-r border-gray-200 dark:border-0"
     :class="{'w-16 items-center': collapsed, 'w-64': !collapsed}"
     id="mainSideNavbar">
     <pricing :show-modal="open" @close-modal="open = false"/>

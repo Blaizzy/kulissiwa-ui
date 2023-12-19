@@ -43,7 +43,7 @@ definePageMeta({
         </div>
         <hr class="w-full border-gray-200 dark:border-neutral-800" />
         <div class="flex mt-4 px-4 text-sm py-2 w-4/5 xl:w-1/3" v-if="!noDataFound">
-            <div class="mt-auto rounded-full flex  w-1/2 items-center px-2 border-2 border-gray-200 hover:border-gray-300 dark:border-neutral-700 dark:hover:border-neutral-500">
+            <div class="mt-auto rounded-full flex w-4/5 xl:w-1/2 items-center px-2 border-2 border-gray-200 hover:border-gray-300 dark:border-neutral-700 dark:hover:border-neutral-500">
                 <button class="px-2 text-gray-500 hover:text-black inline-flex items-center">
                     <ClientOnly>
                         <i class="fas fa-search"></i>
@@ -58,10 +58,11 @@ definePageMeta({
             </div>
             <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white animated-gradient-bg rounded-full px-2 shadow-lg hover:scale-105 ml-5">
                 <ClientOnly>
-                    <i class="fa-solid fa-circle-arrow-up"></i> <span class="pl-1 font-medium">Upload</span>
+                    <i class="fa-solid fa-circle-arrow-up"></i>
                 </ClientOnly>
+                <span class="pl-1 font-medium">Upload</span>
             </button>
-            <div class="ml-3">
+            <div class="ml-3 hidden xl:block">
                 <button @click="showSortOptions = !showSortOptions; showFilterOptions=false" class=" w-full h-full px-2 py-1 border-2 border-gray-200 rounded-full  hover:border-gray-300 inline-flex items-center dark:border-neutral-700 dark:hover:border-neutral-500" v-if="!noDataFound && !isLoading">
                     <ClientOnly>
                         <i class="fa-solid fa-arrow-up-wide-short"></i> <span class="pl-2">Sort</span>
@@ -97,7 +98,7 @@ definePageMeta({
                     </div>
                 </div>
             </div>
-            <div class="ml-3">
+            <div class="ml-3 hidden xl:block">
                 <!-- Filter Button -->
                 <button @click="showFilterOptions = !showFilterOptions; showSortOptions=false" class="ml-2 w-full h-full px-2 py-1 border-2 border-gray-200 rounded-full hover:border-gray-300 inline-flex items-center dark:border-neutral-700 dark:hover:border-neutral-500" v-if="!noDataFound && !isLoading">
                     <ClientOnly>
@@ -154,7 +155,7 @@ definePageMeta({
         </div>
 
         
-        <div class="flex flex-col w-4/5 lg:w-1/3" v-if="!noDataFound">
+        <div class="flex w-4/5 xl:w-1/2" v-if="!noDataFound">
             <h2 class="text-md font-semibold pb-2 pt-4 px-4">Files</h2>     
         </div>
         
@@ -191,10 +192,10 @@ definePageMeta({
             <div class="mt-2 mx-3 text-sm">
                 <!-- Table Headers -->
                 <div class="sticky top-0 z-10 flex flex-row justify-between text-gray-500 px-4 py-3  text-md font-normal rounded-t-lg bg-neutral-100/50 dark:bg-neutral-900 dark:text-gray-300" v-if="!noDataFound && !isLoading">
-                    <span class="flex-1">Filename</span>
-                    <span class="flex-1">Date Created</span>
-                    <span class="flex-1">Type</span>
-                    <span class="flex-1">Active</span>
+                    <span class="flex-grow xl:flex-1">Filename</span>
+                    <span class="hidden xl:flex-1">Date Created</span>
+                    <span class="hidden xl:flex-1">Type</span>
+                    <span class="hidden xl:flex-1">Active</span>
                     <span class="flex-1"></span> <!-- This is to align the dropdown menu in the rows -->
                 </div>
 
@@ -212,13 +213,13 @@ definePageMeta({
                     </div>
 
                     <!-- Date Created -->
-                    <p class="text-gray-500 ml-2 flex-1"  :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''">{{ formatDate(dataSource.created_at) }}</p>
+                    <p class="text-gray-500 ml-2 flex-1 hidden xl:block"  :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''">{{ formatDate(dataSource.created_at) }}</p>
 
                     <!-- File Type -->
-                    <p class="text-gray-500 ml-2 flex-1"  :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''">{{ dataSource.file_type }}</p>
+                    <p class="text-gray-500 ml-2 flex-1 hidden xl:block"  :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''">{{ dataSource.file_type }}</p>
                     
                     <!-- Active -->
-                    <label class="flex-1 items-center cursor-pointer">
+                    <label class="flex-1 items-center cursor-pointer hidden xl:block">
                         <input type="checkbox" class="sr-only" v-model="dataSource.is_active" @change.prevent="selectDataSource(dataSource)">
                         <div class="w-12 h-6 rounded-full transition-all flex items-center" :class="{'bg-sky-600': dataSource.is_active, 'bg-gray-300 dark:bg-neutral-700': !dataSource.is_active}">
                         <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 ml-1" :class="{'translate-x-6': dataSource.is_active}"></div>
@@ -244,23 +245,24 @@ definePageMeta({
                                 leave-to-class="transform scale-95 opacity-0"
                             >
                                 <MenuItems
-                                class="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" style=" z-index: 1000;"
+                                class="z-10 absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 dark:divide-neutral-700 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-neutral-800 " style=" z-index: 1000;"
                                 >
                                 <div class="px-1 py-1">
                                     <MenuItem v-slot="{ disabled }" disabled>
                                         <NuxtLink
+                                            class="dark:text-gray-400"
                                             :class="[
                                             disabled ? 'opacity-50 cursor-not-allowed' : 'text-gray-900',
-                                            active ? 'bg-sky-500 text-white' : 'text-gray-900',
+                                            active ? 'bg-sky-500 text-white ' : 'text-gray-900',
                                             'group flex w-full items-center rounded-md px-2 py-2 text-sm',
                                             
                                             ]"
-                                            :to="`/dataSources/${dataSource.id}`"
+                                          
                                         >   
                                             <div class="flex items-center">
                                                 <PencilSquareIcon
                                                 :active="active"
-                                                class="mr-2 h-5 w-5 text-sky-400"
+                                                class="mr-2 h-5 w-5 text-sky-400 "
                                                 aria-hidden="true"
                                                 />
                                                 <p> Edit </p> 
@@ -272,9 +274,9 @@ definePageMeta({
                                 <div class="px-1 py-1">
                                     <MenuItem v-slot="{ active }" @click="deleteDataSource(dataSource.id)">
                                         <button
-
+                                            class="dark:text-gray-400"
                                             :class="[
-                                            active ? 'bg-sky-500 text-white' : 'text-gray-900',
+                                            active ? 'bg-sky-500 text-white ' : 'text-gray-900',
                                             'group flex w-full items-center rounded-md px-2 py-2 text-sm',
                                             ]"
                                         >
