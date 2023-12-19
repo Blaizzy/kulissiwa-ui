@@ -26,7 +26,7 @@
         
 
         <div class="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-neutral-800">
-            <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600">
+            <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 hover:bg-neutral-100 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                 </svg>
@@ -63,12 +63,13 @@
         </div>
 
 
-        <div class="flex-grow overflow-y-auto mb-4">
+        <div class="sm:flex md:flex-grow overflow-y-auto mb-4 sm:h-[83%] xs:h-[65vh]"
+        :class="'{{ $route.name }}' == 'chats-id' || '{{ $route.name }}' == 'chats' ? 'h-[83%] xs:h-[65vh]' : 'h-[83%] xs:h-[65vh]'">
             
-            <div class="flex justify-center p-2"
+            <div class="flex w-full justify-center p-2"
             :class="noChatFound ? 'flex-col h-full' : ''"
             >
-                <div class="flex justify-center items-center" v-if="noChatFound">
+                <div class="flex justify-center items-cente text-center" v-if="noChatFound">
                     <div class="flex justify-center items-center flex-col dark:bg-transparent">
                     <img src="~~/assets/logos/No-chats-found.jpg" alt="No Chat Found" class="md:w-1/3 max-lg:w-1/2"> 
                     <h1 class="text-4xl font-semibold m-1">No chats yet</h1>
@@ -87,8 +88,8 @@
                         <div class="my-4" >
                             <div class="flex items-start justify-end">
                                 <!-- User Message -->
-                                <div class="bg-sky-500 text-white shadow rounded-b-lg rounded-l-lg px-4 mr-2 dark:bg-sky-600" >
-                                    <div v-html="renderMarkdown(user_message.content)" class="text-md inline-block prose break-words py-2 dark:text-gray-200"></div>
+                                <div class="bg-sky-500 shadow rounded-b-lg rounded-l-lg px-4 mr-2 dark:bg-sky-600" >
+                                    <div v-html="renderMarkdown(user_message.content)" class="text-md inline-block prose break-words py-2 text-white dark:text-gray-200"></div>
                                 </div>
                                 <img :src="avatar_url" alt="User Avatar" class="w-8 h-8 rounded-full">
                             </div>
@@ -96,9 +97,11 @@
 
                         <!-- Chatbot Message -->
                         <div class="my-4 pb-2">
+                            <p class="font-semibold text-md dark:text-gray-500 pt-2 px-2 py-2" v-if="ai_messages[index]">Kulissiwa AI</p>
                             <div class="flex items-start w-auto">
+                                
                                 <div class="flex flex-col bg-sky-50 text-black shadow rounded-b-lg rounded-r-lg py-2 px-6 ml-2 dark:bg-neutral-900 " v-if="ai_messages[index]">
-                                    <p class="font-semibold text-md dark:text-gray-500 pt-2" v-if="ai_messages[index].content">Kulissiwa AI</p>
+                                    
                                     <div v-html="renderMarkdown(ai_messages[index].content)" class="py-2 inline-block break-words prose dark:text-gray-300 text-sm font-normal leading-6"></div>
                                     <div v-show="ai_messages[index].source_documents" class="pb-2 mt-1">
                                         <Disclosure v-slot="{ open }">
@@ -177,12 +180,12 @@
 
 
         <!-- Message Input -->
-        <div class="flex items-center justify-center w-auto">
-            <div class="rounded-xl flex items-center px-2 border-2 border-gray-200 w-1/2 hover:border-gray-300 dark:bg-inherit dark:border-neutral-700 dark:hover:border-neutral-600">
+        <div class="flex items-center justify-center px-4 w-auto sm:flex-grow pb-5 mb-8 md:pb-0 md:mb-0">
+            <div class="rounded-xl flex items-center px-2 border-2 border-gray-200  w-full md:w-1/2 hover:border-gray-300 dark:bg-inherit dark:border-neutral-700 dark:hover:border-neutral-600">
                 <textarea 
                     type="text" 
                     :rows="rows" 
-                    class="bg-white w-full px-4 h-auto py-3 rounded-xl focus:outline-none dark:bg-inherit"  
+                    class="bg-white w-full px-4 h-auto py-3 rounded-lg focus:outline-none dark:bg-inherit"  
                     placeholder="Type your message..." 
                     name="message"
                     v-model="message" 
@@ -190,7 +193,7 @@
                     @keydown.enter.exact.prevent="handleEnterPress"></textarea>
                 <button class="py-2 px-4 mr-1 rounded-lg inline-flex items-center " @click.prevent="queryModel" v-if="!loading_ai_response"
                 :disabled="isMessageEmpty"
-                :class="isMessageEmpty ?'hover:text-gray-500 text-gray-500' : 'hover:bg-sky-500 text-white dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-gray-200'"
+                :class="isMessageEmpty ?'hover:text-gray-500 text-gray-500' : 'bg-sky-500 hover:bg-sky-500 text-white dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-gray-200'"
                 >
                     <ClientOnly>
                         <i class="fas fa-paper-plane"></i>

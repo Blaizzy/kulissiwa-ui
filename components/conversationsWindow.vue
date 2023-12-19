@@ -1,7 +1,7 @@
 <template>
     <!-- Chat Side Navbar -->
     <div class="flex flex-col items-center bg-white border-r border-gray-200 dark:bg-neutral-950 dark:border-neutral-800 dark:text-gray-400" >
-        <div class="flex items-center justify-between w-1/3 px-4">
+        <div class="flex items-center justify-between w-4/5 lg:w-1/3 px-4">
             <div class="flex pb-4 pt-4 relative">
                 <h1 class="text-2xl dark:text-gray-200">Chats</h1>
             </div>
@@ -10,7 +10,7 @@
 
         <hr class="w-full border-gray-200 dark:border-neutral-800" />
 
-        <div class="flex justify-center items-center w-1/3 px-4 py-2 mt-4">
+        <div class="flex justify-center items-center w-4/5 lg:w-1/3 px-4 py-2 mt-4">
             <div class="text-sm mt-auto rounded-full flex items-center px-2 w-full mr-2 border-2 border-gray-200 hover:border-gray-300 dark:border-neutral-700 dark:hover:border-neutral-500">
                 <button class="px-2 text-gray-500 hover:text-black inline-flex items-center">
                     <ClientOnly>
@@ -33,10 +33,10 @@
                     </nuxt-link>
                 </div>
         </div>
-        <div class="w-1/3 px-4" v-if="!noDataFound">
-            <h2 class="text-md font-semibold pb-2 pt-4">Threads</h2>     
+        <div class="w-4/5 lg:w-1/3 px-4" v-if="!noDataFound">
+            <h2 class="text-md font-semibold pb-2 pt-4">Conversations</h2>     
         </div>
-        <div class="overflow-y-auto w-1/3 px-4 mt-4 bg-neutral-100/50 dark:bg-neutral-900 rounded-lg">
+        <div class="lg:overflow-y-auto w-4/5 lg:w-1/3 px-4 mt-4 bg-neutral-100/50 dark:bg-neutral-900 rounded-lg">
 
             <ListSkeleton v-show="isLoading" v-for="i in 5" :key="i" />
             <div v-for="(conversation, index) in conversations" :key="conversation.id" class="rounded-lg">
@@ -70,7 +70,7 @@
                                 
                                 <input
                                 v-show="showTitleEditConfirmation && isSelectedConversation(conversation.id)"
-                                type="text" class="z-99 text-md p-2 text-gray-600 rounded-md border border-sky-500 dark:bg-neutral-800 dark:text-inherit dark:border-neutral-700" 
+                                type="text" class="text-md p-2 text-gray-600 rounded-md border border-sky-500 dark:bg-neutral-800 dark:text-inherit dark:border-neutral-700" 
                                 name="title" v-model="conversationTitle"
                                 @change="onTitleInputChange(conversation)">
                             </div>
