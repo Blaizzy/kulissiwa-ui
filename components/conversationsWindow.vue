@@ -1,47 +1,57 @@
 <template>
     <!-- Chat Side Navbar -->
-    <div class="flex flex-col h-full w-80 bg-white p-4 border-r border-gray-200" >
-        <div class="mb-2">
-            <div class="flex justify-between items-center bg-white px-2 pb-2">
-                <h1 class="text-xl font-semibold">Chats</h1>
-                <div class="font-semibold p-2 rounded-full hover:bg-sky-50">
-                    <nuxt-link to="/chats" @click.native="clearMessages">
-                        <img src="~~/assets/icons/icons8-new-message-24.png" alt="Chatbot Avatar" class="w-5 h-5">
-                    </nuxt-link>
-                </div>
-
+    <div class="flex flex-col items-center bg-white border-r border-gray-200 dark:bg-neutral-950 dark:border-neutral-800 dark:text-gray-400" >
+        <div class="flex items-center justify-between w-1/3 px-4">
+            <div class="flex pb-4 pt-4 relative">
+                <h1 class="text-2xl dark:text-gray-200">Chats</h1>
             </div>
+           
         </div>
 
-        <div class="flex justify-center items-center mb-4">
-            <div class="text-sm mt-auto bg-white rounded-full flex items-center w-full border-2 border-gray-200 hover:border-gray-300 ">
+        <hr class="w-full border-gray-200 dark:border-neutral-800" />
+
+        <div class="flex justify-center items-center w-1/3 px-4 py-2 mt-4">
+            <div class="text-sm mt-auto rounded-full flex items-center px-2 w-full mr-2 border-2 border-gray-200 hover:border-gray-300 dark:border-neutral-700 dark:hover:border-neutral-500">
                 <button class="px-2 text-gray-500 hover:text-black inline-flex items-center">
                     <ClientOnly>
                         <i class="fas fa-search"></i>
                     </ClientOnly>
                 </button>
-                <input type="search"  class="w-full px-1 py-2 rounded-full focus:outline-none" name="search_bar" placeholder="Search chats..." v-model="searchQuery" @keyup.prevent="onKeyup">
-                <button @click="clearSearch" v-show="searchQuery.length>0" class="px-2 text-gray-500 hover:text-black inline-flex items-center">
+                <input type="search"  class="w-full px-1 py-2 rounded-full focus:outline-none  bg-inherit" name="search_bar" placeholder="Search chats..." v-model="searchQuery" @keyup.prevent="onKeyup">
+                <button @click="clearSearch" v-show="searchQuery.length>0" class="px-2 text-gray-500 hover:text-black inline-flex items-center dark:hover:text-inherit">
                     <ClientOnly>
                         <i class="fas fa-times"></i>
                     </ClientOnly>
                 </button>
             </div>
+            <div class="font-semibold p-1.5 rounded-full border-2 hover:bg-neutral-100 dark:bg-neutral-800 dark:border-neutral-700 dark:hover:border-neutral-600 dark:hover:text-gray-300">
+                    <nuxt-link to="/chats" @click="clearMessages">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                        </svg>
+
+                    </nuxt-link>
+                </div>
         </div>
-        <div class="overflow-y-auto">
+        <div class="w-1/3 px-4" v-if="!noDataFound">
+            <h2 class="text-md font-semibold pb-2 pt-4">Threads</h2>     
+        </div>
+        <div class="overflow-y-auto w-1/3 px-4 mt-4 bg-neutral-100/50 dark:bg-neutral-900 rounded-lg">
 
             <ListSkeleton v-show="isLoading" v-for="i in 5" :key="i" />
-            <div class="mb-4" v-for="conversation in conversations" :key="conversation.id">
+            <div v-for="(conversation, index) in conversations" :key="conversation.id" class="rounded-lg">
                 <!-- <h2 class="text-xl font-semibold mb-2">Today</h2> -->
-                <nuxt-link
-                        :to="`/chats/${conversation.id}`" >
-                <div
-                    class="p-3 rounded-full"
-                    :class="{
-                        'bg-sky-100': isSelectedConversation(conversation.id) && !isNewChat(),
-                        'hover:bg-sky-50': !isSelectedConversation(conversation.id)}"
-                    @click="setConversation(conversation.id)"
-                >
+                <NuxtLink
+                        :to="`/chats/${conversation.id}`" 
+                        
+                        >
+                    <div
+                        class="p-2 hover:text-sky-500 dark:hover:bg-inherit dark:hover:text-sky-600"
+                        :class="{
+                            'bg-neutral-100 dark:bg-neutral-800': isSelectedConversation(conversation.id) && !isNewChat(),
+                            }"
+                        @click="setConversation(conversation.id)"
+                    >
 
                         <div class="flex items-center justify-between">
 
@@ -49,73 +59,99 @@
                                 <span v-show="showDeleteConfirmation && isSelectedConversation(conversation.id)"
                                 class="mr-1 ">
                                     <ClientOnly>
-                                        <i class="fas fa-trash-alt text-gray-600"></i>
+                                        <i class="fas fa-trash-alt text-gray-600 dark:text-gray-500"></i>
                                     </ClientOnly>
                                 </span>
-                                <p v-show="!showTitleEditConfirmation || !isSelectedConversation(conversation.id)" class="text-sm text-gray-600" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 150px;"
+                                <p v-show="!showTitleEditConfirmation || !isSelectedConversation(conversation.id)" class="text-md p-2 py-4" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 150px;"
                                 :class="{'typed-title': !typedTitle && isSelectedConversation(conversation.id)}">
                                     {{ conversation.title }}
                             
                                 </p>
+                                
                                 <input
                                 v-show="showTitleEditConfirmation && isSelectedConversation(conversation.id)"
-                                type="text" class="text-sm text-gray-600 border border-sky-500" 
+                                type="text" class="z-99 text-md p-2 text-gray-600 rounded-md border border-sky-500 dark:bg-neutral-800 dark:text-inherit dark:border-neutral-700" 
                                 name="title" v-model="conversationTitle"
                                 @change="onTitleInputChange(conversation)">
                             </div>
+                            
                             <div
-                                class="flex items-center space-x-2"
-                                v-show="isSelectedConversation(conversation.id) && !isNewChat()"
+                                class="flex items-center space-x-2"  
                             >
-                                <button v-show="!showDeleteConfirmation && !showTitleEditConfirmation"
-                                @click.prevent="toggleTitleEditConfirmation()">
-                                    <ClientOnly>
-                                        <i class="fas fa-pencil text-gray-600 hover:text-black"></i>
-                                    </ClientOnly>
-                                </button>
+                            <div class="relative inline-block" v-show="!showTitleEditConfirmation && !showDeleteConfirmation">
+                                <div>
+                                    <button @click.prevent="open = !open" type="button" id="menu-button" class="rounded-full py-1 hover:bg-neutral-200/50 text-sm font-medium text-black dark:bg-inherit dark:hover:bg-neutral-800 dark:text-gray-400" aria-expanded="open" aria-haspopup="true">
+                                        
+                                        <!-- Heroicon name: chevron-down -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                            <path fill-rule="evenodd" d="M10.5 6a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zm0 6a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zm0 6a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" clip-rule="evenodd" />
+                                        </svg>
 
-                                <button v-show="!showDeleteConfirmation && !showTitleEditConfirmation"
-                                @click.prevent="toggleDeleteConfirmation()">
-                                    <ClientOnly>
-                                        <i class="fas fa-trash text-gray-600 hover:text-black"></i>
-                                    </ClientOnly>
-                                </button>
+                                    </button>
+                                </div>
 
-                                <button v-show="showDeleteConfirmation"
-                                @click.prevent="deleteConversation()">
+                                <div v-if="open && isSelectedConversation(conversation.id)" class="z-10 origin-top-right absolute right-0 mt-2 w-56 rounded-md bg-white border dark:bg-neutral-950 dark:border-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                                    <div class="text-black dark:text-gray-400">
+                                        <p  @click.prevent="toggleTitleEditConfirmation(conversation.id)" class="flex items-center px-2 py-2 hover:bg-neutral-100/50 dark:hover:bg-neutral-800">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 pr-1">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                                            </svg>
+                                            Edit Title
+                                        </p>
+                                        <p @click.prevent="toggleDeleteConfirmation(conversation.id)" class="flex items-center px-2 py-2 hover:bg-neutral-100/50 dark:hover:bg-neutral-800">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 pr-1">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                            </svg>
+
+                                            Delete Chat
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                                
+                                <button v-show="showDeleteConfirmation && isSelectedConversation(conversation.id)"
+                                @click.prevent="deleteConversation(conversation.id)">
                                     <ClientOnly>
-                                        <i class="fas fa-check text-gray-600 hover:text-green-400"></i>
+                                        <i class="fas fa-check text-gray-600 hover:text-green-400 dark:text-gray-500 dark:hover:text-green-400"></i>
                                     </ClientOnly>
                                 </button>
-                                <button v-show="showDeleteConfirmation"
-                                @click.prevent="toggleDeleteConfirmation()">
+                                <button v-show="showDeleteConfirmation && isSelectedConversation(conversation.id)"
+                                @click.prevent="toggleDeleteConfirmation(conversation.id)">
                                     <ClientOnly>
-                                        <i class="fas fa-xmark text-gray-600 hover:text-red-500"></i>
+                                        <i class="fas fa-xmark text-gray-600 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-500"></i>
                                     </ClientOnly>
                                 </button>
-                                <button v-show="showTitleEditConfirmation"
+                                <button v-show="showTitleEditConfirmation && isSelectedConversation(conversation.id)"
                                 @click.prevent="editConversationTitle(conversation)">
                                     <ClientOnly>
-                                        <i class="fas fa-check text-gray-600 hover:text-green-400"></i>
+                                        <i class="fas fa-check text-gray-600 hover:text-green-400 dark:text-gray-500 dark:hover:text-green-400"></i>
                                     </ClientOnly>
                                 </button>
-                                <button v-show="showTitleEditConfirmation"
-                                @click.prevent="toggleTitleEditConfirmation()">
+                                <button v-show="showTitleEditConfirmation && isSelectedConversation(conversation.id)"
+                                @click.prevent="toggleTitleEditConfirmation(conversation.id)">
                                     <ClientOnly>
-                                        <i class="fas fa-xmark text-gray-600 hover:text-red-500"></i>
+                                        <i class="fas fa-xmark text-gray-600 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-500"></i>
                                     </ClientOnly>
                                 </button>
 
                             </div>
+                            
                         </div>
-
+                        
                     </div>
-                </nuxt-link>
-
+                    <hr class=" border-gray-200 dark:border-neutral-800" v-if="index < conversations.length - 1"/>
+                </NuxtLink>
+                
+                
             </div>
-            <div class="flex items-center justify-center">
+            
+ 
+
+        </div>
+        <div class="flex items-center justify-center pt-4">
                 <button @click="nextPage()" 
-                class="px-2 py-1 text-black border-2 border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 hover:text-black inline-flex items-center" 
+                class="px-2 py-1 border-2 border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 inline-flex items-center dark:bg-inherit dark:border-neutral-700 dark:hover:border-neutral-500" 
                 :class="{'hidden': currentPage === totalPages}"
                 v-if="!noDataFound && !isLoading">
                     <ClientOnly>
@@ -123,9 +159,6 @@
                     </ClientOnly>
                 </button>
             </div>
- 
-
-        </div>
     </div>
 </template>
 
@@ -142,6 +175,7 @@ export default {
     },
     data() {
         return {
+            open: false,
             conversations: [],
             selectedConversation: null,
             showDeleteConfirmation: false,
@@ -336,24 +370,25 @@ export default {
             const { data, error } = await supabase
                 .from('conversations')
                 .update({ title: this.conversationTitle })
-                .eq('id', this.selectedConversation);
+                .eq('id', conversation.id);
             if (error) {
                 console.log(error);
             }
             else {
                 this.showTitleEditConfirmation = false;
-                this.conversations = this.conversations.map(conversation => {
-                    if (conversation.id === this.selectedConversation) {
+                this.conversations = this.conversations.map(item => {
+                    if (item.id === conversation.id) {
                         return {
                             ...conversation,
                             title: this.conversationTitle
                         };
                     }
-                    return conversation;
+                    return item;
                 });
             }
         },
-        toggleDeleteConfirmation() {
+        toggleDeleteConfirmation(id) {
+            this.selectedConversation = id;
             if (this.showDeleteConfirmation) {
                 this.showDeleteConfirmation = false;
             }
@@ -361,7 +396,8 @@ export default {
                 this.showDeleteConfirmation = true;
             }
         },
-        toggleTitleEditConfirmation() {
+        toggleTitleEditConfirmation(id) {
+            this.selectedConversation = id;
             if (this.showTitleEditConfirmation) {
                 this.showTitleEditConfirmation = false;
             }

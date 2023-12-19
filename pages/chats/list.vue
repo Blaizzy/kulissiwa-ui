@@ -3,9 +3,6 @@ definePageMeta({
   middleware: 'auth',
 });
 </script>
-
 <template>
-
-        <chatWindow/>
-
+    <conversations-window/>
 </template>
