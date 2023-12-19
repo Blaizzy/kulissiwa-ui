@@ -1,9 +1,9 @@
 <template>
   
-  <div class="flex h-[100vh] xl:h-screen dark:bg-neutral-900">
+  <div class="flex h-screen dark:bg-neutral-900">
     <!-- Include custom styles for your widget -->
 
-    <navbar v-if="!isAuth"/>
+    <navbar v-if="!isAuth" class="md:h-[calc(100vh-5rem)]"/>
     <NuxtPage class="flex-1 overflow-y-auto md:h-[calc(100vh-5rem)] w-full"/>
 
   </div>
