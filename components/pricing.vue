@@ -5,7 +5,7 @@
     class="fixed inset-0 flex justify-center z-50 overflow-y-auto"
     :class="{ 'opacity-0 pointer-events-none': !showModal }">
         <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg shadow-lg w-4/5 md:w-1/3 z-50 flex flex-col text-black dark:text-gray-200 dark:bg-neutral-900">
+            <div class="bg-white rounded-lg shadow-lg w-4/5 xl:w-1/3 z-50 flex flex-col text-black dark:text-gray-200 dark:bg-neutral-900">
                 <div class="flex justify-between px-4 pt-4 pb-4 sticky top-0 z-10 max-h-20 rounded-t-lg">
                     <div class="flex flex-1 justify-center text-3xl">
                         <h1 class="font-regular mr-1">Kulissiwa</h1>

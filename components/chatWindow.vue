@@ -26,7 +26,9 @@
         
 
         <div class="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-neutral-800">
-            <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 hover:bg-neutral-100 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600">
+            <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 hover:bg-neutral-100 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600"
+            
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                 </svg>
@@ -34,8 +36,8 @@
             
             <div class="flex mx-auto space-x-4 px-2 " v-if="noChatFound">
                 <div class="flex parent-card items-center space-x-2 bg-white p-2 px-4 dark:bg-inherit">
-                    <p class="font-regular text-lg dark:text-gray-300">GPT-3.5</p>
-                    <ChevronDownIcon class="w-5 h-5 text-gray-400"/>
+                    <img src="~~/assets/logos/kulissiwa.svg" width="24" height="24" alt="Kulissiwa Logo">
+                    <p class="text-lg">Kulissiwa</p>
                 </div>
             </div> 
             <div v-else v-show="!isLoading" class="flex flex-col mx-auto items-center justiy-center">
@@ -71,15 +73,14 @@
             >
                 <div class="flex justify-center items-cente text-center" v-if="noChatFound">
                     <div class="flex justify-center items-center flex-col dark:bg-transparent">
-                    <img src="~~/assets/logos/No-chats-found.jpg" alt="No Chat Found" class="md:w-1/3 max-lg:w-1/2"> 
-                    <h1 class="text-4xl font-semibold m-1">No chats yet</h1>
-                    <p class="text-2xl m-1">Start a new chat by typing a message below
-                    </p>
-                    <ClientOnly>
-                        <i class="mt-2 p-1 fas fa-arrow-down fa-xl"></i> 
-                    </ClientOnly>
-                    
-                </div>
+                        <h1 class="text-xl lg:text-2xl font-semibold m-1">No chats yet</h1>
+                        <p class="text-lg lg:text-xl m-1">Start a new chat by typing a message below
+                        </p>
+                        <ClientOnly>
+                            <i class="mt-2 p-1 fas fa-arrow-down fa-xl"></i> 
+                        </ClientOnly>
+                        
+                    </div>
                 </div>
                 <div class="w-auto px-4 overflow-y-auto" ref="chatWindow" >
                     <LoadingIndicator v-show="isLoading"/>
@@ -181,7 +182,7 @@
 
         <!-- Message Input -->
         <div class="flex items-center justify-center px-4 w-auto sm:flex-grow pb-5 mb-8 md:pb-0 md:mb-0">
-            <div class="rounded-xl flex items-center px-2 border-2 border-gray-200  w-full md:w-1/2 hover:border-gray-300 dark:bg-inherit dark:border-neutral-700 dark:hover:border-neutral-600">
+            <div class="rounded-xl flex items-center px-2 border-2 border-gray-200  w-full lg:w-1/2 hover:border-gray-300 dark:bg-inherit dark:border-neutral-700 dark:hover:border-neutral-600">
                 <textarea 
                     type="text" 
                     :rows="rows" 

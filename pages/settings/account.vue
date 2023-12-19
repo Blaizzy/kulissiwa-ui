@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col items-center pt-4 pb-6 bg-white dark:bg-neutral-950 dark:text-gray-400" >
 
-        <div class="flex items-center justify-between lg:w-1/3 px-4">
+        <div class="flex items-center justify-between w-4/5 xl:w-1/3 px-4">
             <div class="flex pb-4 pt-4 relative">
                 <h1 class="text-2xl dark:text-gray-200">Settings</h1>
             </div>
@@ -9,12 +9,12 @@
         </div>
 
         <hr class="w-full border-gray-200 dark:border-neutral-800" />
-        <div class="flex items-center justify-between lg:w-1/3 px-4">
+        <div class="flex items-center justify-between w-4/5 xl:w-1/3 px-4">
             <div class="flex pb-4 pt-4 w-1/3">
                 <h1 class="text-lg dark:text-gray-200">Account</h1>
             </div>
         </div>
-        <div class="flex flex-col gap-4 w-4/5 lg:w-1/3 px-8 bg-neutral-100/50 dark:bg-neutral-900 p-4 rounded-lg font-light">
+        <div class="flex flex-col gap-4 w-4/5 xl:w-1/3 px-8 bg-neutral-100/50 dark:bg-neutral-900 p-4 rounded-lg font-light">
             <div class="flex items-center justify-between py-2">
                 <h1 class="text-md dark:text-gray-200">Name</h1>
                 <p class="text-sm dark:text-gray-200">{{ name }}</p>   
@@ -33,7 +33,7 @@
 
         
 
-        <div class="flex flex-col mt-4 gap-4 w-4/5 lg:w-1/3 px-8 bg-neutral-100/50 dark:bg-neutral-900 p-4 rounded-lg font-light">
+        <div class="flex flex-col mt-4 gap-4 w-4/5 xl:w-1/3 px-8 bg-neutral-100/50 dark:bg-neutral-900 p-4 rounded-lg font-light">
             <div class="flex items-center justify-between py-2">
                 <h1 class="text-md dark:text-gray-200">Your Plan</h1>
                 <p class="text-md animated-gradient-text font-bold" v-if="tier !== 'Free'">{{ tier }}</p> 
@@ -48,7 +48,7 @@
             </div>
             
         </div>
-        <div class="mt-4 flex justify-end w-4/5 lg:w-1/3 px-4">
+        <div class="mt-4 flex justify-end w-4/5 xl:w-1/3 px-4">
 
             <button class="flex px-4 py-2 rounded-full bg-neutral-100/50 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:bg-neutral-900 dark:hover:text-gray-300" @click="signOut">
                 

@@ -4,7 +4,12 @@
      
     <div class="flex justify-between items-center pb-4 px-4 pt-4 mb-8 border-b border-gray-200 w-full bg-white relative"> <!-- Added relative here -->
       <div class="flex">
-        <h1 class="text-2xl font-semibold">Choose your plan</h1>
+
+        <div class="flex flex-1 justify-center text-3xl">
+          <h1 class="font-regular mr-1">Kulissiwa</h1>
+          <h3 class="animated-gradient-text font-bold">Pro</h3>
+        </div>
+    
       </div>
     </div>
     <div class="flex items-center justify-center space-x-4 bg-white px-2">
