@@ -13,10 +13,8 @@ definePageMeta({
                     <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onShowSuccess('Data uploaded sucessfully')" @show-failure="onShowFailure('Data upload failed!')"  />
                 </div>
                 <div class="flex w-5 h-5">
-                    <a href="mailto:support@kulissiwa.com?subject=Help%20with%20Kulissiwa%20" target="_blank" class="cursor-pointer hover:text-white dark:text-gray-200 dark:hover:bg-sky-500 dark:hover:rounded-full">
-                        <ClientOnly>
-                            <i class="fa-solid fa-question-circle"></i>
-                        </ClientOnly>
+                    <a href="mailto:support@kulissiwa.com?subject=Help%20with%20Kulissiwa%20" target="_blank" class="hover:underline">
+                        <p class="font-semibold text-sm">Help</p>
                     </a>
                 </div>
 

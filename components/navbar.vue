@@ -280,8 +280,16 @@ export default {
         
     },
     methods: {
+        isMobileDevice() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            return /android|ipad|iphone|ipod/i.test(userAgent);
+        },
         showPricingModal(){
-            this.open = !this.open
+            if (this.isMobileDevice()) {
+                this.$router.push({ name: 'checkout' })
+            }else{
+                this.open = !this.open
+            }
         },
         async getConversations(supabase, refresh = false) {
             const startIndex = (this.currentPage - 1) * this.itemsPerPage;
