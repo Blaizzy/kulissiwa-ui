@@ -59,9 +59,14 @@
             </NuxtLink>
             <div class="flex flex-col px-4 mb-2 ">
                 <ul v-show="!collapsed" class="flex list-inside" v-for="conversation in conversations" :key="conversation.id">
+                    <NuxtLink
+                        :to="`/chats/${conversation.id}`" 
+                        
+                        >
                     <li class="px-4 py-2 text-sm w-full border-l-2 text-gray-500 border-gray-100 hover:border-gray-300 dark:border-neutral-800 dark:hover:border-neutral-600 dark:hover:text-gray-300">
                     {{ conversation.title }} 
                     </li>
+                    </NuxtLink>
                 </ul>
             </div>
             
