@@ -65,7 +65,9 @@
         </div>
 
         
-        <div class="overflow-y-auto pb-64 lg:pb-16">
+        <div class="overflow-y-auto pb-64 lg:pb-16"
+        :class="noChatFound ? 'h-full pb-32' : ''"
+        >
             
             <div class="flex w-full justify-center p-2"
             :class="noChatFound ? 'flex-col h-full' : ''"
