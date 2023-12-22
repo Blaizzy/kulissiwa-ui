@@ -1,23 +1,21 @@
 <template>
   
-  <div class="flex h-screen">
+  <div class="flex h-screen dark:bg-neutral-900">
     <!-- Include custom styles for your widget -->
-
     <navbar v-if="!isAuth"/>
-    <conversations v-if="isChats"/>
-    <NuxtPage />
-
+    <NuxtPage class="w-full"/>
+    <mobileNavBar v-if="!isAuth"/>
   </div>
 </template>
 
 <script>
 
-import conversations from './components/conversations.vue'
-
+import conversations from './components/conversationsWindow.vue'
+import mobileNavBar from './components/mobileNavBar.vue'
 
 export default {
-
-  components: { conversations },
+ 
+  components: { conversations, mobileNavBar },
   computed: {
     isChats() {
       if (this.$route.name == 'chats-id' || this.$route.name == 'chats') {

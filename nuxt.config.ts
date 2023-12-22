@@ -8,11 +8,23 @@ export default defineNuxtConfig({
         link: [
           { rel: 'icon', type: 'image/svg', href: '/favicon.png' }
         ],
+        script: [
+          {
+            children: `
+              
+                  if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+              
+              
+            `,
+          },
+        ],
       },
-      
-      
   },
-
+  
   modules: [
       '@nuxtjs/tailwindcss',
       '@nuxtjs/supabase',

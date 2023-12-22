@@ -7,7 +7,7 @@
 
       <div class="absolute inset-0 bg-black bg-opacity-50" :class="{ 'opacity-0': !isOpen, 'opacity-100': isOpen }"></div>
       <div
-        class="bg-white w-1/3 rounded-lg p-6 shadow-lg transform transition ease-in-out duration-300"
+        class="bg-white w-4/5 xl:w-1/3 rounded-lg p-6 shadow-lg transform transition ease-in-out duration-300 dark:bg-neutral-900"
         :class="{ 'opacity-0 scale-90': !isOpen, 'opacity-100 scale-100': isOpen }"
       >
         <button
@@ -18,11 +18,11 @@
             <i class="fas fa-times" ></i>
           </ClientOnly>
         </button>
-        <h2 class="text-xl font-semibold mb-4">New Data Source</h2>
+        <h2 class="text-xl font-semibold mb-4 dark:text-gray-200">New Data Source</h2>
         <div class="text-base">
         
           <label for="data-type" class="block mb-2">Select data type:</label>
-          <select id="data-type" class="block w-full border border-gray-300 rounded-lg p-1 py-2 mb-2" v-model="selectedDataType" @change="resetFiles">
+          <select id="data-type" class="block w-full border border-gray-300 rounded-lg p-1 py-2 mb-2 dark:bg-neutral-800 dark:text-gray-400 dark:border-none" v-model="selectedDataType" @change="resetFiles">
             <option 
               v-for="dataType in dataTypes"
               :key="dataType.value"
@@ -37,7 +37,7 @@
           <input
             id="data-source-name"
             type="text"
-            class="block w-full border border-gray-300 rounded-lg p-2"
+            class="block w-full border border-gray-300 rounded-lg p-2 dark:bg-neutral-800 dark:text-gray-400 dark:border-none"
             placeholder="i.e. Docs"
             name="data-source-name"
             v-model="name" v-show="selectedDataType=='Text' || selectedDataType=='URL'"/>
@@ -46,7 +46,7 @@
           <form @submit.prevent>
             <div v-if="selectedDataType === 'PDF' || selectedDataType === 'Docx'" class="transition-opacity duration-300 delay-300 mt-3" :class="{ 'opacity-0': !selectedDataType, 'opacity-100': selectedDataType === 'PDF' || selectedDataType === 'Docx' }">
               <div 
-                class="file-dropzone border-2 border-dashed border-gray-300 p-5 mb-4 text-center flex flex-col justify-center items-center transition-colors duration-300 rounded"
+                class="file-dropzone border-2 border-dashed border-gray-300 p-5 mb-4 text-center flex flex-col justify-center items-center transition-colors duration-300 rounded dark:border-neutral-700"
                 @dragenter.prevent.stop="dragEnter" 
                 @dragover.prevent.stop="dragOver" 
                 @dragleave.prevent.stop="dragLeave" 
@@ -84,7 +84,7 @@
               </div>
               <!-- File Display Area (loop through each uploaded file) -->
               <div v-for="(file, index) in uploadedFiles" :key="index">
-                <div class="flex flex-col p-3 rounded bg-gray-100 m-2">
+                <div class="flex flex-col p-3 rounded bg-gray-100 m-2 dark:bg-neutral-800 dark:text-gray-400 dark:border-none">
                   <!-- Content (icon, file name, remove icon) -->
                   <div class="flex items-center justify-between mb-2">
                     <!-- File icon based on type -->
@@ -129,7 +129,7 @@
               <input
                 id="website-url"
                 type="url"
-                class="block w-full border border-gray-300 rounded-lg p-2"
+                class="block w-full border border-gray-300 rounded-lg p-2 dark:bg-neutral-800 dark:text-gray-400 dark:border-none"
                 placeholder="https://example.com" v-model="data"
                 name="website-url"
               />
@@ -139,9 +139,9 @@
                 <input class="mr-2" type="checkbox" id="crawl" name="crawl" value="crawl" v-model="crawl">
                 <label for="crawl" class="text-md">Crawl</label><br>
                 <div class="mt-2 text-sm" v-show="onCrawl">
-                  <div class=" flex items-center bg-yellow-50 p-1 px-2 rounded-md border border-yellow-300"> 
-                    <i class="fas fa-info-circle text-yellow-500  mr-2"></i>
-                    <p class="text-gray-700">URL crawling is limited to 300 pages per crawl. Reach out to us if you need more.</p>
+                  <div class=" flex items-center bg-yellow-50 p-1 px-2 rounded-md border border-yellow-300 dark:bg-inherit dark:border-yellow-500"> 
+                    <i class="fas fa-info-circle text-yellow-500 mr-2 dark:text-yellow-500"></i>
+                    <p class="text-gray-700 dark:text-gray-400">URL crawling is limited to 300 pages per crawl. Reach out to us if you need more.</p>
                   </div>
                  
                   
@@ -162,7 +162,7 @@
               <label for="text-data" class="block mb-2 text-md">Text Data:</label>
               <textarea
                 id="text-data"
-                class="block w-full border border-gray-300 rounded-lg p-2"
+                class="block w-full border border-gray-300 rounded-lg p-2 dark:bg-neutral-800 dark:text-gray-400 dark:border-none"
                 placeholder="Enter text here" v-model="data"
               ></textarea>
               <div v-for="(file, index) in uploadedFiles" :key="index">
