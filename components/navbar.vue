@@ -7,14 +7,12 @@
         <!-- Inner Container -->
         <div class="flex flex-col flex-grow mb-4 xl:mb-0">
             <nav class="text-base flex-grow">
-
                 <div class="flex items-center py-2 font-semibold mb-4 text-center justify-between">
                     <img src="~~/assets/logos/kulissiwa.svg" width="32" height="32" alt="Kulissiwa Logo">
                     <button v-show="!collapsed" @click="collapse" class="block px-2 rounded-full hover:bg-sky-50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                         <svg class="icon icon-tabler icon-tabler-layout-sidebar-left-collapse" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><rect height="16" rx="2" width="16" x="4" y="4"/><path d="M9 4v16"/><path d="M15 10l-2 2l2 2"/></svg>
                     </button>
                 </div>
-
                 <button v-show="collapsed" @click="collapse" class="block py-2 px-2 mb-2 font-bold rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                     <Bars3Icon class="w-4 h-4"/>
                 </button>
@@ -93,7 +91,6 @@
             </div>
 
             <hr class="self-end w-full h-px my-2 border-gray-300 dark:border-neutral-700">
-
 
             <div class="flex items-start rounded-full justify-center hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                 <NuxtLink to="/settings/account">
