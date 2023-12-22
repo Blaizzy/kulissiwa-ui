@@ -45,6 +45,7 @@
                     </p>
                 </button>
             </div>
+            <hr class="w-full border-gray-200 dark:border-neutral-800" v-if="tier !=='Free'" />
             <div class="flex items-center justify-between py-2" v-if="tier !=='Free'">
                 <h1 class="text-md dark:text-gray-200">Subscription</h1>
                 <button class="flex px-4 py-2 rounded-full bg-neutral-200/50 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700/50 dark:hover:text-gray-300" @click="redirectToBillingPortal">
