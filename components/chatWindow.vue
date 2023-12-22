@@ -25,7 +25,7 @@
         </div>
         
 
-        <div class="sticky top-0 flex justify-between items-center pt-4 pb-4 border-b border-gray-200 dark:border-neutral-800 dark:bg-neutral-950">
+        <div class="sticky top-0 z-10 flex justify-between items-center py-4 h-16 border-b border-gray-200 dark:border-neutral-800 dark:bg-neutral-950">
             <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 hover:bg-neutral-100 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600"
             
             >
@@ -65,7 +65,7 @@
         </div>
 
         
-        <div class="flex-grow overflow-y-auto pb-32 lg:pb-16">
+        <div class="overflow-y-auto pb-32 lg:pb-16">
             
             <div class="flex w-full justify-center p-2"
             :class="noChatFound ? 'flex-col h-full' : ''"
