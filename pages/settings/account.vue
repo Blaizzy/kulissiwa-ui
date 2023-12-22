@@ -1,6 +1,5 @@
 <template>
-    <div class="flex flex-col items-center pt-4 pb-6 bg-white dark:bg-neutral-950 dark:text-gray-400" >
-
+    <div class="flex flex-col items-center overflow-y-auto pb-6 bg-white dark:bg-neutral-950 dark:text-gray-400" >
         <div class="flex items-center justify-between w-4/5 xl:w-1/3 px-4">
             <div class="flex pb-4 pt-4 relative">
                 <h1 class="text-2xl dark:text-gray-200">Settings</h1>
@@ -46,6 +45,16 @@
                     </p>
                 </button>
             </div>
+            <div class="flex items-center justify-between py-2" v-if="tier !=='Free'">
+                <h1 class="text-md dark:text-gray-200">Subscription</h1>
+                <button class="flex px-4 py-2 rounded-full bg-neutral-200/50 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700/50 dark:hover:text-gray-300" @click="redirectToBillingPortal">
+                    <p class="text-sm flex items-center  dark:text-gray-200"> Manage
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 ml-1">
+                            <path fill-rule="evenodd" d="M8.25 3.75H19.5a.75.75 0 01.75.75v11.25a.75.75 0 01-1.5 0V6.31L5.03 20.03a.75.75 0 01-1.06-1.06L17.69 5.25H8.25a.75.75 0 010-1.5z" clip-rule="evenodd" />
+                        </svg>
+                    </p>
+                </button>
+            </div>
             
         </div>
         <div class="mt-4 flex justify-end w-4/5 xl:w-1/3 px-4">
@@ -88,9 +97,11 @@ export default {
         };
     },
     data() {
+        const store = useAuthStore();
         return {
             open: false,
             selectedTheme: null,
+            store: store,
         }
     },
     methods:{
@@ -112,7 +123,45 @@ export default {
             }else{
                 this.open = !this.open
             }
-        }
+        },
+        async redirectToBillingPortal() {
+            const supabase = await useSupabaseClient();
+            const { data, error } = await supabase
+                .from('subscriptions')
+                .select('stripe_customer_id')
+                .eq('user_id', this.store.user_session.user.id)
+                .single();
+                
+            if (error) {
+                console.error('Error getting subscription:', error);
+                return;
+            }
+            if (!data) {
+                console.error('No subscription found for this user');
+                return;
+            }
+            const stripe_customer_id = data.stripe_customer_id;
+            // Here you'll call your server to create a billing portal session and get the URL.
+            // For simplicity, let's use fetch:
+            try {
+                const response = await fetch('/api/stripe/create-portal-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: new URLSearchParams({ customer_id: stripe_customer_id })
+                // Add any necessary data like session_id if needed
+                });
+
+                const data = await response.json();
+                
+                if (data && data.url) {
+                window.location.href = data.url; // Redirect to the portal
+                }
+            } catch (error) {
+                console.error('Error redirecting to billing portal:', error);
+            }
+        },
     },
     components: { ModeSwitch, pricing }
 }

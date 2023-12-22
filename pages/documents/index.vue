@@ -4,9 +4,9 @@ definePageMeta({
 });
 </script>
 <template>
-    <div class="flex flex-col items-center dark:text-gray-400 dark:bg-neutral-950 dark:rounded-l-lg">
+    <div class="flex flex-col items-center overflow-y-auto dark:text-gray-400 dark:bg-neutral-950 dark:rounded-l-lg">
      
-        <div class="flex justify-between items-center pb-4 px-4 pt-4 w-4/5 xl:w-1/3"> <!-- Added relative here -->
+        <div class="flex dark:bg-neutral-950 justify-between items-center pb-4 px-4 pt-4 w-4/5 xl:w-1/3"> <!-- Added relative here -->
             
                 <div class="flex">
                     <h1 class="text-2xl dark:text-gray-200">Documents</h1>
@@ -42,6 +42,7 @@ definePageMeta({
             </div>
         </div>
         <hr class="w-full border-gray-200 dark:border-neutral-800" />
+        
         <div class="flex mt-4 px-4 text-sm py-2 w-4/5 xl:w-1/3" v-if="!noDataFound">
             <div class="mt-auto rounded-full flex w-4/5 xl:w-1/2 items-center px-2 border-2 border-gray-200 hover:border-gray-300 dark:border-neutral-700 dark:hover:border-neutral-500">
                 <button class="px-2 text-gray-500 hover:text-black inline-flex items-center">
@@ -155,11 +156,11 @@ definePageMeta({
         </div>
 
         
-        <div class="flex w-4/5 xl:w-1/2" v-if="!noDataFound">
+        <div class="flex w-4/5 xl:w-1/3" v-if="!noDataFound">
             <h2 class="text-md font-semibold pb-2 pt-4 px-4">Files</h2>     
         </div>
         
-        <div class="flex-grow overflow-y-auto pb-4 w-4/5 xl:w-1/3"
+        <div class="flex-grow pb-48 lg:pb-16 w-4/5 xl:w-1/3"
         :class="noDataFound ? 'flex justify-center items-center' : ''"
         >
             <div class="flex justify-center items-center" v-if="noDataFound">
@@ -196,7 +197,7 @@ definePageMeta({
                     <span class="hidden xl:flex-1">Date Created</span>
                     <span class="hidden xl:flex-1">Type</span>
                     <span class="hidden xl:flex-1">Active</span>
-                    <span class="flex-1"></span> <!-- This is to align the dropdown menu in the rows -->
+                    <span class="hidden xl:flex-1"></span> <!-- This is to align the dropdown menu in the rows -->
                 </div>
 
                 <!-- Display skeleton loaders when data is being fetched -->
@@ -257,7 +258,7 @@ definePageMeta({
                                             'group flex w-full items-center rounded-md px-2 py-2 text-sm',
                                             
                                             ]"
-                                          
+                                        
                                         >   
                                             <div class="flex items-center">
                                                 <PencilSquareIcon
@@ -314,6 +315,7 @@ definePageMeta({
                 </div>
             </div>
         </div>
+    
     </div>
       
 

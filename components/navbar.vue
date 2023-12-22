@@ -4,7 +4,7 @@
     :class="{'w-16 items-center': collapsed, 'w-64': !collapsed}"
     id="mainSideNavbar">
     <pricing :show-modal="open" @close-modal="open = false"/>
-        <nav class="text-base">
+        <nav class="text-base flex-grow">
             <div class="flex py-3 font-semibold mb-4 text-center justify-between">
                 <img src="~~/assets/logos/kulissiwa.svg" width="32" height="32" alt="Kulissiwa Logo">
                 <button v-show="!collapsed" @click="collapse" class="block py-3 px-2 mb-2 rounded-full hover:bg-sky-50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
@@ -71,71 +71,55 @@
             </div>
             
             
-            <NuxtLink to="/billing" class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300" v-show="!showUpgradeButton"
-            :class="{'bg-neutral-200/50 dark:text-gray-100 dark:bg-neutral-800': isSelectedMenu('/billing'), 'justify-center': collapsed}">
-                <div v-if="isSelectedMenu('/billing')">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                        <path d="M4.5 3.75a3 3 0 00-3 3v.75h21v-.75a3 3 0 00-3-3h-15z" />
-                        <path fill-rule="evenodd" d="M22.5 9.75h-21v7.5a3 3 0 003 3h15a3 3 0 003-3v-7.5zm-18 3.75a.75.75 0 01.75-.75h6a.75.75 0 010 1.5h-6a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5h3a.75.75 0 000-1.5h-3z" clip-rule="evenodd" />
-                    </svg>
-
-                </div>
-                <div v-else>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
-                    </svg>
-                </div>
-                    <span v-show="!collapsed" class="pl-1.5">Billing</span>
-                
-
-            </NuxtLink>
+            
 
         </nav>
-        <div class="mt-auto flex flex-col" v-show="showUpgradeButton">
-            <span id="upgrade" v-show="!collapsed" class="font-medium  dark:text-gray-300">Try Pro</span>
-            <p class="font-light text-md text-gray-500" v-show="!collapsed">
-                Upgrade to upload more documents, and access powerful AI models.
-            </p>
-            <button class="mt-2 py-2 px-2 rounded-lg bg-sky-500 dark:bg-neutral-800 text-white" @click="showPricingModal">
-                
-                    <ClientOnly>
-                        <div class="relative inline-block"> <!-- Container for the icon and animation -->
-                            <i class="fa-solid fa-gift"></i>
-                            <span class="animate-ping absolute top-0 right-0 inline-flex h-1.5 w-1.5 rounded-full bg-red-600"></span> <!-- Positioning adjusted here -->
-                        </div>
-                        <span id="upgrade" v-show="!collapsed" class="pl-1.5">Learn more</span>
-                    </ClientOnly>
-            
-            </button>
-        </div>
-
-        <hr class="w-full h-px my-2 border-gray-300 dark:border-neutral-700"
-            :class="{'mt-auto ': !showUpgradeButton}">
-
-       
-        <div class="flex items-start rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
-            <NuxtLink to="/settings/account">
-                <div class="flex items-center py-1">
-                    <div class="flex items-center">
-                        <img class="rounded-full border-2 border-white"
-                        :class="{'w-6 h-6': collapsed, 'w-8 h-8': !collapsed}"
-                        id="profilePicture" :src="avatar_url" alt="Profile Picture">
-                        <div id="profileDetails" class="pl-2 text-black dark:text-gray-200 text-md" v-show="!collapsed">
-                            <p class="text-ellipsis overflow-hidden w-9/12">{{ email }}</p>
-                        </div>
-                    </div>
+        
+            <div class="flex flex-col" v-show="showUpgradeButton">
+                <span id="upgrade" v-show="!collapsed" class="font-medium  dark:text-gray-300">Try Pro</span>
+                <p class="font-light text-md text-gray-500" v-show="!collapsed">
+                    Upgrade to upload more documents, and access powerful AI models.
+                </p>
+                <button class="mt-2 py-2 px-2 rounded-lg bg-sky-500 dark:bg-neutral-800 text-white" @click="showPricingModal">
                     
-                    <div v-show="!collapsed" class="px-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
+                        <ClientOnly>
+                            <div class="relative inline-block"> <!-- Container for the icon and animation -->
+                                <i class="fa-solid fa-gift"></i>
+                                <span class="animate-ping absolute top-0 right-0 inline-flex h-1.5 w-1.5 rounded-full bg-red-600"></span> <!-- Positioning adjusted here -->
+                            </div>
+                            <span id="upgrade" v-show="!collapsed" class="pl-1.5">Learn more</span>
+                        </ClientOnly>
+                
+                </button>
+            </div>
 
+            <hr class="self-end w-full h-px my-2 border-gray-300 dark:border-neutral-700">
+
+        
+            <div class="flex items-start rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
+                <NuxtLink to="/settings/account">
+                    <div class="flex items-center py-1">
+                        <div class="flex items-center">
+                            <img class="rounded-full border-2 border-white"
+                            :class="{'w-6 h-6': collapsed, 'w-8 h-8': !collapsed}"
+                            id="profilePicture" :src="avatar_url" alt="Profile Picture">
+                            <div id="profileDetails" class="pl-2 text-black dark:text-gray-200 text-md" v-show="!collapsed">
+                                <p class="text-ellipsis overflow-hidden w-9/12">{{ email }}</p>
+                            </div>
+                        </div>
+                        
+                        <div v-show="!collapsed" class="px-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+
+                        </div>
                     </div>
-                </div>
-            </NuxtLink>
-            
-        </div>
+                </NuxtLink>
+                
+            </div>
+        
     </div>
 </template>
 

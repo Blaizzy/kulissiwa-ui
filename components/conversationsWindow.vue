@@ -1,6 +1,6 @@
 <template>
     <!-- Chat Side Navbar -->
-    <div class="flex flex-col items-center bg-white border-r border-gray-200 dark:bg-neutral-950 dark:border-neutral-800 dark:text-gray-400" >
+    <div class="flex flex-col items-center overflow-y-auto bg-white border-r border-gray-200 dark:bg-neutral-950 dark:border-neutral-800 dark:text-gray-400" >
         <div class="flex items-center justify-between w-4/5 xl:w-1/3 px-4">
             <div class="flex pb-4 pt-4 relative">
                 <h1 class="text-2xl dark:text-gray-200">Chats</h1>
@@ -36,7 +36,7 @@
         <div class="w-4/5 xl:w-1/3 px-4" v-if="!noDataFound">
             <h2 class="text-md font-semibold pb-2 pt-4">Conversations</h2>     
         </div>
-        <div class="overflow-y-auto h-[50vh] xl:h-full w-4/5 xl:w-1/3 px-4 mt-4 bg-neutral-100/50 dark:bg-neutral-900 rounded-lg">
+        <div class=" w-4/5 xl:w-1/3 px-4 mt-4 bg-neutral-100/50 dark:bg-neutral-900 rounded-lg">
 
             <ListSkeleton v-show="isLoading" v-for="i in 5" :key="i" />
             <div v-for="(conversation, index) in conversations" :key="conversation.id" class="rounded-lg  overflow-y-visible">
@@ -149,7 +149,7 @@
  
 
         </div>
-        <div class="flex items-center justify-center pt-4">
+        <div class="flex items-center justify-center pt-4 pb-48 lg:pb-16">
                 <button @click="nextPage()" 
                 class="px-2 py-1 border-2 border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 inline-flex items-center dark:bg-inherit dark:border-neutral-700 dark:hover:border-neutral-500" 
                 :class="{'hidden': currentPage === totalPages}"

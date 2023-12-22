@@ -83,7 +83,7 @@
                 <form @submit.prevent="handleSubmit" method="POST">
                   <!-- Add a hidden field with the price ID -->
                   <input type="hidden" name="price_id" :value="price.id"/>
-                  <button id="checkout-and-portal-button" class="w-full text-lg bg-sky-600 font-medium rounded-lg px-2 py-2 text-white dark:text-neutral-900 hover:bg-sky-600/80" type="submit"> Get Started <i class="fa-solid fa-arrow-right"></i>
+                  <button id="checkout-and-portal-button" class="w-full text-md bg-sky-600 font-medium rounded-lg px-2 py-2 text-white dark:text-neutral-900 hover:bg-sky-600/80" type="submit"> Get Started <i class="fa-solid fa-arrow-right"></i>
                   </button>
                 </form>
               </div>
