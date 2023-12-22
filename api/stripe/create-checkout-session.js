@@ -95,7 +95,7 @@ export default async function createCheckoutSession(request) {
             console.log(`Customer ${customerData.customerId} has an active subscription, redirecting to billing portal.`);
             const portalSession = await stripe.billingPortal.sessions.create({
                 customer: customerData.customerId,
-                return_url: `${BASE_URL}/billing`,
+                return_url: `${BASE_URL}/settings/account`,
             });
             return new Response(JSON.stringify(portalSession), {
                 status: 200,
