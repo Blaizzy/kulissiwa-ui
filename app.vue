@@ -3,7 +3,7 @@
   <div class="flex h-screen dark:bg-neutral-900">
     <!-- Include custom styles for your widget -->
     <navbar v-if="!isAuth"/>
-    <NuxtPage class="overflow-y-auto w-full"/>
+    <NuxtPage class="w-full"/>
     <mobileNavBar v-if="!isAuth"/>
   </div>
 </template>
