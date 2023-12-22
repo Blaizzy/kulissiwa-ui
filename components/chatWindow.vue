@@ -40,7 +40,7 @@
                     <p class="text-lg">Kulissiwa</p>
                 </div>
             </div> 
-            <div v-else v-show="!isLoading" class="flex flex-col mx-auto items-center justiy-center">
+            <div v-else v-show="!isLoading" class="flex flex-col mx-auto items-center justiy-center truncate">
                 <div class="flex">
                     <h1 class="text-xl font-regular m-1 truncate">{{ conversationTitle }}</h1>
                 </div>
