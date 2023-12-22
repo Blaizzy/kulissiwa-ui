@@ -5,7 +5,7 @@
     id="mainSideNavbar">
     <pricing :show-modal="open" @close-modal="open = false"/>
     <!-- Inner Container -->
-    <div class="flex flex-col flex-grow mb-4">
+    <div class="flex flex-col flex-grow mb-4 xl:mb-0">
         <nav class="text-base flex-grow">
         
             <div class="flex items-center py-2 font-semibold mb-4 text-center justify-between">
