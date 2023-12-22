@@ -1,6 +1,6 @@
 <template>
     <!-- Content -->
-    <div class="flex flex-col bg-white dark:bg-neutral-950 dark:text-gray-400 z-99" >
+    <div class="flex flex-col bg-white h-screen dark:bg-neutral-950 dark:text-gray-400 z-99" >
         <div class="flex absolute top-0 right-0">
             <div 
                 v-if="showSuccess" 
@@ -65,7 +65,7 @@
         </div>
 
         
-        <div class="flex overflow-y-auto">
+        <div class="flex-grow overflow-y-auto pb-32 lg:pb-16">
             
             <div class="flex w-full justify-center p-2"
             :class="noChatFound ? 'flex-col h-full' : ''"
