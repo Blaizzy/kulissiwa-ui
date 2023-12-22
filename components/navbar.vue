@@ -3,29 +3,31 @@
     <div class="hidden lg:flex h-screen flex-col dark:text-gray-400 bg-neutral-100/50 dark:bg-neutral-900 p-4 border-r border-gray-200 dark:border-0"
     :class="{'w-16 items-center': collapsed, 'w-64': !collapsed}"
     id="mainSideNavbar">
-        <pricing :show-modal="open" @close-modal="open = false"/>
-        <!-- Inner Container -->
-        <div class="flex flex-col flex-grow mb-4 xl:mb-0">
-            <nav class="text-base flex-grow">
-                <div class="flex items-center py-2 font-semibold mb-4 text-center justify-between">
-                    <img src="~~/assets/logos/kulissiwa.svg" width="32" height="32" alt="Kulissiwa Logo">
-                    <button v-show="!collapsed" @click="collapse" class="block px-2 rounded-full hover:bg-sky-50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
-                        <svg class="icon icon-tabler icon-tabler-layout-sidebar-left-collapse" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><rect height="16" rx="2" width="16" x="4" y="4"/><path d="M9 4v16"/><path d="M15 10l-2 2l2 2"/></svg>
-                    </button>
-                </div>
-                <button v-show="collapsed" @click="collapse" class="block py-2 px-2 mb-2 font-bold rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
-                    <Bars3Icon class="w-4 h-4"/>
+    <pricing :show-modal="open" @close-modal="open = false"/>
+    <!-- Inner Container -->
+    <div class="flex flex-col flex-grow mb-4 xl:mb-0">
+        <nav class="text-base flex-grow">
+
+            <div class="flex items-center py-2 font-semibold mb-4 text-center justify-between">
+                <img src="~~/assets/logos/kulissiwa.svg" width="32" height="32" alt="Kulissiwa Logo">
+                <button v-show="!collapsed" @click="collapse" class="block px-2 rounded-full hover:bg-sky-50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
+                    <svg class="icon icon-tabler icon-tabler-layout-sidebar-left-collapse" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><rect height="16" rx="2" width="16" x="4" y="4"/><path d="M9 4v16"/><path d="M15 10l-2 2l2 2"/></svg>
                 </button>
-                <NuxtLink to="/documents" class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300"
-                :class="{'bg-neutral-200/50 dark:text-gray-100 dark:bg-neutral-800': isSelectedMenu('/documents'), 'justify-center': collapsed}">
-                    <ClientOnly>
-                        <div v-if="isSelectedMenu('/documents')">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                                <path d="M21 6.375c0 2.692-4.03 4.875-9 4.875S3 9.067 3 6.375 7.03 1.5 12 1.5s9 2.183 9 4.875z" />
-                                <path d="M12 12.75c2.685 0 5.19-.586 7.078-1.609a8.283 8.283 0 001.897-1.384c.016.121.025.244.025.368C21 12.817 16.97 15 12 15s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.285 8.285 0 001.897 1.384C6.809 12.164 9.315 12.75 12 12.75z" />
-                                <path d="M12 16.5c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 001.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 001.897 1.384C6.809 15.914 9.315 16.5 12 16.5z" />
-                                <path d="M12 20.25c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 001.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 001.897 1.384C6.809 19.664 9.315 20.25 12 20.25z" />
-                            </svg>
+            </div>
+
+            <button v-show="collapsed" @click="collapse" class="block py-2 px-2 mb-2 font-bold rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
+                <Bars3Icon class="w-4 h-4"/>
+            </button>
+            <NuxtLink to="/documents" class="flex items-center py-2 px-2 mb-2 rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300"
+            :class="{'bg-neutral-200/50 dark:text-gray-100 dark:bg-neutral-800': isSelectedMenu('/documents'), 'justify-center': collapsed}">
+                <ClientOnly>
+                    <div v-if="isSelectedMenu('/documents')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                            <path d="M21 6.375c0 2.692-4.03 4.875-9 4.875S3 9.067 3 6.375 7.03 1.5 12 1.5s9 2.183 9 4.875z" />
+                            <path d="M12 12.75c2.685 0 5.19-.586 7.078-1.609a8.283 8.283 0 001.897-1.384c.016.121.025.244.025.368C21 12.817 16.97 15 12 15s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.285 8.285 0 001.897 1.384C6.809 12.164 9.315 12.75 12 12.75z" />
+                            <path d="M12 16.5c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 001.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 001.897 1.384C6.809 15.914 9.315 16.5 12 16.5z" />
+                            <path d="M12 20.25c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 001.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 001.897 1.384C6.809 19.664 9.315 20.25 12 20.25z" />
+                        </svg>
 
                         </div>
                         <div v-else>
@@ -48,29 +50,29 @@
                                 <path d="M15.75 7.5c-1.376 0-2.739.057-4.086.169C10.124 7.797 9 9.103 9 10.609v4.285c0 1.507 1.128 2.814 2.67 2.94 1.243.102 2.5.157 3.768.165l2.782 2.781a.75.75 0 001.28-.53v-2.39l.33-.026c1.542-.125 2.67-1.433 2.67-2.94v-4.286c0-1.505-1.125-2.811-2.664-2.94A49.392 49.392 0 0015.75 7.5z" />
                             </svg>
 
-                        </div>
-                        <div v-else>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
-                            </svg>
-                        </div>
-                        <span v-show="!collapsed" class="pl-2">Chats</span>
+                    </div>
+                    <div v-else>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                        </svg>
+                    </div>
+                    <span v-show="!collapsed" class="pl-2">Chats</span>
 
-                </NuxtLink>
-                <div class="flex flex-col px-4 mb-2 ">
-                    <ul v-show="!collapsed" class="flex list-inside" v-for="conversation in conversations" :key="conversation.id">
-                        <NuxtLink
-                            :to="`/chats/${conversation.id}`"
+            </NuxtLink>
+            <div class="flex flex-col px-4 mb-2 ">
+                <ul v-show="!collapsed" class="flex list-inside" v-for="conversation in conversations" :key="conversation.id">
+                    <NuxtLink
+                        :to="`/chats/${conversation.id}`"
 
-                            >
-                        <li class="px-4 py-2 text-sm w-full border-l-2 text-gray-500 border-gray-100 hover:border-gray-300 dark:border-neutral-800 dark:hover:border-neutral-600 dark:hover:text-gray-300">
-                        {{ conversation.title }}
-                        </li>
-                        </NuxtLink>
-                    </ul>
-                </div>
+                        >
+                    <li class="px-4 py-2 text-sm w-full border-l-2 text-gray-500 border-gray-100 hover:border-gray-300 dark:border-neutral-800 dark:hover:border-neutral-600 dark:hover:text-gray-300">
+                    {{ conversation.title }}
+                    </li>
+                    </NuxtLink>
+                </ul>
+            </div>
 
-            </nav>
+        </nav>
 
             <div class="flex flex-col mt-auto" v-show="showUpgradeButton">
                 <span id="upgrade" v-show="!collapsed" class="font-medium  dark:text-gray-300">Try Pro</span>
@@ -91,6 +93,7 @@
             </div>
 
             <hr class="self-end w-full h-px my-2 border-gray-300 dark:border-neutral-700">
+
 
             <div class="flex items-start rounded-full justify-center hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                 <NuxtLink to="/settings/account">
