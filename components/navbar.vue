@@ -7,14 +7,14 @@
         <!-- Inner Container -->
         <div class="flex flex-col flex-grow mb-4 xl:mb-0">
             <nav class="text-base flex-grow">
-            
+
                 <div class="flex items-center py-2 font-semibold mb-4 text-center justify-between">
                     <img src="~~/assets/logos/kulissiwa.svg" width="32" height="32" alt="Kulissiwa Logo">
                     <button v-show="!collapsed" @click="collapse" class="block px-2 rounded-full hover:bg-sky-50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                         <svg class="icon icon-tabler icon-tabler-layout-sidebar-left-collapse" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><rect height="16" rx="2" width="16" x="4" y="4"/><path d="M9 4v16"/><path d="M15 10l-2 2l2 2"/></svg>
                     </button>
                 </div>
-                
+
                 <button v-show="collapsed" @click="collapse" class="block py-2 px-2 mb-2 font-bold rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                     <Bars3Icon class="w-4 h-4"/>
                 </button>
@@ -36,7 +36,7 @@
                             </svg>
                         </div>
 
-                        <span v-show="!collapsed" class="pl-1.5">Documents</span>    
+                        <span v-show="!collapsed" class="pl-1.5">Documents</span>
                     </ClientOnly>
 
                 </NuxtLink>
@@ -57,30 +57,30 @@
                             </svg>
                         </div>
                         <span v-show="!collapsed" class="pl-2">Chats</span>
-                    
+
                 </NuxtLink>
                 <div class="flex flex-col px-4 mb-2 ">
                     <ul v-show="!collapsed" class="flex list-inside" v-for="conversation in conversations" :key="conversation.id">
                         <NuxtLink
-                            :to="`/chats/${conversation.id}`" 
-                            
+                            :to="`/chats/${conversation.id}`"
+
                             >
                         <li class="px-4 py-2 text-sm w-full border-l-2 text-gray-500 border-gray-100 hover:border-gray-300 dark:border-neutral-800 dark:hover:border-neutral-600 dark:hover:text-gray-300">
-                        {{ conversation.title }} 
+                        {{ conversation.title }}
                         </li>
                         </NuxtLink>
                     </ul>
                 </div>
-                
+
             </nav>
-                
+
             <div class="flex flex-col mt-auto" v-show="showUpgradeButton">
                 <span id="upgrade" v-show="!collapsed" class="font-medium  dark:text-gray-300">Try Pro</span>
                 <p class="font-light text-md text-gray-500" v-show="!collapsed">
                     Upgrade to upload more documents, and access powerful AI models.
                 </p>
                 <button class="mt-2 py-2 px-2 rounded-lg bg-sky-500 dark:bg-neutral-800 text-white" @click="showPricingModal">
-                    
+
                         <ClientOnly>
                             <div class="relative inline-block"> <!-- Container for the icon and animation -->
                                 <i class="fa-solid fa-gift"></i>
@@ -88,13 +88,13 @@
                             </div>
                             <span id="upgrade" v-show="!collapsed" class="pl-1.5">Learn more</span>
                         </ClientOnly>
-                
+
                 </button>
             </div>
 
             <hr class="self-end w-full h-px my-2 border-gray-300 dark:border-neutral-700">
 
-        
+
             <div class="flex items-start rounded-full justify-center hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                 <NuxtLink to="/settings/account">
                     <div class="flex items-center py-1">
@@ -106,7 +106,7 @@
                                 <p class="text-ellipsis overflow-hidden w-9/12">{{ email }}</p>
                             </div>
                         </div>
-                        
+
                         <div v-show="!collapsed" class="px-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
@@ -128,6 +128,7 @@ import { ChevronDoubleLeftIcon, Bars3Icon, CircleStackIcon } from '@heroicons/vu
 import { useAuthStore } from '@/stores/index'
 import { useMonthlyUsageStore } from '@/stores/monthly-usage'
 import { useTierLimits } from '~/stores/tiers'
+import { useUserPreferences } from '@/stores/user-preferences'
 
 
 export default {
@@ -136,6 +137,7 @@ export default {
         const store = useAuthStore()
         const monthly_usage = useMonthlyUsageStore()
         const tier_limits = useTierLimits()
+        const preferences = useUserPreferences()
         return {
             open: false,
             conversations: [],
@@ -149,6 +151,7 @@ export default {
             store: store,
             monthly_usage: monthly_usage,
             tier_limits: tier_limits,
+            preferences: preferences,
             showUpgradeButton: false,
         }
     },
@@ -165,12 +168,12 @@ export default {
                 } else {
                     this.email = this.store.user_session.user.email
                 }
-                    
+
             } else if (event === 'SIGNED_OUT') {
                 const { data, error } = supabase
                     .from('monthly_usage')
                     .update([
-                        { 
+                        {
                             files_uploaded: this.monthly_usage.filesUploaded,
                             messages_sent: this.monthly_usage.messagesSent,
                             active_data_sources: this.monthly_usage.activeDataSourcesCount,
@@ -186,6 +189,7 @@ export default {
                 this.store.signOut()
                 this.monthly_usage.reset()
                 this.tier_limits.reset()
+                this.preferences.reset()
                 this.resetProfile()
                 this.$router.push('/login');
             }
@@ -197,43 +201,44 @@ export default {
                 this.getActiveDataSourcesCount(supabase)
                 this.getSubscription(supabase)
                 this.getTiers(supabase)
+                this.getUserPreferences(supabase)
             }
-            
+
             // Update Files Uploaded
             if (this.monthly_usage.filesUploaded){
                 const { data, error } = await supabase
                     .from('monthly_usage')
                     .update([
-                        { 
+                        {
                             files_uploaded: this.monthly_usage.filesUploaded,
                         }
                     ])
                     .eq('user_id', this.store.user_session.user.id)
                     .eq('year_month', new Date().toISOString().slice(0,7))
-                
+
                 if (error) {
                     console.log(error)
                 }
             }
-            
+
             // Update Tier ID
             if (this.monthly_usage.tier_id) {
                 const { data, error } = await supabase
                     .from('monthly_usage')
                     .update([
-                        { 
+                        {
                             tier_id: this.monthly_usage.tier_id,
                         }
                     ])
                     .eq('user_id', this.store.user_session.user.id)
                     .eq('year_month', new Date().toISOString().slice(0,7))
-                
+
                 if (error) {
                     console.log(error)
                 }
             }
         })
-        
+
     },
     methods: {
         isMobileDevice() {
@@ -245,6 +250,20 @@ export default {
                 this.$router.push({ name: 'checkout' })
             }else{
                 this.open = !this.open
+            }
+        },
+        async getUserPreferences(supabase){
+            const { data, error } = await supabase
+                .from('user_preferences')
+                .select('*')
+                .eq('user_id', this.store.user_session.user.id)
+
+            if (error) {
+                console.log(error);
+                return;
+            }
+            if (data) {
+                this.preferences.update(data[0]);
             }
         },
         async getConversations(supabase, refresh = false) {
@@ -289,10 +308,10 @@ export default {
             const { data, error } = await supabase
                 .from('tiers')
                 .select('id, name, file_limit, message_limit, pages_limit, concurrent_upload_limit, active_data_sources_limit')
-            
+
             if (error) {
                 console.log(error)
-            } 
+            }
             if (data) {
                 this.tier_limits.updateTiers(data)
                 if (this.monthly_usage.tier_id) {
@@ -306,10 +325,10 @@ export default {
                 .from('subscriptions')
                 .select('id, stripe_customer_id, tier, status')
                 .eq('user_id', this.store.user_session.user.id)
-            
+
             if (error) {
                 console.log(error)
-            } 
+            }
             if (data) {
                 if (data.length === 0) {
                     this.showUpgradeButton = true
@@ -347,7 +366,7 @@ export default {
                     const { data, error } = await supabase
                         .from('monthly_usage')
                         .insert([
-                            { 
+                            {
                                 user_id: user_id,
                                 tier_id: tier_id,
                                 files_uploaded: files_uploaded,
@@ -378,10 +397,10 @@ export default {
                 .select('id, user_id, is_active')
                 .eq('user_id', this.store.user_session.user.id)
                 .eq('is_active', true)
-            
+
             if (error) {
                 console.log(error)
-            } 
+            }
             if (data) {
                 this.monthly_usage.updateActiveDataSourcesCount(data)
             }

@@ -7,7 +7,7 @@
                         <MoonIcon v-if="theme === 'dark'" class="mr-3 h-5 w-5" />
                         <SunIcon v-else-if="theme === 'light'" class="mr-3 h-5 w-5" />
                         <ComputerDesktopIcon v-else class="mr-3 h-5 w-5" />
-                        <p> 
+                        <p>
                             {{ capitalizeFirstLetter(theme) }}</p>
                     </div>
                     <svg :class="{ 'rotate-180': open }" class="ml-2 -mr-1 h-5 w-5 transform transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -35,12 +35,12 @@
         </div>
     </div>
   </template>
-  
+
   <script>
   import { ref } from 'vue';
   import useTheme from '~/composables/useTheme';
   import { MoonIcon, SunIcon, ComputerDesktopIcon } from '@heroicons/vue/20/solid';
-  
+
   export default {
     components: {
       MoonIcon,
@@ -50,7 +50,6 @@
     setup() {
       const { theme, setThemeClass } = useTheme();
       
-  
       return {
         theme,
         setThemeClass
@@ -70,4 +69,3 @@
     }
   };
   </script>
-  
