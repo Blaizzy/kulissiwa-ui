@@ -63,7 +63,7 @@
             </div>
 
         </div>
-        <div class="mt-4 flex justify-end w-4/5 xl:w-1/3 px-4 pb-32 lg:pb-16">
+        <div class="mt-4 flex justify-end w-4/5 xl:w-1/3 px-4 pb-64 lg:pb-16">
 
             <button class="flex px-4 py-2 rounded-full bg-neutral-100/50 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:bg-neutral-900 dark:hover:text-gray-300" @click="signOut">
 
