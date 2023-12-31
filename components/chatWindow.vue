@@ -184,7 +184,7 @@
         <!-- Message Input -->
         <div class="flex justify-center">
         <div class="flex justify-center fixed bottom-16 lg:bottom-0 px-4 pb-2 z-30 w-full">
-            <div class="rounded-xl flex items-center px-2 border-2 border-gray-200 w-full lg:w-1/2 hover:border-gray-300 dark:bg-neutral-950 dark:border-neutral-700 dark:hover:border-neutral-600">
+            <div class="rounded-xl flex items-center px-2 border-2 border-gray-200 w-full lg:w-1/2 hover:border-gray-300 bg-white dark:bg-neutral-950 dark:border-neutral-700 dark:hover:border-neutral-600">
                 <textarea
                     type="text"
                     :rows="rows"
