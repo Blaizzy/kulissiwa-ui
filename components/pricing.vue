@@ -5,7 +5,7 @@
     class="fixed inset-0 flex justify-center z-50 overflow-y-auto"
     :class="{ 'opacity-0 pointer-events-none': !showModal }">
         <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg shadow-lg w-4/5 xl:w-1/3 z-50 flex flex-col text-black dark:text-gray-200 dark:bg-neutral-900">
+            <div class="bg-white rounded-lg shadow-lg w-4/5 xl:w-1/2 z-50 flex flex-col text-black dark:text-gray-200 dark:bg-neutral-900">
                 <div class="flex justify-between px-4 pt-4 pb-4 sticky top-0 z-10 max-h-20 rounded-t-lg">
                     <div class="flex flex-1 justify-center text-3xl">
                         <h1 class="font-regular mr-1">Kulissiwa</h1>
@@ -32,10 +32,10 @@
 
                 <h3 class="text-lg"> Upload Documents </h3>
               </div>
-              
+
             </div>
             <p class="font-light text-gray-500 dark:text-gray-400">Ask anything to your PDFs, Docx, text, and get answers in seconds.</p>
-          </div> 
+          </div>
           <div class="md:w-1/2 parent-card md:space-x-2 bg-white p-2 md:px-4 dark:bg-inherit">
             <div class="flex items-center justify-between py-2 md:px-2">
               <div class="flex items-center">
@@ -44,40 +44,40 @@
                 </svg>
                 <h3 class="text-lg"> Powerful AI Models </h3>
               </div>
-              
+
             </div>
             <p class="font-light text-gray-500 dark:text-gray-400">Access GPT-4, Mixtral and Gemini Pro for more accurate answers.</p>
-          </div> 
+          </div>
         </div>
-      
+
       <div class="flex flex-col md:flex-row items-center justify-center md:space-x-4 mx-4 bg-white rounded-lg dark:bg-neutral-900 pb-4">
         <div v-show="isLoading" class="flex space-x-4 bg-white px-2 py-10 dark:bg-neutral-900">
           <LoadingIndicatorModal />
         </div>
-        
+
         <div class="w-full mb-2 md:mb-0 md:w-1/2 parent-card space-x-2 bg-white p-2 mpx-4 rounded-lg border-2 border-gray-200 dark:bg-neutral-800 dark:border-none"
           v-for="price in prices" :key="price.id">
-  
+
             <div class="flex items-center justify-between py-2 px-2"
             >
-              <h3 
+              <h3
               class="text-sky-500 text-lg" v-if="price.recurring.interval == 'month'"
               > Monthly </h3>
               <h3 class="text-sky-500 text-lg" v-else
               > Yearly </h3>
-              <p class="text-sm font-regular text-gray-300 bg-neutral-700 px-2 py-1 rounded-full" v-if="price.recurring.interval != 'month'"> Save $40 a year </p>
+              <p class="text-sm font-regular bg-sky-200 dark:text-gray-300 dark:bg-neutral-700 px-2 py-1 rounded-full" v-if="price.recurring.interval != 'month'"> Save $40 a year </p>
             </div>
-           
+
             <div class="flex items-end">
-              <h5 class="text-2xl font mr-1 dark:text-gray-200"> ${{ price.unit_amount_decimal / 100 }}</h5>  
+              <h5 class="text-2xl font mr-1 dark:text-gray-200"> ${{ price.unit_amount_decimal / 100 }}</h5>
             </div>
 
             <p class="text-md font-light text-gray-500 dark:text-gray-400"
             :class="{ 'mb-10': price.recurring.interval == 'month', 'mb-4': price.recurring.interval != 'month'}"
             > billed per {{ price.recurring.interval }} </p>
-            
+
             <p class="text-md font-light text-sky-500" v-if="price.recurring.interval != 'month'"> <ClientOnly><i class="fas fa-check text-sky-600 pr-1"></i></ClientOnly> 14 day free trial </p>
-           
+
             <div class="flex">
               <div class="flex-grow py-2 mr-1">
                 <form @submit.prevent="handleSubmit" method="POST">
@@ -87,19 +87,19 @@
                   </button>
                 </form>
               </div>
-              
+
             </div>
-  
-        </div> 
+
+        </div>
       </div>
     </div>
     </div>
 </div>
 
-    
-  
+
+
   </template>
-  
+
   <script>
   import { useAuthStore } from '@/stores/index'
   export default {
@@ -134,7 +134,7 @@
           const data = await response.json();
           // sort prices by price
           data.data.sort((a, b) => a.unit_amount_decimal - b.unit_amount_decimal);
-          
+
           if (data) {
               this.prices = data.data.filter(price => price.product && price.product.active);
 
@@ -151,20 +151,20 @@
         },
         async handleSubmit(event) {
         const priceId = event.target.price_id.value;
-  
+
         try {
           const response = await fetch('/api/stripe/create-checkout-session', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/x-www-form-urlencoded',
               },
-              body: new URLSearchParams({ 
+              body: new URLSearchParams({
                   price_id: priceId,
                   user_id: this.store.user_session.user.id,
-                  customer_email: this.store.user_session.user.email, 
+                  customer_email: this.store.user_session.user.email,
               }),
           });
-  
+
           const session = await response.json();
           if (session.url) {
             window.location.href = session.url;
@@ -178,4 +178,3 @@
     },
   }
   </script>
-  
