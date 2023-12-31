@@ -10,7 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
         isAuthenticated.value = true
         token.value = session.access_token
     }
-    
+
     function signOut() {
         user_session.value = null
         isAuthenticated.value = false
@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     return {
-        user_session, isAuthenticated, 
-        token, signIn, signOut, 
+        user_session, isAuthenticated,
+        token, signIn, signOut,
     }
 })

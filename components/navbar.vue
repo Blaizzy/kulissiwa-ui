@@ -3,6 +3,7 @@
     <div class="hidden lg:flex h-screen flex-col dark:text-gray-400 bg-neutral-100/50 dark:bg-neutral-900 p-4 border-r border-gray-200 dark:border-0"
     :class="{'w-16 items-center': collapsed, 'w-64': !collapsed}"
     id="mainSideNavbar">
+
         <pricing :show-modal="open" @close-modal="open = false"/>
         <!-- Inner Container -->
         <div class="flex flex-col flex-grow mb-4 xl:mb-0">
@@ -35,8 +36,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
                             </svg>
                         </div>
-
+                        
                         <span v-show="!collapsed" class="pl-1.5">Documents</span>    
+                        
                     </ClientOnly>
 
                 </NuxtLink>
@@ -49,6 +51,7 @@
                                 <path d="M4.913 2.658c2.075-.27 4.19-.408 6.337-.408 2.147 0 4.262.139 6.337.408 1.922.25 3.291 1.861 3.405 3.727a4.403 4.403 0 00-1.032-.211 50.89 50.89 0 00-8.42 0c-2.358.196-4.04 2.19-4.04 4.434v4.286a4.47 4.47 0 002.433 3.984L7.28 21.53A.75.75 0 016 21v-4.03a48.527 48.527 0 01-1.087-.128C2.905 16.58 1.5 14.833 1.5 12.862V6.638c0-1.97 1.405-3.718 3.413-3.979z" />
                                 <path d="M15.75 7.5c-1.376 0-2.739.057-4.086.169C10.124 7.797 9 9.103 9 10.609v4.285c0 1.507 1.128 2.814 2.67 2.94 1.243.102 2.5.157 3.768.165l2.782 2.781a.75.75 0 001.28-.53v-2.39l.33-.026c1.542-.125 2.67-1.433 2.67-2.94v-4.286c0-1.505-1.125-2.811-2.664-2.94A49.392 49.392 0 0015.75 7.5z" />
                             </svg>
+
 
                         </div>
                         <div v-else>
@@ -80,7 +83,7 @@
                     Upgrade to upload more documents, and access powerful AI models.
                 </p>
                 <button class="mt-2 py-2 px-2 rounded-lg bg-sky-500 dark:bg-neutral-800 text-white" @click="showPricingModal">
-                    
+
                         <ClientOnly>
                             <div class="relative inline-block"> <!-- Container for the icon and animation -->
                                 <i class="fa-solid fa-gift"></i>
@@ -88,13 +91,12 @@
                             </div>
                             <span id="upgrade" v-show="!collapsed" class="pl-1.5">Learn more</span>
                         </ClientOnly>
-                
+
                 </button>
             </div>
 
             <hr class="self-end w-full h-px my-2 border-gray-300 dark:border-neutral-700">
 
-        
             <div class="flex items-start rounded-full justify-center hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                 <NuxtLink to="/settings/account">
                     <div class="flex items-center py-1">
@@ -106,7 +108,7 @@
                                 <p class="text-ellipsis overflow-hidden w-9/12">{{ email }}</p>
                             </div>
                         </div>
-                        
+
                         <div v-show="!collapsed" class="px-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
@@ -128,6 +130,7 @@ import { ChevronDoubleLeftIcon, Bars3Icon, CircleStackIcon } from '@heroicons/vu
 import { useAuthStore } from '@/stores/index'
 import { useMonthlyUsageStore } from '@/stores/monthly-usage'
 import { useTierLimits } from '~/stores/tiers'
+import { useUserPreferences } from '@/stores/user-preferences'
 
 
 export default {
@@ -136,6 +139,7 @@ export default {
         const store = useAuthStore()
         const monthly_usage = useMonthlyUsageStore()
         const tier_limits = useTierLimits()
+        const preferences = useUserPreferences()
         return {
             open: false,
             conversations: [],
@@ -149,6 +153,7 @@ export default {
             store: store,
             monthly_usage: monthly_usage,
             tier_limits: tier_limits,
+            preferences: preferences,
             showUpgradeButton: false,
         }
     },
@@ -165,12 +170,12 @@ export default {
                 } else {
                     this.email = this.store.user_session.user.email
                 }
-                    
+
             } else if (event === 'SIGNED_OUT') {
                 const { data, error } = supabase
                     .from('monthly_usage')
                     .update([
-                        { 
+                        {
                             files_uploaded: this.monthly_usage.filesUploaded,
                             messages_sent: this.monthly_usage.messagesSent,
                             active_data_sources: this.monthly_usage.activeDataSourcesCount,
@@ -186,6 +191,7 @@ export default {
                 this.store.signOut()
                 this.monthly_usage.reset()
                 this.tier_limits.reset()
+                this.preferences.reset()
                 this.resetProfile()
                 this.$router.push('/login');
             }
@@ -197,43 +203,44 @@ export default {
                 this.getActiveDataSourcesCount(supabase)
                 this.getSubscription(supabase)
                 this.getTiers(supabase)
+                this.getUserPreferences(supabase)
             }
-            
+
             // Update Files Uploaded
             if (this.monthly_usage.filesUploaded){
                 const { data, error } = await supabase
                     .from('monthly_usage')
                     .update([
-                        { 
+                        {
                             files_uploaded: this.monthly_usage.filesUploaded,
                         }
                     ])
                     .eq('user_id', this.store.user_session.user.id)
                     .eq('year_month', new Date().toISOString().slice(0,7))
-                
+
                 if (error) {
                     console.log(error)
                 }
             }
-            
+
             // Update Tier ID
             if (this.monthly_usage.tier_id) {
                 const { data, error } = await supabase
                     .from('monthly_usage')
                     .update([
-                        { 
+                        {
                             tier_id: this.monthly_usage.tier_id,
                         }
                     ])
                     .eq('user_id', this.store.user_session.user.id)
                     .eq('year_month', new Date().toISOString().slice(0,7))
-                
+
                 if (error) {
                     console.log(error)
                 }
             }
         })
-        
+
     },
     methods: {
         isMobileDevice() {
@@ -245,6 +252,20 @@ export default {
                 this.$router.push({ name: 'checkout' })
             }else{
                 this.open = !this.open
+            }
+        },
+        async getUserPreferences(supabase){
+            const { data, error } = await supabase
+                .from('user_preferences')
+                .select('*')
+                .eq('user_id', this.store.user_session.user.id)
+
+            if (error) {
+                console.log(error);
+                return;
+            }
+            if (data) {
+                this.preferences.update(data[0]);
             }
         },
         async getConversations(supabase, refresh = false) {
@@ -289,10 +310,10 @@ export default {
             const { data, error } = await supabase
                 .from('tiers')
                 .select('id, name, file_limit, message_limit, pages_limit, concurrent_upload_limit, active_data_sources_limit')
-            
+
             if (error) {
                 console.log(error)
-            } 
+            }
             if (data) {
                 this.tier_limits.updateTiers(data)
                 if (this.monthly_usage.tier_id) {
@@ -306,10 +327,10 @@ export default {
                 .from('subscriptions')
                 .select('id, stripe_customer_id, tier, status')
                 .eq('user_id', this.store.user_session.user.id)
-            
+
             if (error) {
                 console.log(error)
-            } 
+            }
             if (data) {
                 if (data.length === 0) {
                     this.showUpgradeButton = true
@@ -347,7 +368,7 @@ export default {
                     const { data, error } = await supabase
                         .from('monthly_usage')
                         .insert([
-                            { 
+                            {
                                 user_id: user_id,
                                 tier_id: tier_id,
                                 files_uploaded: files_uploaded,
@@ -378,10 +399,10 @@ export default {
                 .select('id, user_id, is_active')
                 .eq('user_id', this.store.user_session.user.id)
                 .eq('is_active', true)
-            
+
             if (error) {
                 console.log(error)
-            } 
+            }
             if (data) {
                 this.monthly_usage.updateActiveDataSourcesCount(data)
             }

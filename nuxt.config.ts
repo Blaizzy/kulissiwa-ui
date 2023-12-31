@@ -11,20 +11,20 @@ export default defineNuxtConfig({
         script: [
           {
             children: `
-              
+
                   if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');
                   } else {
                     document.documentElement.classList.remove('dark');
                   }
-              
-              
+
+
             `,
           },
         ],
       },
   },
-  
+
   modules: [
       '@nuxtjs/tailwindcss',
       '@nuxtjs/supabase',
@@ -39,12 +39,12 @@ export default defineNuxtConfig({
       "@fortawesome/fontawesome-svg-core/styles.css"],
 
   build: {
-      
+
       transpile: [
           "@fortawesome/vue-fontawesome",
           '@headlessui/vue',
       ],
-     
+
   },
 
   plugins: [
