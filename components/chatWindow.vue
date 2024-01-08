@@ -141,8 +141,11 @@
                                                             <DisclosureButton
                                                             class="flex w-full border border-gray-300 justify-between rounded-full bg-white px-4 py-2 my-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-50 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75 dark:bg-neutral-800 dark:text-gray-400 dark:border-none"
                                                             >
-                                                            <span v-if="checkPageExists(source_document)"> {{ source_document.metadata.source }}, p. {{ source_document.metadata.page }}</span>
-                                                            <span v-else> {{ source_document.metadata.source }}</span>
+                                                            <div class="flex">
+                                                                <span class="bg-gray-300 rounded-full px-3 mr-2 font-semibold dark:bg-neutral-600 dark:text-gray-400"> {{source_index + 1}} </span>
+                                                                <span v-if="checkPageExists(source_document)"> {{ source_document.metadata.source }}, p. {{ source_document.metadata.page }}</span>
+                                                                <span v-else> {{ source_document.metadata.source }}</span>
+                                                            </div>
                                                             <ChevronUpIcon
                                                                 :class="open ? 'rotate-180 transform' : ''"
                                                                 class="h-5 w-5 text-gray-500"
@@ -702,7 +705,8 @@ export default {
 
                 if (!response.body) {
                     console.log("No response body")
-                }else{
+                    return {content: "New Chat"}
+                } else{
                     return response.json();
                 }
 
