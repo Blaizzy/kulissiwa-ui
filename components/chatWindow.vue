@@ -479,7 +479,6 @@ export default {
     },
     methods: {
         handleFocusModeChange(newValue){
-            console.log(newValue)   
             this.focus_mode = newValue
         },
         async getLLMs(supabase) {
