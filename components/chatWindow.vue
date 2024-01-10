@@ -26,8 +26,7 @@
 
 
         <div class="sticky top-0 z-10 flex justify-between items-center py-4 h-16 border-b border-gray-200 dark:border-neutral-800 dark:bg-neutral-950">
-            <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 hover:bg-neutral-100 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600"
-
+            <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 hover:bg-neutral-100 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600 transition-transform duration-150 ease-in-out active:scale-90"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -48,6 +47,7 @@
                 <div class="flex items-center text-gray-500 text-sm">
                     <svg class="mr-1 fill-gray-500" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7.39804 12.8085C7.57428 12.9328 7.78476 12.9994 8.00043 12.999C8.21633 12.9992 8.42686 12.9317 8.60243 12.806C8.77993 12.6755 8.91464 12.4952 8.98943 12.288L9.43643 10.915C9.55086 10.5707 9.74391 10.2578 10.0003 10.0011C10.2566 9.74436 10.5693 9.55089 10.9134 9.436L12.3044 8.98499C12.4564 8.93064 12.5936 8.84184 12.7055 8.72555C12.8174 8.60926 12.9008 8.46865 12.9492 8.31473C12.9977 8.1608 13.0098 7.99776 12.9847 7.83836C12.9596 7.67897 12.8979 7.52756 12.8044 7.396C12.6703 7.21007 12.4794 7.07283 12.2604 7.005L10.8854 6.558C10.5409 6.44377 10.2278 6.2508 9.97087 5.99441C9.71396 5.73803 9.52035 5.42528 9.40543 5.081L8.95343 3.693C8.88113 3.49069 8.74761 3.31593 8.57143 3.193C8.43877 3.09927 8.28607 3.03779 8.12548 3.01344C7.96489 2.9891 7.80083 3.00256 7.64636 3.05275C7.49188 3.10295 7.35125 3.1885 7.23564 3.3026C7.12004 3.41669 7.03265 3.55619 6.98043 3.71L6.52343 5.11C6.40884 5.44482 6.21967 5.74923 5.97022 6.00025C5.72076 6.25126 5.41753 6.44232 5.08343 6.559L3.69243 7.007C3.54065 7.06139 3.40352 7.15017 3.29177 7.26638C3.18001 7.3826 3.09666 7.5231 3.04824 7.67688C2.99982 7.83067 2.98764 7.99357 3.01265 8.15285C3.03767 8.31213 3.0992 8.46346 3.19243 8.595C3.32027 8.77445 3.50105 8.90942 3.70943 8.981L5.08343 9.42599C5.52354 9.57248 5.90999 9.84682 6.19343 10.214C6.35585 10.4246 6.4813 10.6613 6.56443 10.914L7.01643 12.305C7.08846 12.5083 7.22179 12.6842 7.39804 12.8085ZM13.5353 16.851C13.6713 16.9472 13.8337 16.9989 14.0003 16.999C14.1654 16.9991 14.3264 16.9481 14.4613 16.853C14.6008 16.7545 14.7058 16.6146 14.7613 16.453L15.0093 15.691C15.0625 15.5326 15.1515 15.3885 15.2693 15.27C15.3867 15.1515 15.5307 15.0627 15.6893 15.011L16.4613 14.759C16.619 14.7045 16.7557 14.6021 16.8523 14.466C16.9257 14.363 16.9736 14.2441 16.9921 14.119C17.0106 13.9939 16.9992 13.8662 16.9588 13.7463C16.9184 13.6265 16.8501 13.518 16.7597 13.4296C16.6692 13.3412 16.5591 13.2756 16.4383 13.238L15.6743 12.989C15.5162 12.9365 15.3724 12.8478 15.2544 12.7302C15.1364 12.6125 15.0473 12.469 14.9943 12.311L14.7423 11.538C14.6886 11.3802 14.586 11.2436 14.4493 11.148C14.3473 11.0751 14.2295 11.0271 14.1056 11.0081C13.9816 10.989 13.8549 10.9994 13.7357 11.0383C13.6164 11.0772 13.508 11.1436 13.4192 11.2322C13.3304 11.3207 13.2636 11.4289 13.2243 11.548L12.9773 12.31C12.925 12.4677 12.8375 12.6113 12.7213 12.73C12.6066 12.8465 12.4667 12.9351 12.3123 12.989L11.5393 13.241C11.3803 13.2949 11.2422 13.3975 11.1447 13.5343C11.0472 13.671 10.9952 13.835 10.9961 14.0029C10.997 14.1708 11.0507 14.3342 11.1496 14.47C11.2486 14.6057 11.3877 14.7068 11.5473 14.759L12.3103 15.006C12.4692 15.0594 12.6136 15.1487 12.7323 15.267C12.8505 15.3853 12.939 15.5299 12.9903 15.689L13.2433 16.463C13.2981 16.6195 13.4001 16.7551 13.5353 16.851Z"/></svg>
                     <p>{{ LLM.model_name }}</p>
+
                 </div>
             </div>
             <div class="flex items-center px-4 cursor-pointer">
@@ -188,29 +188,37 @@
         <div class="flex justify-center">
         <div class="flex justify-center fixed bottom-16 lg:bottom-0 px-4 pb-2 z-30 w-full">
             <div class="rounded-xl flex items-center px-2 border-2 border-gray-200 w-full lg:w-1/2 hover:border-gray-300 bg-white dark:bg-neutral-950 dark:border-neutral-700 dark:hover:border-neutral-600">
-                <textarea
-                    type="text"
-                    :rows="rows"
-                    class="bg-white w-full px-4 h-auto py-3 rounded-lg focus:outline-none dark:bg-inherit"
-                    placeholder="Type your message..."
-                    name="message"
-                    v-model="message"
-                    style="resize: none;"
-                    @keydown.enter.exact.prevent="handleEnterPress"></textarea>
-                <button class="py-2 px-4 mr-1 rounded-lg inline-flex items-center " @click.prevent="queryModel" v-if="!loading_ai_response"
-                :disabled="isMessageEmpty"
-                :class="isMessageEmpty ?'hover:text-gray-500 text-gray-500' : 'bg-sky-500 hover:bg-sky-500 text-white dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-gray-200'"
-                >
-                    <ClientOnly>
-                        <i class="fas fa-paper-plane"></i>
-                    </ClientOnly>
-                </button>
+                <div class="flex flex-col w-full">
+                    <textarea
+                        type="text"
+                        :rows="rows"
+                        class="bg-white w-full px-4 h-auto py-3 rounded-lg focus:outline-none dark:bg-inherit"
+                        placeholder="Type your message..."
+                        name="message"
+                        v-model="message"
+                        style="resize: none;"
+                        @keydown.enter.exact.prevent="handleEnterPress"></textarea>
 
-                <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center" disabled v-else >
-                    <ClientOnly>
-                        <i class="fas fa-spinner fa-spin"></i>
-                    </ClientOnly>
-                </button>
+                    <div class="flex justify-between pb-2">
+                        <focus-mode class="w-fit" @mode="handleFocusModeChange"></focus-mode>
+                        <button class="py-2 px-4 mr-1 rounded-lg inline-flex items-center " @click.prevent="queryModel" v-if="!loading_ai_response"
+                        :disabled="isMessageEmpty"
+                        :class="isMessageEmpty ?'hover:text-gray-500 text-gray-500 bg-neutral-200/50 dark:bg-neutral-800 dark:text-inherit' : 'bg-sky-500 hover:bg-sky-500 text-white dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-gray-200'"
+                        >
+                            <ClientOnly>
+                                <font-awesome-icon :icon="['fas', 'fa-paper-plane']" size="2xs"/>
+                            </ClientOnly>
+                        </button>
+
+                        <button class="py-2 px-4 text-gray-500 hover:text-black inline-flex items-center" disabled v-else >
+                            <ClientOnly>
+                                <font-awesome-icon :icon="['fas', 'fa-spinner']" spin size="2xs"/>
+                            </ClientOnly>
+                        </button>
+
+                    </div>
+                </div>
+
 
             </div>
 
@@ -264,11 +272,20 @@ export default {
             });
         };
 
+        const addDarkModeClassesToLinks = (html) => {
+            // Use a regular expression to find all <a> tags and add the Tailwind dark mode classes
+            return html.replace(/<a href="([^"]+)">([^<]+)<\/a>/g, (match, href, text) => {
+                return `<a href="${href}" class="text-sky-600 dark:text-sky-500">${text}</a>`;
+            });
+        };
+
         renderer.paragraph = (text) => {
             // First, replace the indices with styled spans
             const styledText = replaceIndexWithStyle(text);
+             // Add dark mode classes to links
+            const styledTextWithLinks = addDarkModeClassesToLinks(styledText);
             // Then call the original paragraph renderer
-            return originalParagraph(styledText);
+            return originalParagraph(styledTextWithLinks);
         };
 
         // Store the original list item renderer
@@ -393,6 +410,7 @@ export default {
             LLM: {},
             LLMs: [],
             config: config,
+            focus_mode: '',
         };
     },
     async created() {
@@ -404,6 +422,7 @@ export default {
         })
     },
     async mounted() {
+
         this.$nextTick(() => {
             const clipboard = new ClipboardJS('.copy-code-button');
             clipboard.on('success', (e) => {
@@ -450,6 +469,7 @@ export default {
 
     },
     computed: {
+
         rows() {
             const lineBreaks = (this.message.match(/\n/g) || []).length + 1; // Add one for the first line
             return lineBreaks > maxRows ? maxRows : lineBreaks;
@@ -466,6 +486,9 @@ export default {
 
     },
     methods: {
+        handleFocusModeChange(newValue){
+            this.focus_mode = newValue
+        },
         async getLLMs(supabase) {
             const { data, error } = await supabase
                 .from('LLMs')
@@ -803,8 +826,12 @@ export default {
                 let isFirstIteration = true;
                 let model_name = ''
 
-                if (!this.LLM.api_name.includes('gpt') || this.LLM.api_name.includes('vision')){
-                    model_name = this.LLMs[0].api_name
+                if (this.focus_mode.name === 'Documents'){
+                    if (!this.LLM.api_name.includes('gpt') || this.LLM.api_name.includes('vision')){
+                        model_name = this.LLMs[0].api_name
+                    } else {
+                        model_name = this.LLM.api_name
+                    }
                 } else {
                     model_name = this.LLM.api_name
                 }
@@ -815,6 +842,7 @@ export default {
                         input: last_user_message.content,
                         model_name: model_name,
                         chat_history: history,
+                        focus_mode: this.focus_mode.name,
                     }),
                 });
 
@@ -852,7 +880,7 @@ export default {
                                     }
                                 }
 
-                            } else if (dataLine.includes('/logs/ChatOpenAI/streamed_output_str/-')){
+                            } else if (dataLine.includes('/streamed_output_str/-')){
                                 const data = JSON.parse(dataLine);
                                 if (isFirstIteration && data.ops[0].value !== '') {
                                     index = this.ai_messages.push({sender: "ai", content: ''}) - 1;

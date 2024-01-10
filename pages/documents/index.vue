@@ -5,9 +5,9 @@ definePageMeta({
 </script>
 <template>
     <div class="flex flex-col items-center overflow-y-auto dark:text-gray-400 dark:bg-neutral-950 dark:rounded-l-lg">
-     
-        <div class="flex dark:bg-neutral-950 justify-between items-center pb-4 px-4 pt-4 w-4/5 xl:w-1/3"> <!-- Added relative here -->
-            
+
+        <div class="flex dark:bg-neutral-950 justify-between items-center pb-4 px-4 pt-4 w-4/5 2xl:w-1/3"> <!-- Added relative here -->
+
                 <div class="flex">
                     <h1 class="text-2xl dark:text-gray-200">Documents</h1>
                     <DataSources :isOpen="newDataSourceModalOpen" @close="closeNewDataSource" @refresh-data="onDataRefreshed()" @show-success="onShowSuccess('Data uploaded sucessfully')" @show-failure="onShowFailure('Data upload failed!')"  />
@@ -19,21 +19,21 @@ definePageMeta({
                 </div>
 
             <div class="flex absolute top-0 right-0"> <!-- Changed to absolute positioning -->
-                <div 
-                    v-if="showSuccess" 
+                <div
+                    v-if="showSuccess"
                     class="mt-4 mr-1 py-2 px-4 text-lg text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800 shadow-md transition-transform transform"
                     :class="{ '-translate-x-full opacity-0': !showSuccess, 'translate-x-0 opacity-100': showSuccess }"
-                >   
+                >
                     <ClientOnly>
                         <i class="fas fa-square-check mr-2"></i>
                     </ClientOnly>
                     {{successMessage}}
                 </div>
-                <div 
-                    v-if="showFailure" 
+                <div
+                    v-if="showFailure"
                     class="mt-4 mr-1 py-2 px-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800 shadow-md transition-transform transform"
                     :class="{ '-translate-x-full opacity-0': !showFailure, 'translate-x-0 opacity-100': showFailure }"
-                >   
+                >
                     <ClientOnly>
                         <i class="fa fa-square-xmark mr-2"></i>
                     </ClientOnly>
@@ -42,8 +42,8 @@ definePageMeta({
             </div>
         </div>
         <hr class="w-full border-gray-200 dark:border-neutral-800" />
-        
-        <div class="flex mt-4 px-4 text-sm py-2 w-4/5 xl:w-1/3" v-if="!noDataFound">
+
+        <div class="flex mt-4 px-4 text-sm py-2 w-4/5 2xl:w-1/3" v-if="!noDataFound">
             <div class="mt-auto rounded-full flex w-4/5 xl:w-1/2 items-center px-2 border-2 border-gray-200 hover:border-gray-300 dark:border-neutral-700 dark:hover:border-neutral-500">
                 <button class="px-2 text-gray-500 hover:text-black inline-flex items-center">
                     <ClientOnly>
@@ -57,7 +57,7 @@ definePageMeta({
                     </ClientOnly>
                 </button>
             </div>
-            <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white animated-gradient-bg rounded-full px-2 shadow-lg hover:scale-105 ml-5">
+            <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white animated-gradient-bg rounded-full px-2 shadow-lg ml-5 transition-transform duration-150 ease-in-out active:scale-90">
                 <ClientOnly>
                     <i class="fa-solid fa-circle-arrow-up"></i>
                 </ClientOnly>
@@ -71,7 +71,7 @@ definePageMeta({
                 </button>
                 <div v-show="showSortOptions" class="absolute mt-2 w-48 rounded-md shadow-lg z-50 bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:bg-neutral-900" @click="showSortOptions = false;">
                     <div class="py-1">
-                        
+
                             <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-gray-300" @click="sortData('asc')">
                                 Sort Ascending
                                 <span v-show="isSort('asc')" class="float-right">
@@ -104,7 +104,7 @@ definePageMeta({
                 <button @click="showFilterOptions = !showFilterOptions; showSortOptions=false" class="ml-2 w-full h-full px-2 py-1 border-2 border-gray-200 rounded-full hover:border-gray-300 inline-flex items-center dark:border-neutral-700 dark:hover:border-neutral-500" v-if="!noDataFound && !isLoading">
                     <ClientOnly>
                         <i class="fa fa-filter"></i> <span class="pl-2">Filter</span>
-                    </ClientOnly> 
+                    </ClientOnly>
                 </button>
                 <div v-show="showFilterOptions" class="absolute mt-2 w-48 rounded-md shadow-lg z-50 bg-white ring-1 ring-black ring-opacity-5 dark:bg-neutral-900">
                     <div class="py-1">
@@ -152,20 +152,20 @@ definePageMeta({
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
-        
-        <div class="flex w-4/5 xl:w-1/3" v-if="!noDataFound">
-            <h2 class="text-md font-semibold pb-2 pt-4 px-4">Files</h2>     
+
+        <div class="flex w-4/5 2xl:w-1/3" v-if="!noDataFound">
+            <h2 class="text-md font-semibold pb-2 pt-4 px-4">Files</h2>
         </div>
-        
-        <div class="flex-grow pb-48 lg:pb-16 w-4/5 xl:w-1/3"
+
+        <div class="flex-grow pb-48 lg:pb-16 w-4/5 2xl:w-1/3"
         :class="noDataFound ? 'flex justify-center items-center' : ''"
         >
             <div class="flex justify-center items-center" v-if="noDataFound">
                     <div class="flex justify-center items-center flex-col" v-if="canUploadDataSource()">
-                        <img src="~~/assets/logos/No-documents-found.png" alt="No Documents Found" class="md:w-1/2 max-lg:w-auto"> 
+                        <img src="~~/assets/logos/No-documents-found.png" alt="No Documents Found" class="md:w-1/2 max-lg:w-auto">
                         <h1 class="text-2xl font-semibold m-1">No documents found</h1>
                         <h2 class="text-lg m-1">Upload a new document to get started.</h2>
                         <button @click="newDataSource(); showFilterOptions=false; showSortOptions=false" class="text-white py-1 gradient-border rounded-full px-2 shadow-lg hover:scale-105">
@@ -189,15 +189,15 @@ definePageMeta({
                     </div>
                 </div>
 
-            
+
             <div class="mt-2 mx-3 text-sm">
                 <!-- Table Headers -->
                 <div class="sticky top-0 z-10 flex flex-row justify-between text-gray-500 px-4 py-3  text-md font-normal rounded-t-lg bg-neutral-100/50 dark:bg-neutral-900 dark:text-gray-300" v-if="!noDataFound && !isLoading">
                     <span class="flex-grow xl:flex-1">Filename</span>
-                    <span class="hidden xl:flex-1">Date Created</span>
-                    <span class="hidden xl:flex-1">Type</span>
-                    <span class="hidden xl:flex-1">Active</span>
-                    <span class="hidden xl:flex-1"></span> <!-- This is to align the dropdown menu in the rows -->
+                    <span class="hidden xl:block xl:flex-1">Date Created</span>
+                    <span class="hidden xl:block xl:flex-1">Type</span>
+                    <span class="hidden xl:block xl:flex-1">Active</span>
+                    <span class="hidden xl:block xl:flex-1"></span> <!-- This is to align the dropdown menu in the rows -->
                 </div>
 
                 <!-- Display skeleton loaders when data is being fetched -->
@@ -218,7 +218,7 @@ definePageMeta({
 
                     <!-- File Type -->
                     <p class="text-gray-500 ml-2 flex-1 hidden xl:block"  :class="dataSourceToDelete === dataSource.id ? 'animate-pulse cursor-not-allowed' : ''">{{ dataSource.file_type }}</p>
-                    
+
                     <!-- Active -->
                     <label class="flex-1 items-center cursor-pointer hidden xl:block">
                         <input type="checkbox" class="sr-only" v-model="dataSource.is_active" @change.prevent="selectDataSource(dataSource)">
@@ -256,17 +256,17 @@ definePageMeta({
                                             disabled ? 'opacity-50 cursor-not-allowed' : 'text-gray-900',
                                             active ? 'bg-sky-500 text-white ' : 'text-gray-900',
                                             'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-                                            
+
                                             ]"
-                                        
-                                        >   
+
+                                        >
                                             <div class="flex items-center">
                                                 <PencilSquareIcon
                                                 :active="active"
                                                 class="mr-2 h-5 w-5 text-sky-400 "
                                                 aria-hidden="true"
                                                 />
-                                                <p> Edit </p> 
+                                                <p> Edit </p>
                                             </div>
                                             <span class="inline-flex items-center rounded-md bg-yellow-50 ml-auto px-1.5 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">soon</span>
                                         </NuxtLink>
@@ -315,9 +315,9 @@ definePageMeta({
                 </div>
             </div>
         </div>
-    
+
     </div>
-      
+
 
 </template>
 
@@ -387,9 +387,9 @@ export default {
         },
         async nextPage() {
             if (this.currentPage < this.totalPages) {
-                this.currentPage++;    
+                this.currentPage++;
                 await this.updatePage(this.currentPage, true);
-    
+
             }
         },
         async prevPage() {
@@ -408,22 +408,22 @@ export default {
             this.isFetchingDataSource = false
         },
         canUploadDataSource() {
-            const filesUploaded = this.monthly_usage.filesUploaded; 
-            let tier_mame = this.monthly_usage.tier; 
+            const filesUploaded = this.monthly_usage.filesUploaded;
+            let tier_mame = this.monthly_usage.tier;
             if (this.monthly_usage.tier == null) {
                 tier_mame = 'FREE';
             }
             const tier_limit = this.tier_limits.tiers.find(tier => tier.name === tier_mame);
-        
+
             if (tier_limit.file_limit === -1) {
                 return true;
-            }         
-           
+            }
+
             return filesUploaded < tier_limit.file_limit;
         },
         canActivateMoreDataSources() {
             const active_data_sources = this.monthly_usage.activeDataSourcesCount;
-            let tier_mame = this.monthly_usage.tier; 
+            let tier_mame = this.monthly_usage.tier;
             if (this.monthly_usage.tier == null) {
                 tier_mame = 'FREE';
             }
@@ -432,8 +432,8 @@ export default {
             if (tier_limit.active_data_sources_limit === -1) {
                 return true;
             }
-    
-            return active_data_sources < tier_limit.active_data_sources_limit 
+
+            return active_data_sources < tier_limit.active_data_sources_limit
         },
         async selectDataSource(dataSource) {
             if (this.canActivateMoreDataSources() || dataSource.is_active === false) {
@@ -442,7 +442,7 @@ export default {
             } else {
                 dataSource.is_active = false;
                 this.onShowFailure('Exceed active data sources limit. Please upgrade your plan to activate more data sources.');
-            } 
+            }
         },
         async updateSelectedDataSources(upsert = false) {
             if (this.debounceTimeout) {
@@ -471,7 +471,7 @@ export default {
                     }
                 }
             }, 500);
-    
+
         },
         isFileTypeInDataSources(fileType) {
             return this.dataSources_copy.some(dataSource => dataSource.file_type === fileType);
@@ -515,7 +515,7 @@ export default {
             if (this.selectedFileType) {
                 this.dataSources = this.dataSources_copy.filter((dataSource) => dataSource.file_type === this.selectedFileType);
             }
-            this.showFilterOptions = false;  
+            this.showFilterOptions = false;
         },
         async resetFilter() {
             this.selectedFileType = '';
@@ -531,7 +531,7 @@ export default {
             const fuse = new Fuse(this.dataSources_copy, options);
             return fuse.search(query).map(result => result.item);
         },
-        async searchDataSources() { 
+        async searchDataSources() {
             try {
                 if (this.searchQuery === '') {
                     this.dataSources = this.dataSources_copy
@@ -563,7 +563,7 @@ export default {
                 // Handle the error appropriately based on your application needs.
                 // For instance, you might want to show a user-friendly error message.
             }
-            
+
         },
         onKeyup() {
             if (this.debounceTimeout) {
@@ -664,7 +664,7 @@ export default {
         },
         closeSettings() {
             this.settingsModalOpen = false;
- 
+
         },
         async deleteDataSource(dataSourceId) {
             this.dataSourceToDelete = dataSourceId
@@ -672,12 +672,12 @@ export default {
             const user_session = this.store.user_session
             const item = this.dataSources.find(dataSource => dataSource.id === dataSourceId)
             if (item.is_file){
-                
+
                 const { data, file_error } = await supabase
                 .storage
                 .from('user_files')
                 .remove([`${item.content_data}`])
-                
+
                 if (file_error) {
                     this.onShowFailure("File deletion failed!")
                 }
@@ -687,7 +687,7 @@ export default {
                 .delete()
                 .eq('id', dataSourceId)
 
-        
+
             if (error) {
                 this.onShowFailure("Data deletion failed!")
             } else {

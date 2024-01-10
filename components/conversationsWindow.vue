@@ -5,7 +5,7 @@
             <div class="flex pb-4 pt-4 relative">
                 <h1 class="text-2xl dark:text-gray-200">Chats</h1>
             </div>
-           
+
         </div>
 
         <hr class="w-full border-gray-200 dark:border-neutral-800" />
@@ -24,7 +24,7 @@
                     </ClientOnly>
                 </button>
             </div>
-            <div class="font-semibold p-1.5 rounded-full border-2 hover:bg-neutral-100 dark:bg-neutral-800 dark:border-neutral-700 dark:hover:border-neutral-600 dark:hover:text-gray-300">
+            <div class="font-semibold p-1.5 rounded-full border-2 hover:bg-neutral-100 dark:bg-neutral-800 dark:border-neutral-700 dark:hover:border-neutral-600 dark:hover:text-gray-300 transition-transform duration-150 ease-in-out active:scale-90">
                     <nuxt-link to="/chats" @click="clearMessages">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -34,7 +34,7 @@
                 </div>
         </div>
         <div class="w-4/5 xl:w-1/3 px-4" v-if="!noDataFound">
-            <h2 class="text-md font-semibold pb-2 pt-4">Conversations</h2>     
+            <h2 class="text-md font-semibold pb-2 pt-4">Conversations</h2>
         </div>
         <div class=" w-4/5 xl:w-1/3 px-4 mt-4 bg-neutral-100/50 dark:bg-neutral-900 rounded-lg">
 
@@ -42,8 +42,8 @@
             <div v-for="(conversation, index) in conversations" :key="conversation.id" class="rounded-lg  overflow-y-visible">
                 <!-- <h2 class="text-xl font-semibold mb-2">Today</h2> -->
                 <NuxtLink
-                        :to="`/chats/${conversation.id}`" 
-                        
+                        :to="`/chats/${conversation.id}`"
+
                         >
                     <div
                         class="p-2 hover:text-sky-500 dark:hover:bg-inherit dark:hover:text-sky-600"
@@ -65,23 +65,23 @@
                                 <p v-show="!showTitleEditConfirmation || !isSelectedConversation(conversation.id)" class="text-md p-2 py-4" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 150px;"
                                 :class="{'typed-title': !typedTitle && isSelectedConversation(conversation.id)}">
                                     {{ conversation.title }}
-                            
+
                                 </p>
-                                
+
                                 <input
                                 v-show="showTitleEditConfirmation && isSelectedConversation(conversation.id)"
-                                type="text" class="text-md p-2 text-gray-600 rounded-md border border-sky-500 dark:bg-neutral-800 dark:text-inherit dark:border-neutral-700" 
+                                type="text" class="text-md p-2 text-gray-600 rounded-md border border-sky-500 dark:bg-neutral-800 dark:text-inherit dark:border-neutral-700"
                                 name="title" v-model="conversationTitle"
                                 @change="onTitleInputChange(conversation)">
                             </div>
-                            
+
                             <div
-                                class="flex items-center space-x-2"  
+                                class="flex items-center space-x-2"
                             >
                             <div class="relative inline-block" v-show="!showTitleEditConfirmation && !showDeleteConfirmation">
                                 <div>
                                     <button @click.prevent="open = !open" type="button" id="menu-button" class="rounded-full py-1 hover:bg-neutral-200/50 text-sm font-medium text-black dark:bg-inherit dark:hover:bg-neutral-800 dark:text-gray-400" aria-expanded="open" aria-haspopup="true">
-                                        
+
                                         <!-- Heroicon name: chevron-down -->
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
                                             <path fill-rule="evenodd" d="M10.5 6a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zm0 6a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zm0 6a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" clip-rule="evenodd" />
@@ -109,7 +109,7 @@
                                 </div>
                             </div>
 
-                                
+
                                 <button v-show="showDeleteConfirmation && isSelectedConversation(conversation.id)"
                                 @click.prevent="deleteConversation(conversation.id)">
                                     <ClientOnly>
@@ -136,22 +136,22 @@
                                 </button>
 
                             </div>
-                            
+
                         </div>
-                        
+
                     </div>
                     <hr class=" border-gray-200 dark:border-neutral-800" v-if="index < conversations.length - 1"/>
                 </NuxtLink>
-                
-                
+
+
             </div>
-            
- 
+
+
 
         </div>
         <div class="flex items-center justify-center pt-4 pb-48 lg:pb-16">
-                <button @click="nextPage()" 
-                class="px-2 py-1 border-2 border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 inline-flex items-center dark:bg-inherit dark:border-neutral-700 dark:hover:border-neutral-500" 
+                <button @click="nextPage()"
+                class="px-2 py-1 border-2 border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 inline-flex items-center dark:bg-inherit dark:border-neutral-700 dark:hover:border-neutral-500"
                 :class="{'hidden': currentPage === totalPages}"
                 v-if="!noDataFound && !isLoading">
                     <ClientOnly>
@@ -216,9 +216,9 @@ export default {
         },
         async nextPage() {
             if (this.currentPage < this.totalPages) {
-                this.currentPage++;    
+                this.currentPage++;
                 await this.updatePage(this.currentPage, true);
-    
+
             }
         },
         async updatePage(page, refresh = false) {
