@@ -1,11 +1,11 @@
 <template>
-    <div class="relative inline-block text-gray-500">
+    <div class="relative inline-block text-gray-500 dark:text-gray-400">
         <div class="group relative flex items-center justify-center">
             <button @click="open = !open" id="dropdownTopButton" data-dropdown-toggle="dropdownTop"
-                    class="flex items-center justify-between w-fit h-fit rounded-full bg-inherit px-4 py-2 hover:text-gray-700 hover:bg-neutral-200/50 dark:bg-neutral-800 dark:group-hover:text-inherit">
+                    class="flex items-center justify-between w-fit h-fit rounded-full bg-inherit px-4 py-2 hover:text-gray-700 hover:bg-neutral-200/50 dark:bg-neutral-800 dark:group-hover:text-inherit transition-transform duration-150 ease-in-out active:scale-90">
                 <div class="flex items-center">
                     <font-awesome-icon :icon="['fas', selectedMode.icon]" size="xs" class="mr-1"/>
-                    <p class=" text-xs">
+                    <p class="text-sm">
                         {{ selectedMode.name }}
                     </p>
                 </div>
@@ -17,7 +17,7 @@
                 <div class="bg-neutral-800 text-white rounded py-1 px-4 right-0">
                     <p class="text-xs">Choose the source focus</p>
                 </div>
-                <svg class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255" xml:space="preserve">
+                <svg class="absolute text-black dark:text-neutral-800 h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255" xml:space="preserve">
                     <polygon class="fill-current" points="0,0 127.5,127.5 255,0" />
                 </svg>
             </div>
@@ -25,16 +25,20 @@
 
 
         <!-- Dropdown menu -->
-        <div v-show="open" id="dropdownTop" class="z-10 absolute bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700" style="bottom: 100%; margin-bottom: .5rem;">
-            <ul class="dark:text-gray-200" aria-labelledby="dropdownTopButton">
+        <div v-show="open" id="dropdownTop" class="z-10 absolute bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-neutral-800" style="bottom: 100%; margin-bottom: .5rem;">
+            <ul class="dark:text-gray-500" aria-labelledby="dropdownTopButton">
                 <li v-for="mode in focus_modes" :key="mode.id" @click.prevent="selectMode(mode.id)">
-                    <a href="#" class="px-4 py-2 hover:bg-neutral-200/50 dark:hover:bg-gray-600 dark:hover:text-white flex items-center">
+                    <a href="#" class="px-4 py-2 group rounded-lg hover:bg-neutral-200/50 dark:hover:bg-neutral-700 flex items-center">
                         <div>
-                            <div class="flex items-center text-gray-700 text-xs">
-                                <font-awesome-icon :icon="['fas', mode.icon]" class="icon-class mr-2"/>
-                                <p class="font-semibold">{{ mode.name }}</p>
+                            <div class="flex items-center pb-1 text-gray-700 dark:text-gray-400 text-xs">
+                                <font-awesome-icon :icon="['fas', mode.icon]" class="icon-class mr-1"
+                                :class="mode.selected ? 'text-sky-600' : ''"
+                                />
+                                <p class="font-semibold"
+                                :class="mode.selected ? 'text-sky-600' : ''"
+                                >{{ mode.name }}</p>
                             </div>
-                            <p class="text-xs text-gray-500">{{ mode.description }}</p>
+                            <p class="text-xs text-gray-500 dark:text-inherit dark:group-hover:text-gray-400">{{ mode.description }}</p>
                         </div>
                     </a>
                 </li>

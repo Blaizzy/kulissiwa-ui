@@ -26,8 +26,7 @@
 
 
         <div class="sticky top-0 z-10 flex justify-between items-center py-4 h-16 border-b border-gray-200 dark:border-neutral-800 dark:bg-neutral-950">
-            <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 hover:bg-neutral-100 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600"
-
+            <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 hover:bg-neutral-100 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600 transition-transform duration-150 ease-in-out active:scale-90"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -204,7 +203,7 @@
                         <focus-mode class="w-fit" @mode="handleFocusModeChange"></focus-mode>
                         <button class="py-2 px-4 mr-1 rounded-lg inline-flex items-center " @click.prevent="queryModel" v-if="!loading_ai_response"
                         :disabled="isMessageEmpty"
-                        :class="isMessageEmpty ?'hover:text-gray-500 text-gray-500 bg-neutral-200/50' : 'bg-sky-500 hover:bg-sky-500 text-white dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-gray-200'"
+                        :class="isMessageEmpty ?'hover:text-gray-500 text-gray-500 bg-neutral-200/50 dark:bg-neutral-800 dark:text-inherit' : 'bg-sky-500 hover:bg-sky-500 text-white dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-gray-200'"
                         >
                             <ClientOnly>
                                 <font-awesome-icon :icon="['fas', 'fa-paper-plane']" size="2xs"/>
@@ -273,11 +272,20 @@ export default {
             });
         };
 
+        const addDarkModeClassesToLinks = (html) => {
+            // Use a regular expression to find all <a> tags and add the Tailwind dark mode classes
+            return html.replace(/<a href="([^"]+)">([^<]+)<\/a>/g, (match, href, text) => {
+                return `<a href="${href}" class="text-sky-600 dark:text-sky-500">${text}</a>`;
+            });
+        };
+
         renderer.paragraph = (text) => {
             // First, replace the indices with styled spans
             const styledText = replaceIndexWithStyle(text);
+             // Add dark mode classes to links
+            const styledTextWithLinks = addDarkModeClassesToLinks(styledText);
             // Then call the original paragraph renderer
-            return originalParagraph(styledText);
+            return originalParagraph(styledTextWithLinks);
         };
 
         // Store the original list item renderer
