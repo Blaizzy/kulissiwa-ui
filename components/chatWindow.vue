@@ -272,6 +272,11 @@ export default {
             });
         };
 
+        const styleHeadersForDarkMode = (html) => {
+            return html.replace(/<(h[1-6])>(.*?)<\/\1>/g, (match, headerTag, innerText) => {
+                return `<${headerTag} class="dark:text-gray-400">${innerText}</${headerTag}>`;
+            });
+        };
         const addDarkModeClassesToLinks = (html) => {
             // Use a regular expression to find all <a> tags and add the Tailwind dark mode classes
             return html.replace(/<a href="([^"]+)">([^<]+)<\/a>/g, (match, href, text) => {
@@ -284,8 +289,10 @@ export default {
             const styledText = replaceIndexWithStyle(text);
              // Add dark mode classes to links
             const styledTextWithLinks = addDarkModeClassesToLinks(styledText);
+            // Style headers for dark mode
+            const styledTextWithHeaders = styleHeadersForDarkMode(styledTextWithLinks);
             // Then call the original paragraph renderer
-            return originalParagraph(styledTextWithLinks);
+            return originalParagraph(styledTextWithHeaders);
         };
 
         // Store the original list item renderer
