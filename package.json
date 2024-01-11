@@ -38,6 +38,7 @@
     "globalthis": "^1.0.3",
     "langchain": "^0.0.198",
     "marked": "^8.0.0",
+    "mixpanel-browser": "^2.48.1",
     "pinia": "^2.0.36",
     "prismjs": "^1.29.0",
     "stripe": "^14.7.0",

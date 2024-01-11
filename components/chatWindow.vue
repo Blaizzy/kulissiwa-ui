@@ -26,7 +26,8 @@
 
 
         <div class="sticky top-0 z-10 flex justify-between items-center py-4 h-16 border-b border-gray-200 dark:border-neutral-800 dark:bg-neutral-950">
-            <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 hover:bg-neutral-100 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600 transition-transform duration-150 ease-in-out active:scale-90"
+            <NuxtLink to="/chats/list" class="flex p-2 rounded-full border-2 hover:bg-neutral-100 dark:border-neutral-800 mx-4 dark:hover:bg-neutral-800 dark:hover:border-neutral-600"
+
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -275,9 +276,11 @@ export default {
         const addDarkModeClassesToLinks = (html) => {
             // Use a regular expression to find all <a> tags and add the Tailwind dark mode classes
             return html.replace(/<a href="([^"]+)">([^<]+)<\/a>/g, (match, href, text) => {
-                return `<a href="${href}" class="text-sky-600 dark:text-sky-500">${text}</a>`;
+                return `<a href="${href}" class="text-blue-600 dark:text-blue-300">${text}</a>`;
             });
         };
+
+
 
         renderer.paragraph = (text) => {
             // First, replace the indices with styled spans
@@ -295,6 +298,12 @@ export default {
         renderer.listitem = (text) => {
             return originalListItem(replaceIndexWithStyle(text));
         };
+
+
+        renderer.heading = (text, level) => {
+            return `<h${level} class="dark:text-gray-400">${text}</h${level}>`;
+        };
+        
         // Ensure to set the renderer for marked
         marked.setOptions({ renderer });
 
