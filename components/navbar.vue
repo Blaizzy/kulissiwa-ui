@@ -97,7 +97,7 @@
 
             <hr class="self-end w-full h-px my-2 border-gray-300 dark:border-neutral-700">
 
-            <NuxtLink to="/settings/account">
+            <nuxt-link to="/settings/account">
                 <div class="flex items-start rounded-full justify-center hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                     <div class="flex items-center py-1">
                         <div class="flex items-center">
@@ -118,7 +118,7 @@
                         </div>
                     </div>
                 </div>
-            </NuxtLink>
+            </nuxt-link>
         </div>
     </div>
 </template>
@@ -266,6 +266,13 @@ export default {
             }
         })
 
+    },
+    async created() {
+        const { refreshConversations } = useConversations();
+        watch(refreshConversations, () => {
+            const supabase = useSupabaseClient()
+            this.getConversations(supabase,true);
+        });
     },
     methods: {
         isMobileDevice() {

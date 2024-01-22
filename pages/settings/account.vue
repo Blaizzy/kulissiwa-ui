@@ -63,11 +63,11 @@
             </div>
 
         </div>
-        <div class="mt-4 flex justify-end w-4/5 xl:w-1/3 px-4 pb-64 lg:pb-16">
+        <div class="mt-4 flex justify-end w-4/5 xl:w-1/3 px-4 pb-64 lg:pb-16 font-light">
 
-            <button class="flex px-4 py-2 rounded-full bg-neutral-100/50 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:bg-neutral-900 dark:hover:text-gray-300" @click="signOut">
+            <button class="flex px-4 py-2 rounded-full bg-neutral-200/50 hover:bg-neutral-200 dark:hover:bg-neutral-800 dark:bg-neutral-900 dark:hover:text-gray-300" @click="signOut">
 
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M19.8 12H9"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M19.8 12H9"/></svg>
                 <span id="logOut" class="pl-1.5">Logout</span>
 
             </button>
