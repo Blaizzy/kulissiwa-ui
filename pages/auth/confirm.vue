@@ -12,8 +12,8 @@ export default {
     setup(){
         watchEffect(async () => {
             const user = useSupabaseUser()
-            const { identifyUser } = useMixpanel()
             if (user.value) {
+                const { identifyUser } = useMixpanel()
                 identifyUser(`${user.value.email}`)
                 navigateTo('/documents')
             }
