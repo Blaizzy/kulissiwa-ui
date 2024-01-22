@@ -121,10 +121,13 @@
     },
     data() {
       const store = useAuthStore();
+      const { trackEvent, identifyUser } = useMixpanel();
       return {
           prices: [],
           store: store,
           isLoading: false,
+          trackEvent: trackEvent,
+          identifyUser: identifyUser,
       }
     },
     async mounted() {
@@ -145,12 +148,21 @@
           console.error("Error fetching prices:", error);
       }
       this.isLoading = false;
-    },methods: {
-        closeModal() {
-            this.$emit("close-modal");
-        },
-        async handleSubmit(event) {
+    },
+    methods: {
+      closeModal() {
+        this.$emit("close-modal");
+      },
+
+      async handleSubmit(event) {
         const priceId = event.target.price_id.value;
+
+        // (Mixpanel) Identify user by email and track event
+        this.trackEvent('Created Checkout Session', {
+            'price_id': priceId,
+            'price': this.prices.find(price => price.id === priceId).unit_amount_decimal,
+            'interval': this.prices.find(price => price.id === priceId).recurring.interval,
+        });
 
         try {
           const response = await fetch('/api/stripe/create-checkout-session', {

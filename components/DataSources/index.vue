@@ -3,7 +3,7 @@
       class="fixed inset-0 flex items-center justify-center z-50"
       :class="{ 'opacity-0 pointer-events-none': !isOpen }"
     >
-  
+
 
       <div class="absolute inset-0 bg-black bg-opacity-50" :class="{ 'opacity-0': !isOpen, 'opacity-100': isOpen }"></div>
       <div
@@ -20,10 +20,10 @@
         </button>
         <h2 class="text-xl font-semibold mb-4 dark:text-gray-200">New Data Source</h2>
         <div class="text-base">
-        
+
           <label for="data-type" class="block mb-2">Select data type:</label>
           <select id="data-type" class="block w-full border border-gray-300 rounded-lg p-1 py-2 mb-2 dark:bg-neutral-800 dark:text-gray-400 dark:border-none" v-model="selectedDataType" @change="resetFiles">
-            <option 
+            <option
               v-for="dataType in dataTypes"
               :key="dataType.value"
               :value="dataType.value"
@@ -31,7 +31,7 @@
             >
               {{ dataType.label }}
             </option>
-            
+
           </select>
           <label for="data-type" class="block mb-2" v-show="selectedDataType=='Text' || selectedDataType=='URL'">Name:</label>
           <input
@@ -45,11 +45,11 @@
         <div>
           <form @submit.prevent>
             <div v-if="selectedDataType === 'PDF' || selectedDataType === 'Docx'" class="transition-opacity duration-300 delay-300 mt-3" :class="{ 'opacity-0': !selectedDataType, 'opacity-100': selectedDataType === 'PDF' || selectedDataType === 'Docx' }">
-              <div 
+              <div
                 class="file-dropzone border-2 border-dashed border-gray-300 p-5 mb-4 text-center flex flex-col justify-center items-center transition-colors duration-300 rounded dark:border-neutral-700"
-                @dragenter.prevent.stop="dragEnter" 
-                @dragover.prevent.stop="dragOver" 
-                @dragleave.prevent.stop="dragLeave" 
+                @dragenter.prevent.stop="dragEnter"
+                @dragover.prevent.stop="dragOver"
+                @dragleave.prevent.stop="dragLeave"
                 @drop.prevent.stop="dropFile"
                 :class="{ 'bg-gray-100': isDragging }"
               >
@@ -89,12 +89,12 @@
                   <div class="flex items-center justify-between mb-2">
                     <!-- File icon based on type -->
                     <img :src="fileIcons[file.file_type.toLowerCase()]" alt="File Icon" class="inline-block mr-2 h-10">
-                    
+
                     <!-- File name -->
                     <div class="flex flex-col flex-grow mr-4 min-w-0">
                       <div class="flex justify-between items-center pb-1">
                         <p class="truncate overflow-hidden text-sm">{{ file.display_name }}</p>
-                        
+
                         <!-- Remove file icon -->
                         <button
                           @click="removeFile(index)"
@@ -139,15 +139,15 @@
                 <input class="mr-2" type="checkbox" id="crawl" name="crawl" value="crawl" v-model="crawl">
                 <label for="crawl" class="text-md">Crawl</label><br>
                 <div class="mt-2 text-sm" v-show="onCrawl">
-                  <div class=" flex items-center bg-yellow-50 p-1 px-2 rounded-md border border-yellow-300 dark:bg-inherit dark:border-yellow-500"> 
+                  <div class=" flex items-center bg-yellow-50 p-1 px-2 rounded-md border border-yellow-300 dark:bg-inherit dark:border-yellow-500">
                     <i class="fas fa-info-circle text-yellow-500 mr-2 dark:text-yellow-500"></i>
                     <p class="text-gray-700 dark:text-gray-400">URL crawling is limited to 300 pages per crawl. Reach out to us if you need more.</p>
                   </div>
-                 
-                  
+
+
                 </div>
                 <div v-for="(file, index) in uploadedFiles" :key="index">
-          
+
                   <p v-if="loading" class="flex text-gray-700 text-md justify-end">{{ file.loadingProgress }}%</p>
                   <div v-if="loading" class="mt-2">
                     <div class="h-1 bg-white rounded-full">
@@ -179,7 +179,7 @@
               <ClientOnly>
                 <i class="fas fa-exclamation-circle"></i>
               </ClientOnly>
-               {{ error }} 
+               {{ error }}
               </p>
             </div>
             <div class="flex justify-end mt-4 items-center text-md">
@@ -190,7 +190,7 @@
               >
                 Cancel
               </button>
-              <p v-if="loading" class="text-gray-500 mr-2 inline-block  prose break-words animate-pulse"> This will take a few seconds, please wait... </p>  
+              <p v-if="loading" class="text-gray-500 mr-2 inline-block  prose break-words animate-pulse"> This will take a few seconds, please wait... </p>
               <button
                 @click="uploadData"
                 class=" text-white py-1 px-3 rounded-lg m-1"
@@ -201,7 +201,7 @@
                 Upload
 
               </button>
-              
+
               <button
                 class="bg-blue-600 text-white py-1 px-3 rounded-lg m-1"
                 disabled v-else
@@ -236,6 +236,7 @@ export default {
     const store = useAuthStore()
     const monthly_usage_store = useMonthlyUsageStore()
     const config = useRuntimeConfig()
+    const { trackEvent } = useMixpanel()
     return {
       store: store,
       monthly_usage_store: monthly_usage_store,
@@ -266,6 +267,7 @@ export default {
       },
       isDragging: false,
       config: config,
+      trackEvent: trackEvent,
     };
   },
   methods: {
@@ -327,23 +329,23 @@ export default {
       this.file_type = "";
       this.loading= false;
       this.crawl = false;
-      // clear all inputs 
+      // clear all inputs
       const inputs = document.querySelectorAll('input[type="file"]')
       inputs.forEach(input => input.value = '')
     },
-    async embedURLWorker(file, data_source, user_session, data_type, crawl, excluded_urls){  
+    async embedURLWorker(file, data_source, user_session, data_type, crawl, excluded_urls){
       return new Promise((resolve, reject) => {
         const worker = new EmbedURLWorker();
         worker.postMessage({
           data_api: this.config.public.dataAPI,
-          data: file.data,  
-          data_source: data_source, 
+          data: file.data,
+          data_source: data_source,
           namespace: user_session.user.id,
-          data_type: data_type, 
+          data_type: data_type,
           crawl: crawl,
           excluded_urls: excluded_urls,
         });
-        
+
 
         worker.addEventListener('message', (event) => {
           if (event.data.error) {
@@ -370,13 +372,13 @@ export default {
         worker.postMessage({
           action: action,
           data_api: this.config.public.dataAPI,
-          data: file.data,  
-          data_source: data_source, 
+          data: file.data,
+          data_source: data_source,
           namespace: user_session.user.id,
-          data_type: file_type, 
+          data_type: file_type,
           is_file: is_file,
         });
-        
+
 
         worker.addEventListener('message', (event) => {
           if (event.data.error) {
@@ -402,7 +404,7 @@ export default {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     },
     async handleFileUpload(event) {
-    
+
       this.errors = []; // Reset the error message
 
       // Get all the files from the event
@@ -417,7 +419,7 @@ export default {
       // Check if the files combined are larger than 50 MB
       let totalFileSizeInMB = 0;
 
-    
+
       for (let file of files) {
         // Check file size
         const fileSizeInMB = file.size / (1024 * 1024);  // Convert bytes to MB
@@ -440,7 +442,7 @@ export default {
           fileType = file.type.split("/")[1];
         }
 
-        if (this.selectedDataType.toLowerCase() !== fileType.toLowerCase()) {       
+        if (this.selectedDataType.toLowerCase() !== fileType.toLowerCase()) {
           this.errors.push(`The file "${file.name}" is not a ${this.selectedDataType} file and was not added.`);
           continue;  // Skip this file
         }
@@ -454,9 +456,9 @@ export default {
           loadingProgress: 0,
         });
       }
-      
+
     },
-    
+
     async uploadData() {
       const supabase = useSupabaseClient();
       const user_session = this.store.user_session
@@ -544,9 +546,26 @@ export default {
         }
       }
 
+      var document = {
+        'type': this.selectedDataType,
+        'count': this.uploadedFiles.length,
+      }
+
+      // (Mixpanel)
+      if (this.selectedDataType == "URL") {
+        this.trackEvent('Document Uploaded', {
+          ...document,
+          'crawl': this.crawl ? 'Yes' : 'No',
+        })
+      } else {
+        this.trackEvent('Document Uploaded', {
+          ...document,
+          'size (MB)': this.uploadedFiles.reduce((acc, file) => acc + file.data.size / (1024 * 1024), 0),
+        })
+      }
       this.$emit("refreshData")
       this.loading = false;
-      this.uploadedFiles = []; 
+      this.uploadedFiles = [];
       this.resetModal();
     },
     async listFiles(file_name = null) {
@@ -590,7 +609,7 @@ export default {
       if (this.selectedDataType=="Text" || this.selectedDataType=="URL") {
         return this.name.length == 0 || this.data.length == 0
       } else if (this.selectedDataType=="PDF" || this.selectedDataType=="Docx" || this.selectedDataType=="CSV") {
-        
+
         return this.uploadedFiles.length == 0
       }
     },

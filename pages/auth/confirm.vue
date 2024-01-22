@@ -10,9 +10,11 @@ import LoadingIndicator from '~/components/LoadingIndicator.vue';
 
 export default {
     setup(){
-        watchEffect(() => {
+        watchEffect(async () => {
             const user = useSupabaseUser()
+            const { identifyUser } = useMixpanel()
             if (user.value) {
+                identifyUser(`${user.value.email}`)
                 navigateTo('/documents')
             }
         })
