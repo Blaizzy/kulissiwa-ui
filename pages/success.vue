@@ -24,13 +24,15 @@ import confetti from 'canvas-confetti';
 
 export default {
     data(){
-        const { trackEvent } = useMixpanel()
+        const { trackEvent, trackPageView } = useMixpanel()
         return {
             trackEvent: trackEvent,
+            trackPageView: trackPageView
         }
     },
     mounted() {
         this.launchConfetti();
+        this.trackPageView();
         this.trackEvent('Subscription Success');
     },
     methods: {

@@ -105,11 +105,16 @@ export default {
     },
     data() {
         const store = useAuthStore();
+        const { trackPageView } = useMixpanel()
         return {
             open: false,
             selectedTheme: null,
             store: store,
+            trackPageView: trackPageView
         }
+    },
+    mounted() {
+        this.trackPageView();
     },
     computed: {
         isFreeTier() {

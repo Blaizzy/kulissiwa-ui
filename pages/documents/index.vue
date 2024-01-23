@@ -336,6 +336,7 @@ export default {
         const store = useAuthStore()
         const monthly_usage = useMonthlyUsageStore()
         const tier_limits = useTierLimits();
+        const { trackPageView } = useMixpanel()
         return {
             isGroup: false,
             dataSources: [],
@@ -364,9 +365,11 @@ export default {
             itemsPerPage: 10,
             totalItems: 0,
             isFetchingDataSource: false,
+            trackPageView: trackPageView
          };
     },
     async mounted(){
+        this.trackPageView();
         // Load data sources from database and append to dataSources array
         watchEffect(() => {
             if (this.dataSources.length === 0 !== this.isLoading && this.dataSources_copy.length === 0) {

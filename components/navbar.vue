@@ -137,7 +137,7 @@ export default {
 
     data(){
         // Mixpanel
-        const { trackEvent, setUserProfile, resetUser, identifyUser } = useMixpanel();
+        const { trackEvent, setUserProfile, resetUser, identifyUser } = useMixpanel()
         const store = useAuthStore()
         const monthly_usage = useMonthlyUsageStore()
         const tier_limits = useTierLimits()

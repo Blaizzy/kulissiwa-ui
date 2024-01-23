@@ -14,7 +14,7 @@ export default {
             const user = useSupabaseUser()
             if (user.value) {
                 const { identifyUser } = useMixpanel()
-                identifyUser(`${user.value.email}`)
+                await identifyUser(`${user.value.email}`)
                 navigateTo('/documents')
             }
         })

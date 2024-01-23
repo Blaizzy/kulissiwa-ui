@@ -9,8 +9,8 @@ export default function useMixpanel() {
     // Initialize Mixpanel only if it hasn't been initialized and the token is available
     if (mixpanelToken) {
         mixpanel.init(mixpanelToken, {
-            debug: true,
-            track_pageview: true,
+            // debug: true,
+            track_pageview: false,
             persistence: 'localStorage',
             ignore_dnt: true
         });

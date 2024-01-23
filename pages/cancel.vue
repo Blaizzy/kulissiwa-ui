@@ -24,17 +24,19 @@
 <script>
 export default {
     data(){
-        const { trackEvent } = useMixpanel()
+        const { trackEvent, trackPageView } = useMixpanel()
         return {
             trackEvent: trackEvent,
+            trackPageView: trackPageView
         }
     },
     mounted() {
+        this.trackPageView();
         this.trackEvent('Cancelled Subscription');
     },
     methods:{
         async cancelSubscription() {
-            navigateTo('/billing')
+            navigateTo('/settings/account')
         },
         async continueSubscription() {
             navigateTo('/checkout')
