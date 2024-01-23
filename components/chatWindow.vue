@@ -303,7 +303,7 @@ export default {
         renderer.heading = (text, level) => {
             return `<h${level} class="dark:text-gray-400">${text}</h${level}>`;
         };
-        
+
         // Ensure to set the renderer for marked
         marked.setOptions({ renderer });
 
@@ -384,6 +384,7 @@ export default {
         const monthly_usage = useMonthlyUsageStore();
         const config = useRuntimeConfig()
         const preferences = useUserPreferences();
+        const { trackEvent } = useMixpanel();
         return {
             showModal: false,
             conversationId: '',
@@ -420,6 +421,7 @@ export default {
             LLMs: [],
             config: config,
             focus_mode: '',
+            trackEvent: trackEvent
         };
     },
     async created() {
@@ -774,7 +776,6 @@ export default {
         },
         async queryModel() {
             // Prevent sending if the message is empty or only whitespace
-
             const supabase = this.initSupabase()
             const user_session = await this.getSession(supabase)
 
@@ -1010,6 +1011,15 @@ export default {
                     }
                 ]
             )
+            
+            this.trackEvent('Chat',{
+                'conversation_id': this.conversationId,
+                'model_name': this.LLM.model_name,
+                'focus_mode': this.focus_mode.name,
+                'data_sources': this.dataSources,
+                'active_data_sources': this.monthly_usage.activeDataSources ? Array.from(this.monthly_usage.activeDataSources).length : 0,
+                'query': this.user_messages[this.user_messages.length - 1]["content"],
+            })
 
         },
         getSourceName(id){

@@ -8,14 +8,14 @@
         <!-- Inner Container -->
         <div class="flex flex-col flex-grow mb-4 xl:mb-0">
             <nav class="text-base flex-grow">
-            
+
                 <div class="flex items-center py-2 font-semibold mb-4 text-center justify-between">
                     <img src="~~/assets/logos/kulissiwa.svg" width="32" height="32" alt="Kulissiwa Logo">
                     <button v-show="!collapsed" @click="collapse" class="block px-2 rounded-full hover:bg-sky-50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                         <svg class="icon icon-tabler icon-tabler-layout-sidebar-left-collapse" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><rect height="16" rx="2" width="16" x="4" y="4"/><path d="M9 4v16"/><path d="M15 10l-2 2l2 2"/></svg>
                     </button>
                 </div>
-                
+
                 <button v-show="collapsed" @click="collapse" class="block py-2 px-2 mb-2 font-bold rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                     <Bars3Icon class="w-4 h-4"/>
                 </button>
@@ -36,9 +36,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
                             </svg>
                         </div>
-                        
-                        <span v-show="!collapsed" class="pl-1.5">Documents</span>    
-                        
+
+                        <span v-show="!collapsed" class="pl-1.5">Documents</span>
+
                     </ClientOnly>
 
                 </NuxtLink>
@@ -60,23 +60,23 @@
                             </svg>
                         </div>
                         <span v-show="!collapsed" class="pl-2">Chats</span>
-                    
+
                 </NuxtLink>
                 <div class="flex flex-col px-4 mb-2 ">
                     <ul v-show="!collapsed" class="flex list-inside" v-for="conversation in conversations" :key="conversation.id">
                         <NuxtLink
-                            :to="`/chats/${conversation.id}`" 
-                            
+                            :to="`/chats/${conversation.id}`"
+
                             >
                         <li class="px-4 py-2 text-sm w-full border-l-2 text-gray-500 border-gray-100 hover:border-gray-300 dark:border-neutral-800 dark:hover:border-neutral-600 dark:hover:text-gray-300">
-                        {{ conversation.title }} 
+                        {{ conversation.title }}
                         </li>
                         </NuxtLink>
                     </ul>
                 </div>
-                
+
             </nav>
-                
+
             <div class="flex flex-col mt-auto" v-show="showUpgradeButton">
                 <span id="upgrade" v-show="!collapsed" class="font-medium  dark:text-gray-300">Try Pro</span>
                 <p class="font-light text-md text-gray-500" v-show="!collapsed">
@@ -97,8 +97,8 @@
 
             <hr class="self-end w-full h-px my-2 border-gray-300 dark:border-neutral-700">
 
-            <div class="flex items-start rounded-full justify-center hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
-                <NuxtLink to="/settings/account">
+            <nuxt-link to="/settings/account">
+                <div class="flex items-start rounded-full justify-center hover:bg-neutral-200/50 dark:hover:bg-neutral-800 dark:hover:text-gray-300">
                     <div class="flex items-center py-1">
                         <div class="flex items-center">
                             <img class="rounded-full border-2 border-white"
@@ -117,8 +117,8 @@
 
                         </div>
                     </div>
-                </NuxtLink>
-            </div>
+                </div>
+            </nuxt-link>
         </div>
     </div>
 </template>
@@ -136,10 +136,13 @@ import { useUserPreferences } from '@/stores/user-preferences'
 export default {
 
     data(){
+        // Mixpanel
+        const { trackEvent, setUserProfile, resetUser, identifyUser } = useMixpanel()
         const store = useAuthStore()
         const monthly_usage = useMonthlyUsageStore()
         const tier_limits = useTierLimits()
         const preferences = useUserPreferences()
+        const config = useRuntimeConfig()
         return {
             open: false,
             conversations: [],
@@ -155,6 +158,11 @@ export default {
             tier_limits: tier_limits,
             preferences: preferences,
             showUpgradeButton: false,
+            config: config,
+            trackEvent: trackEvent,
+            setUserProfile: setUserProfile,
+            resetUser: resetUser,
+            identifyUser: identifyUser,
         }
     },
     async mounted() {
@@ -170,6 +178,20 @@ export default {
                 } else {
                     this.email = this.store.user_session.user.email
                 }
+                // (Mixpanel) Signed Up Event
+                if(session.user.last_sign_in_at == null) {
+                    this.trackEvent('Signed Up')
+                }
+                // (Mixpanel) Identify User
+                this.identifyUser(`${this.store.user_session.user.email}`)
+
+                // (Mixpanel) Set User Profile
+                this.setUserProfile({
+                    '$avatar': `${this.store.user_session.user.user_metadata.avatar_url}`,
+                    '$email': `${this.store.user_session.user.email}`,
+                    '$name': `${this.store.user_session.user.user_metadata.full_name}`,
+                }, true)
+
 
             } else if (event === 'SIGNED_OUT') {
                 const { data, error } = supabase
@@ -188,12 +210,15 @@ export default {
                     console.log(error)
                 }
 
+                this.trackEvent('Signed Out') // (Mixpanel) User Signed Out Event
+                this.resetUser() // (Mixpanel) Reset User Profile
                 this.store.signOut()
                 this.monthly_usage.reset()
                 this.tier_limits.reset()
                 this.preferences.reset()
                 this.resetProfile()
                 this.$router.push('/login');
+
             }
         });
 
@@ -241,6 +266,13 @@ export default {
             }
         })
 
+    },
+    async created() {
+        const { refreshConversations } = useConversations();
+        watch(refreshConversations, () => {
+            const supabase = useSupabaseClient()
+            this.getConversations(supabase,true);
+        });
     },
     methods: {
         isMobileDevice() {
@@ -344,6 +376,12 @@ export default {
                         } else {
                             this.showUpgradeButton = true
                         }
+                        this.setUserProfile({
+                            'Plan': data[0].tier,
+                            'Status': data[0].status,
+                            'STRIPE_CUSTOMER_ID': data[0].stripe_customer_id,
+                            'Date': (new Date()).toISOString(),
+                        })
                     }
                 }
             }

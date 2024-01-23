@@ -5,7 +5,18 @@ definePageMeta({
 </script>
 
 <template>
-
-        <chatWindow/>
-
+  <chatWindow/>
 </template>
+<script>
+export default {
+  data(){
+    const { trackPageView } = useMixpanel()
+    return {
+      trackPageView: trackPageView
+    }
+  },
+  mounted() {
+      this.trackPageView();
+  },
+}
+</script>

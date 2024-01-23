@@ -55,6 +55,7 @@ export default defineNuxtConfig({
       baseUrl: process.env.BASE_URL || 'http://localhost:3000',
       chatAPI: process.env.CHAT_API || 'http://localhost:8787',
       dataAPI: process.env.DATA_API || 'https://blaizzy--kulissiwa-data-data-dev.modal.run',
+      mixpanel: process.env.MIXPANEL_PROJECT_TOKEN 
     },
   },
   supabase:{

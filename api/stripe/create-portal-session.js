@@ -21,7 +21,7 @@ export default async function createCheckoutSession(request) {
         try {
             const portalSession = await stripe.billingPortal.sessions.create({
                 customer: customer_id,
-                return_url: `${BASE_URL}/billing`,
+                return_url: `${BASE_URL}/settings/account`,
             });
 
             return new Response(JSON.stringify({ url: portalSession.url }), {

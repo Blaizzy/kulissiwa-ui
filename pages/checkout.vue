@@ -1,14 +1,14 @@
 <template>
 
   <div class="flex flex-col text-black dark:text-gray-200  dark:bg-neutral-950">
-     
+
     <div class="flex justify-center pb-4 px-4 mx-4 pt-4 "> <!-- Added relative here -->
       <div class="flex ">
         <div class="flex text-3xl w-4/5 xl:w-1/3">
           <h1 class="font-regular mr-1">Kulissiwa</h1>
           <h3 class="animated-gradient-text font-bold">Pro</h3>
         </div>
-    
+
       </div>
     </div>
     <hr class="w-full border-gray-200 dark:border-neutral-800" />
@@ -20,7 +20,7 @@
         </p>
       </div>
       <div class="md:flex items-center justify-center mx-2 xl:mx-4  rounded-lg pb-4">
-        
+
         <div class="md:w-1/2 parent-card p-2 px-4 dark:bg-inherit">
           <div class="flex items-center justify-between py-2 px-2">
             <div class="flex items-center">
@@ -30,10 +30,10 @@
 
               <h3 class="text-lg text-inherit"> Upload Documents </h3>
             </div>
-            
+
           </div>
           <p class="font-light text-gray-500 dark:text-gray-400">Ask anything to your PDFs, Docx, text, and get answers in seconds.</p>
-        </div> 
+        </div>
         <div class="md:w-1/2 parent-card bg-white p-2 px-4 dark:bg-inherit">
           <div class="flex items-center justify-between py-2 px-2">
             <div class="flex items-center">
@@ -42,40 +42,40 @@
               </svg>
               <h3 class="text-lg text-inherit"> Powerful AI Models </h3>
             </div>
-            
+
           </div>
           <p class="font-light text-gray-500 dark:text-gray-400">Access GPT-4, Mixtral and Gemini Pro for more accurate answers.</p>
-        </div> 
+        </div>
       </div>
-        
+
         <div class="flex flex-col md:flex-row items-center justify-center md:space-x-4 mx-4 rounded-lg  pb-4">
           <div v-show="isLoading" class="flex space-x-4  px-2 py-10 ">
             <LoadingIndicatorModal />
           </div>
-          
+
           <div class="w-full mb-2 md:w-1/2 parent-card space-x-2 bg-white p-2 mx-4 rounded-lg border-2 border-gray-200 dark:bg-neutral-800 dark:border-none"
             v-for="price in prices" :key="price.id">
-    
+
               <div class="flex items-center justify-between py-2 px-2"
               >
-                <h3 
+                <h3
                 class="text-sky-500 text-lg" v-if="price.recurring.interval == 'month'"
                 > Monthly </h3>
                 <h3 class="text-sky-500 text-lg" v-else
                 > Yearly </h3>
                 <p class="text-sm font-regular text-gray-300 bg-neutral-700 px-2 py-1 rounded-full" v-if="price.recurring.interval != 'month'"> Save $40 a year </p>
               </div>
-            
+
               <div class="flex items-end">
-                <h5 class="text-2xl font mr-1 dark:text-gray-200"> ${{ price.unit_amount_decimal / 100 }}</h5>  
+                <h5 class="text-2xl font mr-1 dark:text-gray-200"> ${{ price.unit_amount_decimal / 100 }}</h5>
               </div>
 
               <p class="text-md font-light text-gray-500 dark:text-gray-400"
               :class="{ 'mb-10': price.recurring.interval == 'month', 'mb-4': price.recurring.interval != 'month'}"
               > billed per {{ price.recurring.interval }} </p>
-              
+
               <p class="text-md font-light text-sky-500" v-if="price.recurring.interval != 'month'"> <ClientOnly><i class="fas fa-check text-sky-600 pr-1"></i></ClientOnly> 14 day free trial </p>
-            
+
               <div class="flex">
                 <div class="flex-grow py-2 mr-1">
                   <form @submit.prevent="handleSubmit" method="POST">
@@ -85,14 +85,14 @@
                     </button>
                   </form>
                 </div>
-                
+
               </div>
-    
-          </div> 
+
+          </div>
         </div>
       </div>
   </div>
-  
+
 
 </template>
 
@@ -102,20 +102,23 @@ export default {
   name: 'Checkout',
   data() {
     const store = useAuthStore();
+    const { trackPageView } = useMixpanel()
     return {
         prices: [],
         store: store,
         isLoading: false,
+        trackPageView: trackPageView
     }
   },
   async mounted() {
+    this.trackPageView();
     this.isLoading = true;
     try {
         const response = await fetch('/api/stripe/get-prices');
         const data = await response.json();
         // sort prices by price
         data.data.sort((a, b) => a.unit_amount_decimal - b.unit_amount_decimal);
-        
+
         if (data) {
             this.prices = data.data.filter(price => price.product && price.product.active);
         } else {
@@ -135,10 +138,10 @@ export default {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: new URLSearchParams({ 
+            body: new URLSearchParams({
                 price_id: priceId,
                 user_id: this.store.user_session.user.id,
-                customer_email: this.store.user_session.user.email, 
+                customer_email: this.store.user_session.user.email,
             }),
         });
 
