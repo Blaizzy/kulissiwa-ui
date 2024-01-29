@@ -280,8 +280,6 @@ export default {
             });
         };
 
-
-
         renderer.paragraph = (text) => {
             // First, replace the indices with styled spans
             const styledText = replaceIndexWithStyle(text);
@@ -297,6 +295,11 @@ export default {
         // Extend the list item renderer
         renderer.listitem = (text) => {
             return originalListItem(replaceIndexWithStyle(text));
+        };
+
+        // And if you need to target inline code within paragraphs
+        renderer.codespan = function(code) {
+            return `<code class="dark:text-gray-400">${code}</code>`;
         };
 
 
@@ -977,7 +980,7 @@ export default {
                         }
                         this.ai_messages[index].content =
                             "No data sources active. Please select a data source to search from. \n\n" +
-                            `Click on the database icon on the bottom right corner of the chat window to select a data source or add a new one [here](/documents).`;
+                            `Visit the documents page or add a new one [here](/documents).`;
                     }
                 }
             } catch (err) {
@@ -1011,7 +1014,7 @@ export default {
                     }
                 ]
             )
-            
+
             this.trackEvent('Chat',{
                 'conversation_id': this.conversationId,
                 'model_name': this.LLM.model_name,
